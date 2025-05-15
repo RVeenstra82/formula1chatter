@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Race } from '../../api/client';
-import { format, parseISO } from 'date-fns';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining } from '../../utils/timeUtils';
 
 interface RaceCardProps {
-  race: Race;
+  race: any;
   isNext?: boolean;
 }
 
 const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  
-  const raceDate = parseISO(race.date);
   
   // Format date based on locale
   const formattedDate = formatDateLocalized(race.date, 'PP', language);

@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race, Driver } from '../api/client';
-import { format, parseISO } from 'date-fns';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining } from '../utils/timeUtils';
 

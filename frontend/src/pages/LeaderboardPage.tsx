@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { api } from '../api/client';
 import type { LeaderboardEntry } from '../api/client';
 import { mockLeaderboard } from '../mocks/mockLeaderboardData';
 

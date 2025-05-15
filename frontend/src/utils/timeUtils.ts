@@ -1,4 +1,4 @@
-import { format, formatRelative, formatDistance, parseISO, addMinutes } from 'date-fns';
+import { format, formatDistance, parseISO, addMinutes } from 'date-fns';
 import { nl, enUS } from 'date-fns/locale';
 import type { Language } from '../contexts/LanguageContext';
 
@@ -26,7 +26,7 @@ export const formatTimeLocalized = (
 ): string => {
   // Use a base date and add the time
   const baseDate = new Date('2000-01-01');
-  const [hours, minutes, seconds] = timeString.split(':').map(Number);
+  const [hours, minutes] = timeString.split(':').map(Number);
   const time = addMinutes(addMinutes(baseDate, hours * 60), minutes);
   
   return format(time, formatString, { 

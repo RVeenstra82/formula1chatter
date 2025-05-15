@@ -1,4 +1,4 @@
-import type { Race, Prediction, User, LeaderboardEntry, PredictionResult } from '../api/client';
+import type { Race, User, LeaderboardEntry, PredictionResult } from '../api/client';
 
 export const mockUsers: User[] = [
   {

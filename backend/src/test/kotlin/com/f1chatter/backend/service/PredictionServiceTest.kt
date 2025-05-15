@@ -57,7 +57,7 @@ class PredictionServiceTest {
             driverOfTheDayId = "leclerc"
         )
         
-        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com")
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
         val race = createSampleRace(raceId, 2023, 1)
         
         every { userRepository.findById(userId) } returns Optional.of(user)
@@ -86,7 +86,7 @@ class PredictionServiceTest {
         val raceId = "2023-1"
         val existingPrediction = Prediction(
             id = 1,
-            user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com"),
+            user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null),
             race = createSampleRace(raceId, 2023, 1),
             firstPlaceDriverId = "hamilton",
             secondPlaceDriverId = "verstappen",
@@ -129,7 +129,7 @@ class PredictionServiceTest {
         // Arrange
         val userId = 1L
         val raceId = "2023-1"
-        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com")
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
         val race = createSampleRace(raceId, 2023, 1)
         
         every { userRepository.findById(userId) } returns Optional.of(user)
@@ -172,7 +172,7 @@ class PredictionServiceTest {
         
         val prediction1 = Prediction(
             id = 1,
-            user = User(id = 1L, facebookId = "fb123", name = "User 1", email = "user1@example.com"),
+            user = User(id = 1L, facebookId = "fb123", name = "User 1", email = "user1@example.com", profilePictureUrl = null),
             race = race,
             firstPlaceDriverId = "verstappen", // +5 points
             secondPlaceDriverId = "hamilton",  // +3 points
@@ -183,7 +183,7 @@ class PredictionServiceTest {
         
         val prediction2 = Prediction(
             id = 2,
-            user = User(id = 2L, facebookId = "fb456", name = "User 2", email = "user2@example.com"),
+            user = User(id = 2L, facebookId = "fb456", name = "User 2", email = "user2@example.com", profilePictureUrl = null),
             race = race,
             firstPlaceDriverId = "hamilton",    // +0 points (incorrect)
             secondPlaceDriverId = "verstappen", // +0 points (incorrect)
@@ -194,6 +194,7 @@ class PredictionServiceTest {
         
         every { raceRepository.findById(raceId) } returns Optional.of(race)
         every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(prediction1, prediction2)
+        every { predictionRepository.save(any()) } answers { firstArg() }
         
         // Act
         predictionService.calculateScores(raceId)

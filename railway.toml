@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && ./gradlew build"
+buildCommand = "./gradlew build"
 
 [deploy]
-startCommand = "cd backend && java -jar build/libs/backend-0.0.1-SNAPSHOT.jar"
+startCommand = "java -jar app.jar"
 healthcheckPath = "/api/health"
 
 [env]

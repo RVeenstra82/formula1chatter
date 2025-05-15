@@ -22,7 +22,8 @@ class SecurityConfig {
                 auth
                     .requestMatchers("/api/auth/user").authenticated()
                     .requestMatchers("/api/predictions/user/**").authenticated()
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/**").permitAll()
+                    .requestMatchers("/**").permitAll()
             }
             .oauth2Login { oauth2 ->
                 oauth2

@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
               Data Deletion
             </Link>
             <a 
-              href="https://github.com/yourusername/formula1chatter" 
+              href="https://github.com/Rick-Ritense/formula1chatter" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hover:text-f1-red transition-colors"

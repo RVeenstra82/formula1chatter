@@ -4,6 +4,7 @@ WORKDIR /app
 COPY backend ./backend
 WORKDIR /app/backend
 RUN gradle build --no-daemon
+RUN ls -la build/libs/
 
 # ---- Frontend build ----
 FROM node:20 AS frontend-build
@@ -18,11 +19,15 @@ WORKDIR /app
 
 # Copy backend jar
 COPY --from=backend-build /app/backend/build/libs/*.jar /app/app.jar
+RUN ls -la /app/
 
-# Copy frontend build to a static folder (optioneel, als je via Spring wilt serveren)
+# Copy frontend build to a static folder
 COPY --from=frontend-build /app/frontend/dist /app/public
+RUN ls -la /app/public/
 
 ENV PORT=8090
 EXPOSE 8090
 
-CMD ["java", "-jar", "/app/app.jar"] 
+# Add debugging
+ENV JAVA_OPTS="-Dserver.port=8090 -Dlogging.level.root=DEBUG"
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"] 

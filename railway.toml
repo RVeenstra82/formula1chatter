@@ -3,8 +3,11 @@ builder = "nixpacks"
 buildCommand = "./gradlew build"
 
 [deploy]
-startCommand = "java -jar app.jar"
-healthcheckPath = "/api/health"
+startCommand = "java -Dserver.port=8090 -Dlogging.level.root=DEBUG -jar app.jar"
+healthcheckPath = "/api/api/health"
+healthcheckTimeout = 300
+healthcheckInterval = 30
 
 [env]
-PORT = "8090" 
+PORT = "8090"
+JAVA_OPTS = "-Dserver.port=8090 -Dlogging.level.root=DEBUG" 

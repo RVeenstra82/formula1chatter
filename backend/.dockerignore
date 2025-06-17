@@ -1,0 +1,18 @@
+# Ignore Gradle cache and build output
+.gradle
+build
+
+# Ignore IDE/project files
+*.iml
+.idea
+.vscode
+.DS_Store
+
+# Ignore test reports and logs
+*.log
+out
+test-results
+test-output
+
+# Ignore OS files
+Thumbs.db 

@@ -126,6 +126,8 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.selectRace': 'Select Race',
     'leaderboard.noCompletedRaces': 'No completed races available.',
     'leaderboard.raceNotCompleted': 'This race has not been completed yet.',
+    'leaderboard.loginRequired': 'Login Required',
+    'leaderboard.loginToView': 'You need to be logged in to view the leaderboard.',
     'leaderboard.change': 'Change',
     
     // Common

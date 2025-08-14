@@ -14,8 +14,6 @@ const LeaderboardPage: React.FC = () => {
   const { user, isLoading: isLoadingAuth } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('season');
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Fetch all races to get completed ones for the race menu
   const { data: allRaces = [] } = useQuery<Race[]>({
@@ -102,13 +100,7 @@ const LeaderboardPage: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
+
 
   const renderPodium = (data: (LeaderboardEntry | PredictionResult)[]) => {
     const podium = data.slice(0, 3);

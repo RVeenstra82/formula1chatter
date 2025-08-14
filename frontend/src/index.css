@@ -24,9 +24,25 @@ body {
   font-family: 'Titillium Web', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* Touch-friendly improvements */
+@media (max-width: 768px) {
+  /* Ensure minimum touch target size */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve touch feedback */
+  button:active, a:active, [role="button"]:active {
+    transform: scale(0.98);
+  }
+}
+
 @layer components {
   .btn {
     @apply px-4 py-2 rounded-md font-semibold transition-colors;
+    /* Touch-friendly sizing for mobile */
+    @apply min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0;
   }
   
   .btn-primary {
@@ -38,23 +54,27 @@ body {
   }
   
   .card {
-    @apply bg-white p-6 rounded-lg shadow-md;
+    @apply bg-white p-4 sm:p-6 rounded-lg shadow-md;
   }
   
   .input {
     @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-f1-red focus:border-transparent;
+    /* Touch-friendly input height */
+    @apply min-h-[44px];
   }
   
   .select {
     @apply px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-f1-red focus:border-transparent;
+    /* Touch-friendly select height */
+    @apply min-h-[44px];
   }
   
   .podium {
-    @apply flex items-end justify-center my-8 h-64;
+    @apply flex items-end justify-center my-8 h-48 sm:h-64;
   }
   
   .podium-place {
-    @apply flex flex-col items-center justify-end mx-2;
+    @apply flex flex-col items-center justify-end mx-1 sm:mx-2;
   }
   
   .podium-1st {
@@ -70,22 +90,33 @@ body {
   }
   
   .podium-stand {
-    @apply w-32 flex items-center justify-center text-white font-bold;
+    @apply w-24 sm:w-32 flex items-center justify-center text-white font-bold text-sm sm:text-base;
   }
   
   .podium-1st .podium-stand {
-    @apply bg-f1-red h-32;
+    @apply bg-f1-red h-24 sm:h-32;
   }
   
   .podium-2nd .podium-stand {
-    @apply bg-gray-500 h-24;
+    @apply bg-gray-500 h-20 sm:h-24;
   }
   
   .podium-3rd .podium-stand {
-    @apply bg-amber-700 h-16;
+    @apply bg-amber-700 h-12 sm:h-16;
   }
   
   .profile-pic {
     @apply rounded-full object-cover border-2 border-white shadow-lg;
+  }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    .card {
+      @apply p-4;
+    }
+    
+    .btn {
+      @apply px-3 py-2 text-sm;
+    }
   }
 }

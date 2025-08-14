@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race, PredictionResult } from '../api/client';
+import { mockRaces, mockRaceResults } from '../mocks/mockLeaderboardData';
 import ResultsPodium from '../components/prediction/ResultsPodium';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -17,12 +18,27 @@ const ResultsPage: React.FC = () => {
   
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
-    queryFn: () => api.getRaceById(raceId),
+    queryFn: () => {
+      if (import.meta.env.DEV) {
+        // Use mock data in development
+        const mockRace = mockRaces.find(r => r.id === raceId);
+        if (mockRace) {
+          return Promise.resolve(mockRace);
+        }
+      }
+      return api.getRaceById(raceId);
+    },
   });
   
   const { data: results = [], isLoading: isLoadingResults } = useQuery<PredictionResult[]>({
     queryKey: ['results', raceId],
-    queryFn: () => api.getRaceResults(raceId),
+    queryFn: () => {
+      if (import.meta.env.DEV) {
+        // Use mock data in development
+        return Promise.resolve(mockRaceResults[raceId] || []);
+      }
+      return api.getRaceResults(raceId);
+    },
     enabled: !!race?.completed,
   });
   

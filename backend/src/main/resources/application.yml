@@ -20,7 +20,7 @@ logging:
     root: INFO
     com.f1chatter.backend.service.JolpicaApiService: DEBUG
 
-ergast:
+jolpica:
   api:
     base-url: https://api.jolpi.ca/ergast/f1
     rate-limit:

@@ -134,8 +134,24 @@ class PredictionService(
     
     fun getRaceResults(raceId: String): List<PredictionResultDto> {
         val predictions = predictionRepository.findByRaceIdOrderByScoreDesc(raceId)
+        val race = raceRepository.findById(raceId).orElseThrow()
+        
+        // Get current season leaderboard to calculate position changes
+        val currentSeasonLeaderboard = getSeasonLeaderboard(race.season)
+        val currentPositions = currentSeasonLeaderboard.mapIndexed { index, entry -> 
+            entry.userId to (index + 1) 
+        }.toMap()
+        
+        // Get previous season leaderboard (before this race)
+        val previousSeasonLeaderboard = getSeasonLeaderboardBeforeRace(raceId, race.season)
+        val previousPositions = previousSeasonLeaderboard.mapIndexed { index, entry -> 
+            entry.userId to (index + 1) 
+        }.toMap()
         
         return predictions.map { prediction ->
+            val currentPosition = currentPositions[prediction.user.id]
+            val previousPosition = previousPositions[prediction.user.id]
+            
             PredictionResultDto(
                 userId = prediction.user.id!!,
                 userName = prediction.user.name,
@@ -147,7 +163,9 @@ class PredictionService(
                     thirdPlaceDriverId = prediction.thirdPlaceDriverId,
                     fastestLapDriverId = prediction.fastestLapDriverId,
                     driverOfTheDayId = prediction.driverOfTheDayId
-                )
+                ),
+                seasonPosition = currentPosition,
+                previousSeasonPosition = previousPosition
             )
         }
     }
@@ -168,5 +186,25 @@ class PredictionService(
     
     fun getUserSeasonScore(userId: Long, season: Int = LocalDate.now().year): Int {
         return predictionRepository.getTotalScoreByUserIdAndSeason(userId, season)
+    }
+    
+    fun getSeasonLeaderboardBeforeRace(raceId: String, season: Int): List<LeaderboardEntryDto> {
+        val race = raceRepository.findById(raceId).orElseThrow()
+        
+        // Get all races in the season before this race
+        val previousRaces = raceRepository.findBySeasonAndRoundLessThan(season, race.round)
+        
+        // Calculate leaderboard based on races before this race
+        val leaderboard = predictionRepository.getSeasonLeaderboardBeforeRace(season, race.round)
+        
+        return leaderboard.map { entry ->
+            val user = userRepository.findById(entry.userId).orElseThrow()
+            LeaderboardEntryDto(
+                userId = user.id!!,
+                userName = user.name,
+                profilePictureUrl = user.profilePictureUrl,
+                totalScore = entry.totalScore
+            )
+        }
     }
 } 

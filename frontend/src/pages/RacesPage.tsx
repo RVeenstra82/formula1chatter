@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race } from '../api/client';
+import { mockRaces } from '../mocks/mockLeaderboardData';
 import RaceCard from '../components/race/RaceCard';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -11,12 +12,28 @@ const RacesPage: React.FC = () => {
   
   const { data: allRaces, isLoading: isLoadingAll } = useQuery<Race[]>({
     queryKey: ['races', 'all'],
-    queryFn: api.getCurrentSeasonRaces,
+    queryFn: () => {
+      if (import.meta.env.DEV) {
+        // Use mock data in development
+        return Promise.resolve(mockRaces);
+      }
+      return api.getCurrentSeasonRaces();
+    },
   });
   
   const { data: nextRace, isLoading: isLoadingNext } = useQuery<Race>({
     queryKey: ['races', 'next'],
-    queryFn: api.getNextRace,
+    queryFn: () => {
+      if (import.meta.env.DEV) {
+        // Use mock data in development - find the next upcoming race
+        const today = new Date();
+        const upcomingRace = mockRaces.find(race => new Date(race.date) > today);
+        if (upcomingRace) {
+          return Promise.resolve(upcomingRace);
+        }
+      }
+      return api.getNextRace();
+    },
   });
   
   if (isLoadingAll || isLoadingNext) {

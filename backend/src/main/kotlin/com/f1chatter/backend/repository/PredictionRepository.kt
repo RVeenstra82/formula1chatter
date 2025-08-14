@@ -22,4 +22,7 @@ interface PredictionRepository : JpaRepository<Prediction, Long> {
     
     @Query("SELECT p.user.id as userId, SUM(p.score) as totalScore FROM Prediction p WHERE p.race.season = :season GROUP BY p.user.id ORDER BY totalScore DESC")
     fun getSeasonLeaderboard(season: Int): List<UserScoreProjection>
+    
+    @Query("SELECT p.user.id as userId, SUM(p.score) as totalScore FROM Prediction p WHERE p.race.season = :season AND p.race.round < :round GROUP BY p.user.id ORDER BY totalScore DESC")
+    fun getSeasonLeaderboardBeforeRace(season: Int, round: Int): List<UserScoreProjection>
 } 

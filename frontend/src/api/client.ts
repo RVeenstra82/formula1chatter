@@ -62,6 +62,8 @@ export interface PredictionResult {
   profilePictureUrl: string | null;
   score: number;
   prediction: Prediction;
+  seasonPosition?: number;
+  previousSeasonPosition?: number;
 }
 
 export interface LeaderboardEntry {
@@ -144,6 +146,16 @@ export const api = {
       ? `/predictions/user/${userId}/score?season=${season}`
       : `/predictions/user/${userId}/score`;
     const response = await apiClient.get(url);
+    return response.data;
+  },
+
+  getLeaderboard: async (): Promise<LeaderboardEntry[]> => {
+    const response = await apiClient.get('/predictions/leaderboard');
+    return response.data;
+  },
+
+  getRaceLeaderboard: async (raceId: string): Promise<PredictionResult[]> => {
+    const response = await apiClient.get(`/predictions/race/${raceId}/results`);
     return response.data;
   },
 }; 

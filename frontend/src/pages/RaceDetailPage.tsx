@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import type { Race, Driver } from '../api/client';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining } from '../utils/timeUtils';
+import { mockRaces } from '../mocks/mockLeaderboardData';
 
 const RaceDetailPage: React.FC = () => {
   const { raceId } = useParams<{ raceId: string }>();
@@ -18,7 +19,16 @@ const RaceDetailPage: React.FC = () => {
   
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
-    queryFn: () => api.getRaceById(raceId),
+    queryFn: () => {
+      if (import.meta.env.DEV) {
+        // Use mock data in development
+        const mockRace = mockRaces.find(r => r.id === raceId);
+        if (mockRace) {
+          return Promise.resolve(mockRace);
+        }
+      }
+      return api.getRaceById(raceId);
+    },
   });
   
   const { data: drivers, isLoading: isLoadingDrivers } = useQuery<Driver[]>({

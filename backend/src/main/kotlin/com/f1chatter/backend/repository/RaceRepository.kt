@@ -18,4 +18,7 @@ interface RaceRepository : JpaRepository<Race, String> {
     
     @Query("SELECT r FROM Race r WHERE r.date >= :today ORDER BY r.date ASC LIMIT 1")
     fun findNextRace(today: LocalDate): Optional<Race>
+    
+    @Query("SELECT r FROM Race r WHERE r.season = :season AND r.round < :round ORDER BY r.round ASC")
+    fun findBySeasonAndRoundLessThan(season: Int, round: Int): List<Race>
 } 

@@ -8,20 +8,49 @@ import { useLanguage } from '../contexts/LanguageContext';
 import PredictionForm from '../components/prediction/PredictionForm';
 import { calculateTimeRemaining } from '../utils/timeUtils';
 
+// Helper function to get race ID from country name
+const getRaceIdFromCountry = (country?: string): string | null => {
+  if (!country) return null;
+  
+  // Map country names to race IDs (this could be made more dynamic)
+  const countryToRaceMap: Record<string, string> = {
+    'netherlands': '2025-15', // Dutch GP
+    'belgium': '2025-14',     // Belgian GP
+    'hungary': '2025-13',     // Hungarian GP
+    'britain': '2025-12',     // British GP
+    'austria': '2025-11',     // Austrian GP
+    'spain': '2025-10',       // Spanish GP
+    'monaco': '2025-9',       // Monaco GP
+    'italy': '2025-8',        // Italian GP
+    'france': '2025-7',       // French GP
+    'canada': '2025-6',       // Canadian GP
+    'miami': '2025-5',        // Miami GP
+    'china': '2025-4',        // Chinese GP
+    'japan': '2025-3',        // Japanese GP
+    'australia': '2025-2',    // Australian GP
+    'bahrain': '2025-1',      // Bahrain GP
+  };
+  
+  return countryToRaceMap[country.toLowerCase()] || null;
+};
+
 const PredictionPage: React.FC = () => {
-  const { raceId } = useParams<{ raceId: string }>();
+  const { raceId, country } = useParams<{ raceId?: string; country?: string }>();
   const navigate = useNavigate();
   const { user, isLoading: isLoadingAuth } = useAuth();
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   
-  if (!raceId) {
+  // Determine the actual race ID based on URL format
+  const actualRaceId = raceId || getRaceIdFromCountry(country);
+  
+  if (!actualRaceId) {
     return <div>Race ID is required</div>;
   }
   
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
-    queryKey: ['race', raceId],
-    queryFn: () => api.getRaceById(raceId),
+    queryKey: ['race', actualRaceId],
+    queryFn: () => api.getRaceById(actualRaceId),
   });
   
   // Update countdown timer every second

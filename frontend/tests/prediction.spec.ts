@@ -58,7 +58,7 @@ test.describe('Prediction Page', () => {
 
   test('should display race information', async ({ page }) => {
     await expect(page.getByText('Bahrain Grand Prix')).toBeVisible();
-    await expect(page.getByText('Predict Results')).toBeVisible();
+    await expect(page.getByText('Make Prediction')).toBeVisible();
   });
 
   test('should allow selecting drivers for prediction', async ({ page }) => {

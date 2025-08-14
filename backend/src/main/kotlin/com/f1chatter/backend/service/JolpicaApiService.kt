@@ -24,11 +24,11 @@ class JolpicaApiService(
     private val raceRepository: RaceRepository,
     private val driverRepository: DriverRepository,
     private val constructorRepository: ConstructorRepository,
-    @Value("\${ergast.api.base-url}")
+    @Value("\${jolpica.api.base-url}")
     private val baseUrl: String,
-    @Value("\${ergast.api.rate-limit.requests-per-second:3}")
+    @Value("\${jolpica.api.rate-limit.requests-per-second:3}")
     private val requestsPerSecond: Int,
-    @Value("\${ergast.api.rate-limit.max-retries:3}")
+    @Value("\${jolpica.api.rate-limit.max-retries:3}")
     private val maxRetries: Int
 ) {
     private val logger = KotlinLogging.logger {}

@@ -26,7 +26,7 @@ persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", vers
 postgresql = { module = "org.postgresql:postgresql" }
 h2 = { module = "com.h2database:h2" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
-spring-security-test = { module = "org.springframework.security:spring-security-test", version.ref = "spring-boot" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-core" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }

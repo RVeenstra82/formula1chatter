@@ -120,6 +120,13 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.user': 'User',
     'leaderboard.points': 'Points',
     'leaderboard.you': 'You',
+    'leaderboard.viewMode': 'View Mode',
+    'leaderboard.seasonTotal': 'Season Total',
+    'leaderboard.raceResults': 'Race Results',
+    'leaderboard.selectRace': 'Select Race',
+    'leaderboard.noCompletedRaces': 'No completed races available.',
+    'leaderboard.raceNotCompleted': 'This race has not been completed yet.',
+    'leaderboard.change': 'Change',
     
     // Common
     'common.loading': 'Loading...',
@@ -133,6 +140,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.point': 'point',
     'common.raceIdRequired': 'Race ID is required',
     'common.important': 'Important',
+    'common.login': 'Login',
   },
   nl: {
     // Navigation
@@ -235,12 +243,22 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.season': 'Seizoen',
     'leaderboard.yourPosition': 'Jouw positie',
     'leaderboard.of': 'van',
-    'leaderboard.noResults': 'Nog geen resultaten beschikbaar voor dit seizoen.',
+    'leaderboard.noResults': 'Nog geen verdere resultaten beschikbaar voor dit seizoen.',
+    'leaderboard.noRaceResults': 'Geen verdere voorspellingen voor deze race gedaan.',
+    'leaderboard.loginRequired': 'Inloggen Vereist',
+    'leaderboard.loginToView': 'Je moet ingelogd zijn om de ranglijst te bekijken.',
     'leaderboard.checkBack': 'Kom terug nadat races zijn voltooid!',
     'leaderboard.position': 'Positie',
     'leaderboard.user': 'Gebruiker',
     'leaderboard.points': 'Punten',
     'leaderboard.you': 'Jij',
+    'leaderboard.viewMode': 'Weergave Modus',
+    'leaderboard.seasonTotal': 'Seizoen Totaal',
+    'leaderboard.raceResults': 'Race Resultaten',
+    'leaderboard.selectRace': 'Selecteer Race',
+    'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
+    'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
+    'leaderboard.change': 'Verandering',
     
     // Common
     'common.loading': 'Laden...',
@@ -254,6 +272,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.point': 'punt',
     'common.raceIdRequired': 'Race ID is vereist',
     'common.important': 'Belangrijk',
+    'common.login': 'Inloggen',
   }
 };
 

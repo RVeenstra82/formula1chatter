@@ -9,8 +9,32 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Important for cookies/sessions
+  withCredentials: true, // Keep for OAuth2 callback
 });
+
+// Add JWT token to requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle token expiration
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, clear stored data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      // Optionally redirect to login or refresh page
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Types
 export interface User {

@@ -30,6 +30,11 @@ dependencies {
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.persistence.api)
     
+    // JWT dependencies
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
+    
     runtimeOnly(libs.postgresql)
     runtimeOnly(libs.h2)
     

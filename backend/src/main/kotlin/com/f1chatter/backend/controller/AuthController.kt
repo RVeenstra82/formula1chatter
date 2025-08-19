@@ -2,13 +2,16 @@ package com.f1chatter.backend.controller
 
 import com.f1chatter.backend.dto.UserDto
 import com.f1chatter.backend.service.UserService
+import com.f1chatter.backend.service.JwtService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestHeader
 import mu.KotlinLogging
 import org.springframework.web.client.RestTemplate
 import org.springframework.beans.factory.annotation.Value
@@ -16,26 +19,55 @@ import org.springframework.beans.factory.annotation.Value
 @RestController
 @RequestMapping("/auth")
 class AuthController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val jwtService: JwtService
 ) {
     private val logger = KotlinLogging.logger {}
     
     @GetMapping("/user")
-    fun getUser(@AuthenticationPrincipal principal: OAuth2User?): ResponseEntity<UserDto> {
-        logger.info { "AuthController.getUser called with principal: ${principal != null}" }
+    fun getUser(
+        @AuthenticationPrincipal principal: OAuth2User?,
+        @AuthenticationPrincipal userDetails: UserDetails?,
+        @RequestHeader("Authorization", required = false) authHeader: String?
+    ): ResponseEntity<Any> {
+        logger.info { "AuthController.getUser called" }
         
-        if (principal == null) {
-            logger.warn { "No principal found, returning 401" }
-            return ResponseEntity.status(401).build()
+        // Try JWT authentication first
+        val token = jwtService.extractTokenFromHeader(authHeader)
+        if (token != null && jwtService.isTokenValid(token)) {
+            val userId = jwtService.extractUserId(token)
+            if (userId != null) {
+                try {
+                    val user = userService.getUserById(userId)
+                    logger.info { "JWT authentication successful for user: ${user.name}" }
+                    return ResponseEntity.ok(user)
+                } catch (e: Exception) {
+                    logger.warn { "JWT authentication failed: ${e.message}" }
+                }
+            }
         }
         
-        logger.info { "Principal found: ${principal.name}, attributes: ${principal.attributes}" }
+        // Fallback to OAuth2 authentication (for the OAuth2 callback)
+        if (principal != null) {
+            logger.info { "OAuth2 principal found: ${principal.name}" }
+            
+            val auth = OAuth2AuthenticationToken(principal, emptyList(), "facebook")
+            val user = userService.processOAuthPostLogin(auth)
+            
+            // Generate JWT token for the user
+            val jwtToken = jwtService.generateToken(user.id, user.name, user.email)
+            
+            logger.info { "OAuth2 authentication successful, generated JWT for user: ${user.name}" }
+            
+            // Return both user data and JWT token
+            return ResponseEntity.ok(mapOf(
+                "user" to user,
+                "token" to jwtToken
+            ))
+        }
         
-        val auth = OAuth2AuthenticationToken(principal, emptyList(), "facebook")
-        val user = userService.processOAuthPostLogin(auth)
-        
-        logger.info { "User processed successfully: ${user.name}" }
-        return ResponseEntity.ok(user)
+        logger.warn { "No valid authentication found, returning 401" }
+        return ResponseEntity.status(401).build()
     }
     
     @GetMapping("/login-failed")
@@ -54,6 +86,55 @@ class AuthController(
         }
     }
 
+    @GetMapping("/oauth2/callback")
+    fun oauthCallback(@AuthenticationPrincipal principal: OAuth2User?): ResponseEntity<String> {
+        logger.info { "OAuth2 callback endpoint called" }
+        
+        if (principal != null) {
+            logger.info { "OAuth2 callback - principal found: ${principal.name}" }
+            
+            val auth = OAuth2AuthenticationToken(principal, emptyList(), "facebook")
+            val user = userService.processOAuthPostLogin(auth)
+            
+            // Generate JWT token for the user
+            val jwtToken = jwtService.generateToken(user.id, user.name, user.email)
+            
+            logger.info { "OAuth2 callback successful, generated JWT for user: ${user.name}" }
+            
+            // Return HTML that saves the token and redirects
+            val html = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Login Successful</title>
+                </head>
+                <body>
+                    <script>
+                        localStorage.setItem('authToken', '$jwtToken');
+                        localStorage.setItem('user', JSON.stringify({
+                            id: ${user.id},
+                            name: '${user.name}',
+                            email: '${user.email}',
+                            profilePictureUrl: '${user.profilePictureUrl ?: ""}'
+                        }));
+                        window.location.href = 'https://formula1chatter.vercel.app/#/';
+                    </script>
+                    <p>Login successful, redirecting...</p>
+                </body>
+                </html>
+            """.trimIndent()
+            
+            return ResponseEntity.ok()
+                .header("Content-Type", "text/html")
+                .body(html)
+        }
+        
+        logger.warn { "OAuth2 callback failed - no principal" }
+        return ResponseEntity.status(401)
+            .header("Content-Type", "text/html")
+            .body("<html><body><h1>Login failed</h1></body></html>")
+    }
+    
     @GetMapping("/test-oauth")
     fun testOAuth(): ResponseEntity<Map<String, Any>> {
         logger.info { "OAuth2 test endpoint called" }

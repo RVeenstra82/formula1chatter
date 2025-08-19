@@ -49,7 +49,7 @@ class PredictionService(
     
     private fun isRaceStartingWithinFiveMinutes(race: Race): Boolean {
         val now = LocalDateTime.now()
-        val raceDateTime = LocalDateTime.of(race.date, race.time ?: LocalTime.of(12, 0))
+        val raceDateTime = LocalDateTime.of(race.date, race.time)
         val minutesUntilRace = java.time.Duration.between(now, raceDateTime).toMinutes()
         
         return minutesUntilRace <= 5 && minutesUntilRace > 0
@@ -206,9 +206,6 @@ class PredictionService(
     
     fun getSeasonLeaderboardBeforeRace(raceId: String, season: Int): List<LeaderboardEntryDto> {
         val race = raceRepository.findById(raceId).orElseThrow()
-        
-        // Get all races in the season before this race
-        val previousRaces = raceRepository.findBySeasonAndRoundLessThan(season, race.round)
         
         // Calculate leaderboard based on races before this race
         val leaderboard = predictionRepository.getSeasonLeaderboardBeforeRace(season, race.round)

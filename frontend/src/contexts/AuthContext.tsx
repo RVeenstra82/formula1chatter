@@ -21,12 +21,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user is already logged in via JWT token
     const checkUserStatus = async () => {
       try {
         setIsLoading(true);
-        const userData = await api.getCurrentUser();
-        setUser(userData);
+        
+        // First check localStorage for stored user and token
+        const storedToken = localStorage.getItem('authToken');
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedToken && storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            // Verify token is still valid by making API call
+            const currentUserData = await api.getCurrentUser();
+            setUser(currentUserData);
+          } catch (err) {
+            // Token invalid, clear storage and try API call
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            const userData = await api.getCurrentUser();
+            setUser(userData);
+          }
+        } else {
+          // No stored data, try API call (for OAuth2 callback)
+          const userData = await api.getCurrentUser();
+          setUser(userData);
+        }
       } catch (err) {
         setUser(null);
         console.error('Not logged in', err);
@@ -44,7 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    // Redirect to logout endpoint
+    // Clear JWT token and user data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    
+    // Optionally call backend logout endpoint
     window.location.href = `${apiClient.defaults.baseURL}/logout`;
   };
 

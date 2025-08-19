@@ -88,7 +88,10 @@ class AuthController(
 
     @GetMapping("/oauth2/callback")
     fun oauthCallback(@AuthenticationPrincipal principal: OAuth2User?): ResponseEntity<String> {
-        logger.info { "OAuth2 callback endpoint called" }
+        logger.info { "OAuth2 callback endpoint called with principal: ${principal != null}" }
+        if (principal != null) {
+            logger.info { "Principal details: ${principal.name}, attributes: ${principal.attributes}" }
+        }
         
         if (principal != null) {
             logger.info { "OAuth2 callback - principal found: ${principal.name}" }

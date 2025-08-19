@@ -51,4 +51,14 @@ class AuthController(
             ResponseEntity.ok(mapOf("authenticated" to false))
         }
     }
+
+    @GetMapping("/test-oauth")
+    fun testOAuth(): ResponseEntity<Map<String, Any>> {
+        logger.info { "OAuth2 test endpoint called" }
+        
+        return ResponseEntity.ok(mapOf(
+            "message" to "OAuth2 endpoint accessible",
+            "timestamp" to System.currentTimeMillis()
+        ))
+    }
 } 

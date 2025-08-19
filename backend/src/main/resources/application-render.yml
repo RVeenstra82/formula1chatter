@@ -29,7 +29,7 @@ spring:
             client-id: ${FACEBOOK_CLIENT_ID}
             client-secret: ${FACEBOOK_CLIENT_SECRET}
             scope: public_profile
-            redirect-uri: https://formula1chatter.onrender.com/api/login/oauth2/code/facebook
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
   session:
     cookie:
       name: JSESSIONID
@@ -46,5 +46,7 @@ server:
 logging:
   level:
     com.f1chatter: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql.BasicBinder: WARN

@@ -30,6 +30,9 @@ class SecurityConfig {
                 oauth2
                     .defaultSuccessUrl("https://formula1chatter.vercel.app/#/", true)
                     .failureUrl("/api/auth/login-failed")
+                    .authorizationEndpoint { auth ->
+                        auth.baseUri("/oauth2/authorization")
+                    }
             }
             .logout { logout ->
                 logout

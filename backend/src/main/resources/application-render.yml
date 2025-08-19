@@ -7,16 +7,20 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      auto-commit: false
+      connection-test-query: SELECT 1
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
         format_sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        # For Render's PostgreSQL connection pooling
-        connection:
-          provider_disables_autocommit: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
 
 server:
   port: ${PORT:8090}

@@ -38,6 +38,7 @@ class DatabaseConfig {
                 logger.info("Using separate DB_USERNAME and DB_PASSWORD environment variables")
             } else {
                 // Extract from URL if separate variables don't exist
+				logger.info("Extracting username and password from DATABASE_URL")
                 try {
                     val urlParts = databaseUrl.substring("postgresql://".length)
                     val atIndex = urlParts.indexOf("@")

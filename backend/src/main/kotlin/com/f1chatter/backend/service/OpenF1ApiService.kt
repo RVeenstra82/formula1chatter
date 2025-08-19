@@ -167,4 +167,3 @@ class OpenF1ApiService(
         }
     }
 }
-https://fonts.google.com/specimen/Barlow+Condensed

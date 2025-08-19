@@ -21,7 +21,7 @@ class UserService(
             existingUser.get()
         } else {
             val name = attributes["name"].toString()
-            val email = attributes["email"]?.toString() ?: ""
+            val email = "${facebookId}@f1chatter.local" // Generate email from Facebook ID
             val profilePictureUrl = "https://graph.facebook.com/$facebookId/picture?type=large"
             
             val newUser = User(

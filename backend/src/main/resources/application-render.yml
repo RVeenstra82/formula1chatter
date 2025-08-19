@@ -28,7 +28,7 @@ spring:
           facebook:
             client-id: ${FACEBOOK_CLIENT_ID}
             client-secret: ${FACEBOOK_CLIENT_SECRET}
-            scope: email, public_profile
+            scope: public_profile
 
 server:
   port: ${PORT:8090}

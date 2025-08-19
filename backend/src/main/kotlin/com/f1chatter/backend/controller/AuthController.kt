@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import mu.KotlinLogging
-import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/auth")
@@ -51,25 +50,5 @@ class AuthController(
         } else {
             ResponseEntity.ok(mapOf("authenticated" to false))
         }
-    }
-
-    @GetMapping("/debug")
-    fun debugAuth(request: HttpServletRequest): ResponseEntity<Map<String, Any>> {
-        logger.info { "Debug endpoint called" }
-        
-        val session = request.getSession(false)
-        val sessionId = session?.id
-        val cookies = request.cookies?.map { "${it.name}=${it.value}" } ?: emptyList()
-        
-        logger.info { "Session ID: $sessionId" }
-        logger.info { "Cookies: $cookies" }
-        
-        return ResponseEntity.ok(mapOf(
-            "sessionId" to (sessionId ?: "null"),
-            "cookies" to cookies,
-            "userAgent" to (request.getHeader("User-Agent") ?: "unknown"),
-            "origin" to (request.getHeader("Origin") ?: "unknown"),
-            "referer" to (request.getHeader("Referer") ?: "unknown")
-        ))
     }
 } 

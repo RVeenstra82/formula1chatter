@@ -71,7 +71,7 @@ class DataSyncService(
     }
     
     // Check for new season data daily
-    @Scheduled(cron = "0 6 * * *") // At 6 AM daily
+    @Scheduled(cron = "0 0 6 * * *") // At 6 AM daily
     fun checkForNewSeason() {
         logger.info { "Checking for new season data" }
         

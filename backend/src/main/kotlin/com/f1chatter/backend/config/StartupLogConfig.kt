@@ -70,7 +70,12 @@ class StartupLogConfig {
                         logger.warn("⚠️  Facebook app response is unexpected: $response")
                     }
                 } catch (e: Exception) {
-                    logger.error("❌ Cannot access Facebook app: ${e.message}")
+                    if (e.message?.contains("400 Bad Request") == true) {
+                        logger.warn("⚠️  Facebook app is in development mode or has restricted access")
+                        logger.info("ℹ️  This is normal for development. App will work for app developers and test users.")
+                    } else {
+                        logger.error("❌ Cannot access Facebook app: ${e.message}")
+                    }
                 }
             }
             

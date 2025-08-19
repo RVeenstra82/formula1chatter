@@ -35,6 +35,25 @@ class JolpicaApiService(
     private val requestDelayMs = (1000 / requestsPerSecond).toLong() // Calculate delay based on requests per second
     private var lastRequestTime = 0L
     
+    /**
+     * Determines the current F1 season based on the current date.
+     * F1 seasons typically start in March, so if we're in January or February,
+     * we use the previous year's season data.
+     */
+    private fun getCurrentSeason(): Int {
+        val currentDate = LocalDate.now()
+        val currentYear = currentDate.year
+        val currentMonth = currentDate.monthValue
+        
+        // If we're in January or February, we're still in the previous year's season
+        // F1 seasons typically start in March
+        return if (currentMonth <= 2) {
+            currentYear - 1
+        } else {
+            currentYear
+        }
+    }
+    
     // Cache to store API responses
     private val apiCache = ConcurrentHashMap<String, Map<*, *>>()
     private val cacheExpiryHours = 24L // Cache expires after 24 hours
@@ -117,7 +136,7 @@ class JolpicaApiService(
     
     fun fetchCurrentSeasonRaces() {
         // First check if we already have races for the current season in the database
-        val currentSeason = 2025
+        val currentSeason = getCurrentSeason()
         val existingRaces = raceRepository.findBySeason(currentSeason)
         
         if (existingRaces.isNotEmpty()) {
@@ -125,8 +144,8 @@ class JolpicaApiService(
             return
         }
         
-        val url = "$baseUrl/2024.json"
-        logger.info { "Fetching races from $url (We gebruiken 2024 data omdat 2025 nog niet beschikbaar is)" }
+        val url = "$baseUrl/$currentSeason.json"
+        logger.info { "Fetching races from $url for season $currentSeason" }
         
         val response = makeApiRequest(url, Map::class.java) ?: return
         val raceData = response["MRData"] as? Map<*, *>
@@ -145,8 +164,7 @@ class JolpicaApiService(
             val locality = location["locality"].toString()
             val country = location["country"].toString()
             
-            val originalDate = LocalDate.parse(raceMap["date"].toString())
-            val date = originalDate.plusYears(1)
+            val date = LocalDate.parse(raceMap["date"].toString())
             
             val time = if (raceMap["time"] != null) {
                 LocalTime.parse(raceMap["time"].toString().replace("Z", ""))
@@ -175,7 +193,10 @@ class JolpicaApiService(
         logger.info { "Successfully imported ${races.size} races for season $currentSeason" }
     }
     
-    fun fetchDriversForSeason(season: Int = 2025) {
+    fun fetchDriversForSeason(season: Int? = null) {
+        // Use provided season or determine current season
+        val dataYear = season ?: getCurrentSeason()
+        
         // Check if we already have drivers stored
         val existingDrivers = driverRepository.findAll().toList()
         val existingConstructors = constructorRepository.findAll().toList()
@@ -186,9 +207,6 @@ class JolpicaApiService(
             logger.info { "Using ${existingDrivers.size} existing drivers and ${existingConstructors.size} constructors from database" }
             return
         }
-        
-        // Gebruik 2024 data voor drivers
-        val dataYear = 2024
         
         // If we have no drivers or need to update, fetch them
         if (existingDrivers.isEmpty()) {

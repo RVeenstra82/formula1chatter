@@ -21,11 +21,30 @@ class DataSyncService(
 ) {
     private val logger = KotlinLogging.logger {}
     
+    /**
+     * Determines the current F1 season based on the current date.
+     * F1 seasons typically start in March, so if we're in January or February,
+     * we use the previous year's season data.
+     */
+    private fun getCurrentSeason(): Int {
+        val currentDate = LocalDate.now()
+        val currentYear = currentDate.year
+        val currentMonth = currentDate.monthValue
+        
+        // If we're in January or February, we're still in the previous year's season
+        // F1 seasons typically start in March
+        return if (currentMonth <= 2) {
+            currentYear - 1
+        } else {
+            currentYear
+        }
+    }
+    
     // Reduced frequency to once per week to minimize API calls
     @Scheduled(cron = "0 0 0 * * SUN") // At midnight on Sunday
     fun syncCurrentSeasonData() {
         // First check if we need to sync race data
-        val currentSeason = 2025
+        val currentSeason = getCurrentSeason()
         val existingRaces = raceRepository.findBySeason(currentSeason)
         
         if (existingRaces.isEmpty()) {
@@ -48,6 +67,25 @@ class DataSyncService(
             jolpicaApiService.fetchDriversForSeason()
         } else {
             logger.info { "Drivers and constructors already exist, skipping driver sync" }
+        }
+    }
+    
+    // Check for new season data daily
+    @Scheduled(cron = "0 6 * * *") // At 6 AM daily
+    fun checkForNewSeason() {
+        logger.info { "Checking for new season data" }
+        
+        // Get current season
+        val currentSeason = getCurrentSeason()
+        
+        // Check if we have races for the current season
+        val existingRaces = raceRepository.findBySeason(currentSeason)
+        
+        if (existingRaces.isEmpty()) {
+            logger.info { "No races found for season $currentSeason, syncing new season data" }
+            syncCurrentSeasonData()
+        } else {
+            logger.info { "Races already exist for season $currentSeason, skipping season sync" }
         }
     }
     

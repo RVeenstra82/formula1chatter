@@ -1,3 +1,4 @@
+
 package com.f1chatter.backend.service
 
 import com.f1chatter.backend.dto.LeaderboardEntryDto
@@ -58,11 +59,11 @@ class PredictionService(
         val prediction = Prediction(
             user = user,
             race = race,
-            firstPlaceDriverId = predictionDto.firstPlaceDriverId,
-            secondPlaceDriverId = predictionDto.secondPlaceDriverId,
-            thirdPlaceDriverId = predictionDto.thirdPlaceDriverId,
-            fastestLapDriverId = predictionDto.fastestLapDriverId,
-            driverOfTheDayId = predictionDto.driverOfTheDayId
+            firstPlaceDriverId = predictionDto.firstPlaceDriverId.ifEmpty { "" },
+            secondPlaceDriverId = predictionDto.secondPlaceDriverId.ifEmpty { "" },
+            thirdPlaceDriverId = predictionDto.thirdPlaceDriverId.ifEmpty { "" },
+            fastestLapDriverId = predictionDto.fastestLapDriverId.ifEmpty { "" },
+            driverOfTheDayId = predictionDto.driverOfTheDayId.ifEmpty { "" }
         )
         
         return predictionRepository.save(prediction)
@@ -70,11 +71,11 @@ class PredictionService(
     
     private fun updatePrediction(prediction: Prediction, predictionDto: PredictionDto): Prediction {
         val updatedPrediction = prediction.copy(
-            firstPlaceDriverId = predictionDto.firstPlaceDriverId,
-            secondPlaceDriverId = predictionDto.secondPlaceDriverId,
-            thirdPlaceDriverId = predictionDto.thirdPlaceDriverId,
-            fastestLapDriverId = predictionDto.fastestLapDriverId,
-            driverOfTheDayId = predictionDto.driverOfTheDayId
+            firstPlaceDriverId = predictionDto.firstPlaceDriverId.ifEmpty { "" },
+            secondPlaceDriverId = predictionDto.secondPlaceDriverId.ifEmpty { "" },
+            thirdPlaceDriverId = predictionDto.thirdPlaceDriverId.ifEmpty { "" },
+            fastestLapDriverId = predictionDto.fastestLapDriverId.ifEmpty { "" },
+            driverOfTheDayId = predictionDto.driverOfTheDayId.ifEmpty { "" }
         )
         
         return predictionRepository.save(updatedPrediction)
@@ -92,11 +93,11 @@ class PredictionService(
         return if (prediction.isPresent) {
             val p = prediction.get()
             PredictionDto(
-                firstPlaceDriverId = p.firstPlaceDriverId,
-                secondPlaceDriverId = p.secondPlaceDriverId,
-                thirdPlaceDriverId = p.thirdPlaceDriverId,
-                fastestLapDriverId = p.fastestLapDriverId,
-                driverOfTheDayId = p.driverOfTheDayId
+                firstPlaceDriverId = p.firstPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                secondPlaceDriverId = p.secondPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                thirdPlaceDriverId = p.thirdPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                fastestLapDriverId = p.fastestLapDriverId.takeIf { it.isNotEmpty() } ?: "",
+                driverOfTheDayId = p.driverOfTheDayId.takeIf { it.isNotEmpty() } ?: ""
             )
         } else {
             null
@@ -118,27 +119,27 @@ class PredictionService(
             var score = 0
             
             // First place prediction (5 points)
-            if (prediction.firstPlaceDriverId == race.firstPlaceDriverId) {
+            if (prediction.firstPlaceDriverId.isNotEmpty() && prediction.firstPlaceDriverId == race.firstPlaceDriverId) {
                 score += 5
             }
             
             // Second place prediction (3 points)
-            if (prediction.secondPlaceDriverId == race.secondPlaceDriverId) {
+            if (prediction.secondPlaceDriverId.isNotEmpty() && prediction.secondPlaceDriverId == race.secondPlaceDriverId) {
                 score += 3
             }
             
             // Third place prediction (1 point)
-            if (prediction.thirdPlaceDriverId == race.thirdPlaceDriverId) {
+            if (prediction.thirdPlaceDriverId.isNotEmpty() && prediction.thirdPlaceDriverId == race.thirdPlaceDriverId) {
                 score += 1
             }
             
             // Fastest lap prediction (1 point)
-            if (prediction.fastestLapDriverId == race.fastestLapDriverId) {
+            if (prediction.fastestLapDriverId.isNotEmpty() && prediction.fastestLapDriverId == race.fastestLapDriverId) {
                 score += 1
             }
             
             // Driver of the day prediction (1 point)
-            if (prediction.driverOfTheDayId == race.driverOfTheDayId) {
+            if (prediction.driverOfTheDayId.isNotEmpty() && prediction.driverOfTheDayId == race.driverOfTheDayId) {
                 score += 1
             }
             
@@ -173,11 +174,11 @@ class PredictionService(
                 profilePictureUrl = prediction.user.profilePictureUrl,
                 score = prediction.score ?: 0,
                 prediction = PredictionDto(
-                    firstPlaceDriverId = prediction.firstPlaceDriverId,
-                    secondPlaceDriverId = prediction.secondPlaceDriverId,
-                    thirdPlaceDriverId = prediction.thirdPlaceDriverId,
-                    fastestLapDriverId = prediction.fastestLapDriverId,
-                    driverOfTheDayId = prediction.driverOfTheDayId
+                    firstPlaceDriverId = prediction.firstPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                    secondPlaceDriverId = prediction.secondPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                    thirdPlaceDriverId = prediction.thirdPlaceDriverId.takeIf { it.isNotEmpty() } ?: "",
+                    fastestLapDriverId = prediction.fastestLapDriverId.takeIf { it.isNotEmpty() } ?: "",
+                    driverOfTheDayId = prediction.driverOfTheDayId.takeIf { it.isNotEmpty() } ?: ""
                 ),
                 seasonPosition = currentPosition,
                 previousSeasonPosition = previousPosition

@@ -28,13 +28,13 @@ class SecurityConfig {
             }
             .oauth2Login { oauth2 ->
                 oauth2
-                    .defaultSuccessUrl("https://formula1chatter.vercel.app", true)
+                    .defaultSuccessUrl("https://formula1chatter.vercel.app/#/", true)
                     .failureUrl("/api/auth/login-failed")
             }
             .logout { logout ->
                 logout
                     .logoutUrl("/api/logout")
-                    .logoutSuccessUrl("/")
+                    .logoutSuccessUrl("https://formula1chatter.vercel.app/#/")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .permitAll()

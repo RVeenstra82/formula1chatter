@@ -15,6 +15,9 @@ spring:
         connection:
           provider_disables_autocommit: true
 
+server:
+  port: ${PORT:8090}
+
 logging:
   level:
     com.f1chatter: INFO

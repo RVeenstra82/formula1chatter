@@ -37,8 +37,17 @@ class DatabaseConfig {
             properties.url = jdbcUrl
             logger.info("Converted JDBC URL: ${jdbcUrl.take(50)}...")
             
-            // Extract username and password from the URL if they're not set separately
-            if (System.getenv("DB_USERNAME") == null && System.getenv("DB_PASSWORD") == null) {
+            // Extract username and password from the URL or use separate environment variables
+            val dbUsername = System.getenv("DB_USERNAME")
+            val dbPassword = System.getenv("DB_PASSWORD")
+            
+            if (dbUsername != null && dbPassword != null) {
+                // Use separate environment variables if they exist
+                properties.username = dbUsername
+                properties.password = dbPassword
+                logger.info("Using separate DB_USERNAME and DB_PASSWORD environment variables")
+            } else {
+                // Extract from URL if separate variables don't exist
                 try {
                     val urlParts = databaseUrl.substring("postgresql://".length)
                     val atIndex = urlParts.indexOf("@")
@@ -48,12 +57,14 @@ class DatabaseConfig {
                         if (colonIndex > 0) {
                             properties.username = credentials.substring(0, colonIndex)
                             properties.password = credentials.substring(colonIndex + 1)
+                            logger.info("Extracted username and password from DATABASE_URL")
                         }
                     }
                 } catch (e: Exception) {
-                    // If parsing fails, use the default values
-                    properties.username = System.getenv("DB_USERNAME") ?: "postgres"
-                    properties.password = System.getenv("DB_PASSWORD") ?: "postgres"
+                    logger.warn("Failed to parse credentials from DATABASE_URL: ${e.message}")
+                    // If parsing fails, use the separate environment variables or defaults
+                    properties.username = dbUsername ?: "postgres"
+                    properties.password = dbPassword ?: "postgres"
                 }
             }
         }

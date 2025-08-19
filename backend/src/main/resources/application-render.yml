@@ -29,6 +29,16 @@ spring:
             client-id: ${FACEBOOK_CLIENT_ID}
             client-secret: ${FACEBOOK_CLIENT_SECRET}
             scope: public_profile
+            redirect-uri: https://formula1chatter.onrender.com/api/login/oauth2/code/facebook
+  session:
+    cookie:
+      name: JSESSIONID
+      path: /
+      http-only: true
+      secure: true
+      same-site: none
+      max-age: 86400
+    timeout: 86400
 
 server:
   port: ${PORT:8090}

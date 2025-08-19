@@ -78,7 +78,7 @@ The original implementation was making too many API calls to the OpenF1 API duri
 
 ## Deployment
 
-The application is configured for deployment on Railway with automatic database provisioning and environment variable management.
+The application is configured for deployment on Render (backend) and Vercel (frontend) with automatic database provisioning and environment variable management. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions.
 
 ## Contributing
 

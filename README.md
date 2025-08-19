@@ -169,3 +169,4 @@ Configure the database connection in `backend/src/main/resources/application.yml
 ## API Documentation
 Once the backend is running, Swagger documentation will be available at:
 http://localhost:8080/api/swagger-ui.html # Last updated: Tue Aug 19 18:31:34 CEST 2025
+# CORS fix deployment - Tue Aug 19 19:16:11 CEST 2025

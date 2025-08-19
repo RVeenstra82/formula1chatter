@@ -19,9 +19,13 @@ class PredictionController(
         @PathVariable raceId: String,
         @RequestBody predictionDto: PredictionDto,
         @RequestParam userId: Long
-    ): ResponseEntity<PredictionDto> {
-        predictionService.savePrediction(userId, raceId, predictionDto)
-        return ResponseEntity.ok(predictionDto)
+    ): ResponseEntity<Any> {
+        return try {
+            predictionService.savePrediction(userId, raceId, predictionDto)
+            ResponseEntity.ok(predictionDto)
+        } catch (e: IllegalStateException) {
+            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        }
     }
     
     @GetMapping("/user/{userId}/race/{raceId}")

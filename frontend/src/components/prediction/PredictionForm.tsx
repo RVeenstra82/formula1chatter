@@ -5,6 +5,7 @@ import type { Driver, Prediction, Race } from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import DriverSelect from './DriverSelect';
+import { isLessThanFiveMinutes } from '../../utils/timeUtils';
 
 interface PredictionFormProps {
   race: Race;
@@ -44,7 +45,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   }, [existingPrediction]);
   
   // Mutation to save prediction
-  const { mutate: savePrediction, isPending: isSaving } = useMutation({
+  const { mutate: savePrediction, isPending: isSaving, error: saveError } = useMutation({
     mutationFn: () => api.savePrediction(user!.id, race.id, prediction),
     onSuccess: () => {
       if (onSuccess) onSuccess();
@@ -66,7 +67,8 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   
   const isLoading = isLoadingDrivers || isLoadingPrediction;
   const isPast = new Date(race.date) < new Date();
-  const isDisabled = isLoading || isSaving || race.completed || isPast;
+  const isWithinFiveMinutes = isLessThanFiveMinutes(race.date, race.time);
+  const isDisabled = isLoading || isSaving || race.completed || isPast || isWithinFiveMinutes;
   
   if (isLoading) {
     return <div className="card p-6">{t('common.loading')}</div>;
@@ -84,9 +86,19 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-6">
           {t('predict.raceStarted')}
         </div>
+      ) : isWithinFiveMinutes ? (
+        <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
+          ⚠️ {t('predict.noMorePredictions')}
+        </div>
       ) : (
         <div className="bg-blue-100 text-blue-800 p-4 rounded-md mb-6">
           {t('predict.makeFor')} {race.raceName}!
+        </div>
+      )}
+      
+      {saveError && (
+        <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
+          ⚠️ {t('predict.noMorePredictions')}
         </div>
       )}
       

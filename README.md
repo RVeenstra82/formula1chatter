@@ -10,6 +10,10 @@ A web application for Formula 1 fans to predict race outcomes and compete with f
 - Point system (5/3/1/1/1) for correct predictions
 - Leaderboard to track season standings
 - Race data from Jolpica API
+- Driver profile pictures from OpenF1 API
+- Real-time countdown timer with visual indicators
+- 5-minute prediction cutoff before race start
+- Modern Barlow Condensed typography
 
 ## Tech Stack
 
@@ -69,6 +73,36 @@ cd frontend
 npm install
 npm run dev
 ```
+
+## API Endpoints
+
+### Driver Management
+
+- `GET /api/drivers` - Get all drivers with profile pictures
+- `GET /api/drivers/{id}` - Get a specific driver by ID
+- `POST /api/drivers/update-profile-pictures` - Manually trigger profile picture updates from OpenF1 API
+- `GET /api/drivers/test-openf1-connection` - Test connection to OpenF1 API
+
+### Driver Profile Pictures
+
+The application automatically fetches driver profile pictures from the [OpenF1 API](https://openf1.org/) and caches them in the database. Profile pictures are updated:
+
+- Weekly via scheduled task (Sundays at 2 AM)
+- During application startup if drivers exist
+- Manually via the `/api/drivers/update-profile-pictures` endpoint
+
+### Race Countdown & Prediction Rules
+
+The application features a real-time countdown timer that shows the time remaining until race start:
+
+- **Blue timer**: Normal countdown (more than 1 hour remaining)
+- **Red timer**: Urgent countdown (less than 1 hour remaining)
+- **5-minute cutoff**: Predictions are automatically blocked 5 minutes before race start
+- **Visual warnings**: Clear indicators when predictions are no longer accepted
+
+### Typography
+
+The application uses **Barlow Condensed** as the primary font, providing a modern and sporty appearance that matches the Formula 1 aesthetic.
 
 ## Testing
 

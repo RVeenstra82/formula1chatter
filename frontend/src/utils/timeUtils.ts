@@ -66,4 +66,48 @@ export const calculateTimeRemaining = (
     locale: locale === 'nl' ? nl : enUS,
     addSuffix: false
   });
+};
+
+/**
+ * Check if the race starts in less than one hour
+ */
+export const isLessThanOneHour = (
+  dateString: string, 
+  timeString: string | null
+): boolean => {
+  const date = parseISO(dateString);
+  
+  if (timeString) {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    date.setHours(hours, minutes, 0);
+  } else {
+    date.setHours(12, 0, 0);
+  }
+  
+  const now = new Date();
+  const diffInMinutes = (date.getTime() - now.getTime()) / (1000 * 60);
+  
+  return diffInMinutes <= 60 && diffInMinutes > 0;
+};
+
+/**
+ * Check if the race starts in less than five minutes
+ */
+export const isLessThanFiveMinutes = (
+  dateString: string, 
+  timeString: string | null
+): boolean => {
+  const date = parseISO(dateString);
+  
+  if (timeString) {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    date.setHours(hours, minutes, 0);
+  } else {
+    date.setHours(12, 0, 0);
+  }
+  
+  const now = new Date();
+  const diffInMinutes = (date.getTime() - now.getTime()) / (1000 * 60);
+  
+  return diffInMinutes <= 5 && diffInMinutes > 0;
 }; 

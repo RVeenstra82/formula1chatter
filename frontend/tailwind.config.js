@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["'Titillium Web'", 'Inter', 'system-ui', 'sans-serif'],
+        sans: ["'Barlow Condensed'", 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         'f1-red': '#e10600',

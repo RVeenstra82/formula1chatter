@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race, Driver } from '../api/client';
 import { useLanguage } from '../contexts/LanguageContext';
-import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining } from '../utils/timeUtils';
+import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour } from '../utils/timeUtils';
 import { mockRaces } from '../mocks/mockLeaderboardData';
 
 const RaceDetailPage: React.FC = () => {
@@ -169,9 +169,21 @@ const RaceDetailPage: React.FC = () => {
           </p>
           
           {canPredict && timeRemaining && (
-            <div className="mt-4 bg-blue-50 p-4 rounded">
-              <p className="font-semibold text-blue-700">{t('races.timeRemaining')}: {timeRemaining}</p>
-              <p className="text-sm text-blue-600 mt-1">{t('races.saveBeforeStart')}</p>
+            <div className={`mt-4 p-4 rounded ${
+              isLessThanOneHour(race.date, race.time)
+                ? 'bg-red-50'
+                : 'bg-blue-50'
+            }`}>
+              <p className={`font-semibold ${
+                isLessThanOneHour(race.date, race.time)
+                  ? 'text-red-700'
+                  : 'text-blue-700'
+              }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
+              <p className={`text-sm mt-1 ${
+                isLessThanOneHour(race.date, race.time)
+                  ? 'text-red-600'
+                  : 'text-blue-600'
+              }`}>{t('races.saveBeforeStart')}</p>
               <Link 
                 to={`/races/${race.id}/predict`}
                 className="btn btn-primary btn-sm mt-3"

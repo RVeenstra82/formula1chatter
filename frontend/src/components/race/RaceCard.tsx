@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining } from '../../utils/timeUtils';
+import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour } from '../../utils/timeUtils';
 
 interface RaceCardProps {
   race: any;
@@ -58,9 +58,21 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
             </p>
             
             {canPredict && timeRemaining && (
-              <div className="mt-2 bg-blue-50 p-2 rounded text-xs sm:text-sm text-gray-800">
-                <p className="font-semibold text-blue-700">{t('races.timeRemaining')}: {timeRemaining}</p>
-                <p className="text-xs text-blue-600 mt-1">{t('races.saveBeforeStart')}</p>
+              <div className={`mt-2 p-2 rounded text-xs sm:text-sm ${
+                isLessThanOneHour(race.date, race.time)
+                  ? 'bg-red-50 text-red-800'
+                  : 'bg-blue-50 text-gray-800'
+              }`}>
+                <p className={`font-semibold ${
+                  isLessThanOneHour(race.date, race.time)
+                    ? 'text-red-700'
+                    : 'text-blue-700'
+                }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
+                <p className={`text-xs mt-1 ${
+                  isLessThanOneHour(race.date, race.time)
+                    ? 'text-red-600'
+                    : 'text-blue-600'
+                }`}>{t('races.saveBeforeStart')}</p>
               </div>
             )}
           </div>

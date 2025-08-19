@@ -12,6 +12,8 @@ import com.f1chatter.backend.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.NoSuchElementException
 
 @Service
@@ -29,6 +31,11 @@ class PredictionService(
         val race = raceRepository.findById(raceId)
             .orElseThrow { NoSuchElementException("Race not found") }
         
+        // Check if race starts within 5 minutes
+        if (isRaceStartingWithinFiveMinutes(race)) {
+            throw IllegalStateException("Predictions are no longer accepted. Race starts within 5 minutes.")
+        }
+        
         val existingPrediction = predictionRepository.findByUserAndRace(user, race)
         
         return if (existingPrediction.isPresent) {
@@ -37,6 +44,14 @@ class PredictionService(
         } else {
             createPrediction(user, race, predictionDto)
         }
+    }
+    
+    private fun isRaceStartingWithinFiveMinutes(race: Race): Boolean {
+        val now = LocalDateTime.now()
+        val raceDateTime = LocalDateTime.of(race.date, race.time ?: LocalTime.of(12, 0))
+        val minutesUntilRace = java.time.Duration.between(now, raceDateTime).toMinutes()
+        
+        return minutesUntilRace <= 5 && minutesUntilRace > 0
     }
     
     private fun createPrediction(user: User, race: Race, predictionDto: PredictionDto): Prediction {

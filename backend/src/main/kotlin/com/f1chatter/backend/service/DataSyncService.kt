@@ -13,6 +13,7 @@ import java.time.LocalDate
 @EnableScheduling
 class DataSyncService(
     private val jolpicaApiService: JolpicaApiService,
+    private val openF1ApiService: OpenF1ApiService,
     private val raceRepository: RaceRepository,
     private val driverRepository: DriverRepository,
     private val constructorRepository: ConstructorRepository,
@@ -48,6 +49,13 @@ class DataSyncService(
         } else {
             logger.info { "Drivers and constructors already exist, skipping driver sync" }
         }
+    }
+    
+    // Update driver profile pictures weekly
+    @Scheduled(cron = "0 0 2 * * SUN") // At 2 AM on Sunday
+    fun updateDriverProfilePictures() {
+        logger.info { "Starting scheduled update of driver profile pictures" }
+        openF1ApiService.updateDriverProfilePictures()
     }
     
     // Keep checking for completed races more frequently
@@ -117,6 +125,17 @@ class DataSyncService(
             syncDriverData()
         } else {
             logger.info { "Drivers and constructors already exist in database, skipping driver sync" }
+        }
+        
+        // Update driver profile pictures if we have drivers
+        if (hasDrivers) {
+            logger.info { "Updating driver profile pictures from OpenF1 API" }
+            try {
+                Thread.sleep(2000) // Wait 2 seconds before updating profile pictures
+                openF1ApiService.updateDriverProfilePictures()
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to update driver profile pictures during initialization" }
+            }
         }
     }
 } 

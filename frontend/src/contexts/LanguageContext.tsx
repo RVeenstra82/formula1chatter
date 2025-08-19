@@ -94,7 +94,8 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.for3rdPlace': 'for correctly predicting 3rd place',
     'predict.forFastestLap': 'for correctly predicting fastest lap',
     'predict.forDriverOfDay': 'for correctly predicting driver of the day',
-    'predict.canUpdateBeforeStart': 'You can update your prediction any time before the race starts',
+    'predict.canUpdateBeforeStart': 'You can update your prediction until 5 minutes before the race starts',
+    'predict.noMorePredictions': 'It is no longer possible to submit or modify predictions!',
     
     // Results
     'results.title': 'Prediction Results',
@@ -225,7 +226,8 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.for3rdPlace': 'voor het correct voorspellen van de 3e plaats',
     'predict.forFastestLap': 'voor het correct voorspellen van de snelste ronde',
     'predict.forDriverOfDay': 'voor het correct voorspellen van de coureur van de dag',
-    'predict.canUpdateBeforeStart': 'Je kunt je voorspelling op elk moment bijwerken voordat de race begint',
+    'predict.canUpdateBeforeStart': 'Je kunt je voorspelling bijwerken tot 5 minuten voor de race begint',
+    'predict.noMorePredictions': 'Het is niet meer mogelijk om voorspellingen in te dienen of te wijzigen!',
     
     // Results
     'results.title': 'Voorspellingsresultaten',

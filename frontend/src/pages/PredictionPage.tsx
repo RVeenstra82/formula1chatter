@@ -6,7 +6,7 @@ import type { Race } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import PredictionForm from '../components/prediction/PredictionForm';
-import { calculateTimeRemaining } from '../utils/timeUtils';
+import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes } from '../utils/timeUtils';
 
 // Helper function to get race ID from country name
 const getRaceIdFromCountry = (country?: string): string | null => {
@@ -182,7 +182,11 @@ const PredictionPage: React.FC = () => {
             <p className="mb-4">{race.circuitName}, {race.locality}, {race.country}</p>
             
             {timeRemaining && (
-              <div className="bg-primary text-white p-4 rounded-md mb-6">
+              <div className={`p-4 rounded-md mb-6 ${
+                isLessThanOneHour(race.date, race.time) 
+                  ? 'bg-red-600 text-white' 
+                  : 'bg-blue-600 text-white'
+              }`}>
                 <p className="font-bold text-lg mb-1">{t('races.timeRemaining')}:</p>
                 <p className="text-2xl font-bold">{timeRemaining}</p>
                 <p className="text-sm mt-2">{t('races.saveBeforeStart')}</p>
@@ -211,6 +215,11 @@ const PredictionPage: React.FC = () => {
             <div className="bg-yellow-100 p-4 rounded-md text-yellow-800">
               <p className="font-semibold">{t('common.important')}:</p>
               <p>{t('predict.canUpdateBeforeStart')}</p>
+              {isLessThanFiveMinutes(race.date, race.time) && (
+                <p className="font-bold text-red-600 mt-2">
+                  ⚠️ {t('predict.noMorePredictions')}
+                </p>
+              )}
             </div>
           </div>
         </div>

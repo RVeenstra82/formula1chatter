@@ -64,11 +64,21 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
         placeholder="Select a driver"
         formatOptionLabel={({ driver }) => (
           <div className="flex items-center gap-2">
-            <img
-              src={driver.profilePictureUrl ?? undefined}
-              alt={`${driver.firstName} ${driver.lastName}`}
-              className="w-6 h-6 rounded-full"
-            />
+            {driver.profilePictureUrl ? (
+              <img
+                src={driver.profilePictureUrl}
+                alt={`${driver.firstName} ${driver.lastName}`}
+                className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  // Hide the image if it fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-600">
+                {driver.firstName.charAt(0)}{driver.lastName.charAt(0)}
+              </div>
+            )}
             <span>{driver.firstName} {driver.lastName}</span>
           </div>
         )}

@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.model.Driver
 import com.f1chatter.backend.repository.DriverRepository
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -20,6 +21,15 @@ class OpenF1ApiService(
     private val logger = KotlinLogging.logger {}
     private val baseUrl = "https://api.openf1.org/v1"
     
+    @Value("\${openf1.api.rate-limit.delay-between-drivers-ms:500}")
+    private lateinit var delayBetweenDriversMs: String
+    
+    @Value("\${openf1.api.rate-limit.delay-between-calls-ms:200}")
+    private lateinit var delayBetweenCallsMs: String
+    
+    @Value("\${openf1.api.rate-limit.max-errors-before-stop:5}")
+    private lateinit var maxErrorsBeforeStop: String
+    
     /**
      * Updates profile pictures for all drivers using OpenF1 API
      */
@@ -35,9 +45,18 @@ class OpenF1ApiService(
         val drivers = driverRepository.findAll()
         var updatedCount = 0
         var skippedCount = 0
+        var errorCount = 0
         
-        drivers.forEach { driver ->
+        val delayBetweenDrivers = delayBetweenDriversMs.toIntOrNull() ?: 500
+        val maxErrors = maxErrorsBeforeStop.toIntOrNull() ?: 5
+        
+        for ((index, driver) in drivers.withIndex()) {
             try {
+                // Add longer delay between drivers to avoid rate limiting
+                if (index > 0) {
+                    Thread.sleep(delayBetweenDrivers.toLong())
+                }
+                
                 val headshotUrl = fetchDriverHeadshotUrl(driver)
                 if (headshotUrl != null && headshotUrl != driver.profilePictureUrl) {
                     driver.profilePictureUrl = headshotUrl
@@ -49,14 +68,19 @@ class OpenF1ApiService(
                     logger.debug { "No headshot URL found for driver: ${driver.givenName} ${driver.familyName}" }
                 }
                 
-                // Add a small delay to avoid rate limiting
-                Thread.sleep(100)
             } catch (e: Exception) {
+                errorCount++
                 logger.error(e) { "Failed to update profile picture for driver: ${driver.givenName} ${driver.familyName}" }
+                
+                // If we get too many errors, stop to avoid overwhelming the API
+                if (errorCount >= maxErrors) {
+                    logger.warn { "Too many errors encountered, stopping profile picture updates to avoid rate limiting" }
+                    break
+                }
             }
         }
         
-        logger.info { "Completed updating driver profile pictures. Updated $updatedCount drivers, skipped $skippedCount drivers." }
+        logger.info { "Completed updating driver profile pictures. Updated $updatedCount drivers, skipped $skippedCount drivers, errors: $errorCount" }
     }
     
     /**
@@ -78,6 +102,8 @@ class OpenF1ApiService(
      */
     private fun fetchDriverHeadshotUrl(driver: Driver): String? {
         try {
+            val delayBetweenCalls = delayBetweenCallsMs.toIntOrNull() ?: 200
+            
             // Try to find the driver by their permanent number first
             val driverNumber = driver.permanentNumber?.toIntOrNull()
             if (driverNumber != null) {
@@ -93,6 +119,9 @@ class OpenF1ApiService(
                         return headshotUrl
                     }
                 }
+                
+                // Add delay between API calls for the same driver
+                Thread.sleep(delayBetweenCalls.toLong())
             }
             
             // If not found by number, try to find by name
@@ -110,6 +139,9 @@ class OpenF1ApiService(
                     return headshotUrl
                 }
             }
+            
+            // Add delay between API calls for the same driver
+            Thread.sleep(delayBetweenCalls.toLong())
             
             // Try a broader search with just the last name
             val lastNameUrl = "$baseUrl/drivers?last_name=$encodedLastName"

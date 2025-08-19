@@ -26,5 +26,14 @@ jolpica:
     rate-limit:
       requests-per-second: 3
       max-retries: 3
+
+openf1:
+  api:
+    rate-limit:
+      delay-between-drivers-ms: 500
+      delay-between-calls-ms: 200
+      max-errors-before-stop: 2
+    startup:
+      update-profile-pictures: ${UPDATE_PROFILE_PICTURES_ON_STARTUP:false}
     
  

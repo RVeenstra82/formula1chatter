@@ -1,172 +1,93 @@
-# Formula 1 Chatter Championship
+# Formula 1 Chatter
 
-A web application for Formula 1 fans to predict race outcomes and compete with friends.
+A Formula 1 prediction and discussion platform where users can make predictions about race outcomes and compete with others.
 
 ## Features
 
-- Facebook login integration
-- Display upcoming F1 races
-- Predict race results (top 3 finishers, fastest lap, driver of the day)
-- Point system (5/3/1/1/1) for correct predictions
-- Leaderboard to track season standings
-- Race data from Jolpica API
-- Driver profile pictures from OpenF1 API
-- Real-time countdown timer with visual indicators
-- 5-minute prediction cutoff before race start
-- Modern Barlow Condensed typography
+- **Race Predictions**: Make predictions for upcoming F1 races
+- **Leaderboard**: Compete with other users and see rankings
+- **Real-time Data**: Automatic synchronization with F1 data sources
+- **User Authentication**: Secure login with Facebook OAuth
+- **Mobile Responsive**: Works great on all devices
 
 ## Tech Stack
 
-- **Frontend**: React, TypeScript, Vite, React Query, React Router, Tailwind CSS
-- **Backend**: Spring Boot, Kotlin, Gradle
-- **Database**: PostgreSQL
-- **Testing**: JUnit, MockK, Playwright
-
-## Running the Application
-
-### Option 1: Using Docker Compose (Recommended)
-
-The easiest way to run the application is using the provided start script, which will:
-1. Start PostgreSQL database using Docker Compose
-2. Run the backend with the PostgreSQL profile
-3. Run the frontend development server
-
-```bash
-./start.sh
-```
-
-This will start:
-- PostgreSQL database at `localhost:5432`
-- PgAdmin at `http://localhost:5050` (email: admin@f1chatter.com, password: admin)
-- Backend API at `http://localhost:8080/api`
-- Frontend at `http://localhost:5173`
-
-Press `Ctrl+C` to stop all services.
-
-### Option 2: Running Components Individually
-
-#### Database
-You can run PostgreSQL using Docker Compose:
-
-```bash
-docker-compose up -d postgres
-```
-
-#### Backend
-
-```bash
-cd backend
-./gradlew bootRun --args='--spring.profiles.active=postgres'
-```
-
-For in-memory database (H2) instead of PostgreSQL:
-
-```bash
-cd backend
-./gradlew bootRun
-```
+### Backend
+- **Kotlin** with **Spring Boot**
+- **PostgreSQL** database
+- **JPA/Hibernate** for data persistence
+- **Spring Security** for authentication
+- **Scheduled tasks** for data synchronization
 
 ### Frontend
+- **React** with **TypeScript**
+- **Tailwind CSS** for styling
+- **Vite** for build tooling
+- **React Router** for navigation
 
-```bash
-cd frontend
-npm install
-npm run dev
+## API Rate Limiting Configuration
+
+The application uses external APIs (OpenF1 and Jolpica) for F1 data. To prevent rate limiting issues, the following configuration options are available:
+
+### OpenF1 API Configuration
+
+Add these settings to your `application.yml` or environment variables:
+
+```yaml
+openf1:
+  api:
+    rate-limit:
+      delay-between-drivers-ms: 500    # Delay between processing different drivers
+      delay-between-calls-ms: 200      # Delay between API calls for the same driver
+      max-errors-before-stop: 5        # Stop after this many errors
+    startup:
+      update-profile-pictures: false   # Disable profile picture updates during startup
 ```
 
-## API Endpoints
+### Environment Variables
 
-### Driver Management
+- `UPDATE_PROFILE_PICTURES_ON_STARTUP`: Set to `true` to enable profile picture updates during application startup (default: `false`)
 
-- `GET /api/drivers` - Get all drivers with profile pictures
-- `GET /api/drivers/{id}` - Get a specific driver by ID
-- `POST /api/drivers/update-profile-pictures` - Manually trigger profile picture updates from OpenF1 API
-- `GET /api/drivers/test-openf1-connection` - Test connection to OpenF1 API
+### Why These Changes?
 
-### Driver Profile Pictures
+The original implementation was making too many API calls to the OpenF1 API during startup, causing 504 Gateway Timeout errors. The improvements include:
 
-The application automatically fetches driver profile pictures from the [OpenF1 API](https://openf1.org/) and caches them in the database. Profile pictures are updated:
+1. **Configurable delays** between API calls to respect rate limits
+2. **Optional startup updates** to prevent startup delays
+3. **Better error handling** to stop when too many errors occur
+4. **Increased timeouts** in RestTemplate configuration
+5. **Scheduled updates** that run weekly instead of during startup
 
-- Weekly via scheduled task (Sundays at 2 AM)
-- During application startup if drivers exist
-- Manually via the `/api/drivers/update-profile-pictures` endpoint
+## Development Setup
 
-### Race Countdown & Prediction Rules
+### Prerequisites
+- Java 17+
+- Node.js 18+
+- PostgreSQL 13+
 
-The application features a real-time countdown timer that shows the time remaining until race start:
+### Backend Setup
+1. Navigate to the backend directory: `cd backend`
+2. Create a PostgreSQL database
+3. Update `application-dev.yml` with your database credentials
+4. Run: `./gradlew bootRun`
 
-- **Blue timer**: Normal countdown (more than 1 hour remaining)
-- **Red timer**: Urgent countdown (less than 1 hour remaining)
-- **5-minute cutoff**: Predictions are automatically blocked 5 minutes before race start
-- **Visual warnings**: Clear indicators when predictions are no longer accepted
+### Frontend Setup
+1. Navigate to the frontend directory: `cd frontend`
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
 
-### Typography
+## Deployment
 
-The application uses **Barlow Condensed** as the primary font, providing a modern and sporty appearance that matches the Formula 1 aesthetic.
+The application is configured for deployment on Railway with automatic database provisioning and environment variable management.
 
-## Testing
+## Contributing
 
-### Backend Tests
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-To run the backend tests:
+## License
 
-```bash
-cd backend
-./gradlew test
-```
-
-This will run all the JUnit tests for services, repositories, and controllers.
-
-### Frontend Tests
-
-To run the frontend Playwright tests:
-
-```bash
-cd frontend
-npm test
-```
-
-To run the tests in headed mode (with visible browser):
-
-```bash
-cd frontend
-npm run test:headed
-```
-
-To run the tests with the Playwright UI:
-
-```bash
-cd frontend
-npm run test:ui
-```
-
-## Test Coverage
-
-### Backend Tests
-
-- **UserService**: Tests for user creation, retrieval, and OAuth login flow
-- **RaceService**: Tests for retrieving races, handling race data
-- **PredictionService**: Tests for creating/updating predictions, calculating scores
-
-### Frontend Tests
-
-- **Home Page**: Tests for page rendering, navigation, and next race display
-- **Prediction Form**: Tests for form validation, driver selection, and API interactions
-- **Leaderboard**: Tests for displaying rankings, podium positions, and error handling
-
-## Development
-
-The project is structured as a multi-module application:
-
-- `backend/`: Spring Boot backend with REST API
-- `frontend/`: React frontend application
-
-## Database Setup
-
-The application uses PostgreSQL. Make sure to have PostgreSQL installed and running.
-Configure the database connection in `backend/src/main/resources/application.yml`.
-
-## API Documentation
-Once the backend is running, Swagger documentation will be available at:
-http://localhost:8080/api/swagger-ui.html # Last updated: Tue Aug 19 18:31:34 CEST 2025
-# CORS fix deployment - Tue Aug 19 19:16:11 CEST 2025
+This project is licensed under the MIT License.

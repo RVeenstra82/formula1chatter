@@ -4,6 +4,7 @@ import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -20,6 +21,9 @@ class DataSyncService(
     private val predictionService: PredictionService
 ) {
     private val logger = KotlinLogging.logger {}
+    
+    @Value("\${openf1.api.startup.update-profile-pictures:false}")
+    private lateinit var updateProfilePicturesOnStartup: String
     
     /**
      * Determines the current F1 season based on the current date.
@@ -165,15 +169,20 @@ class DataSyncService(
             logger.info { "Drivers and constructors already exist in database, skipping driver sync" }
         }
         
-        // Update driver profile pictures if we have drivers
-        if (hasDrivers) {
-            logger.info { "Updating driver profile pictures from OpenF1 API" }
+        // Only update driver profile pictures during startup if explicitly enabled
+        // This can be controlled via environment variable to avoid startup delays
+        val shouldUpdateProfilePictures = updateProfilePicturesOnStartup.toBoolean()
+        
+        if (hasDrivers && shouldUpdateProfilePictures) {
+            logger.info { "Updating driver profile pictures from OpenF1 API during startup" }
             try {
                 Thread.sleep(2000) // Wait 2 seconds before updating profile pictures
                 openF1ApiService.updateDriverProfilePictures()
             } catch (e: Exception) {
                 logger.error(e) { "Failed to update driver profile pictures during initialization" }
             }
+        } else if (hasDrivers) {
+            logger.info { "Skipping profile picture updates during startup (set UPDATE_PROFILE_PICTURES_ON_STARTUP=true to enable)" }
         }
     }
 } 

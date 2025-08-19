@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // For local development, use proxy. For production, use the Render backend URL
 const baseURL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.DEV ? '/api' : 'https://formula1chatter.onrender.com/api');
+  (import.meta.env.DEV ? '/api' : 'https://formula1chatter.onrender.com');
 
 export const apiClient = axios.create({
   baseURL,

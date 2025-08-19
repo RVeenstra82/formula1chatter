@@ -83,6 +83,11 @@ export const api = {
     return response.data;
   },
 
+  getAuthStatus: async (): Promise<{ authenticated: boolean }> => {
+    const response = await apiClient.get('/auth/status');
+    return response.data;
+  },
+
   // Races
   getCurrentSeasonRaces: async (): Promise<Race[]> => {
     const response = await apiClient.get('/races/current-season');

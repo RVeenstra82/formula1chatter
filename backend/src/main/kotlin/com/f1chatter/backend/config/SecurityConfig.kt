@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -28,11 +29,20 @@ class SecurityConfig {
             .oauth2Login { oauth2 ->
                 oauth2
                     .defaultSuccessUrl("/api/auth/user", true)
+                    .failureUrl("/api/auth/login-failed")
             }
             .logout { logout ->
                 logout
+                    .logoutUrl("/api/logout")
                     .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
                     .permitAll()
+            }
+            .sessionManagement { session ->
+                session
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .maximumSessions(1)
             }
         
         return http.build()
@@ -45,11 +55,13 @@ class SecurityConfig {
             "https://formula1chatter.vercel.app",
             "https://formula1chatter.onrender.com",
             "http://localhost:3000",
-            "http://localhost:5173"
+            "http://localhost:5173",
+            "http://localhost:8090"
         )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
+        configuration.exposedHeaders = listOf("Set-Cookie")
         
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)

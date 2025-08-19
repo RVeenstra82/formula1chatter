@@ -44,4 +44,11 @@ yarn-error.log*
 # Gegenereerde bestanden
 bin/
 tmp/
-*.class 
+*.class
+
+# Test results en screenshots
+test-results/
+playwright-report/
+*.png
+*.jpg
+*.jpeg 

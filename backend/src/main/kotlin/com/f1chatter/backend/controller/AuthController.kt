@@ -26,4 +26,18 @@ class AuthController(
         
         return ResponseEntity.ok(user)
     }
+    
+    @GetMapping("/login-failed")
+    fun loginFailed(): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.status(401).body(mapOf("error" to "Login failed"))
+    }
+    
+    @GetMapping("/status")
+    fun getAuthStatus(@AuthenticationPrincipal principal: OAuth2User?): ResponseEntity<Map<String, Any>> {
+        return if (principal != null) {
+            ResponseEntity.ok(mapOf("authenticated" to true))
+        } else {
+            ResponseEntity.ok(mapOf("authenticated" to false))
+        }
+    }
 } 

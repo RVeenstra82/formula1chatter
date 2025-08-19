@@ -27,7 +27,4 @@ jolpica:
       requests-per-second: 3
       max-retries: 3
     
-sportmonks:
-  api:
-    base-url: https://api.sportmonks.com/v3/formula-one
-    key: ${SPORTMONKS_API_KEY:your-api-key-here} 
+ 

@@ -21,6 +21,14 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+            scope: email, public_profile
 
 server:
   port: ${PORT:8090}

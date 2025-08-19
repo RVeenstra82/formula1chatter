@@ -41,7 +41,12 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:5173") // Add frontend URL
+        configuration.allowedOrigins = listOf(
+            "https://formula1chatter.vercel.app",
+            "https://formula1chatter.onrender.com",
+            "http://localhost:3000",
+            "http://localhost:5173"
+        )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true

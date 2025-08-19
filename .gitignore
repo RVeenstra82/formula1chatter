@@ -1,5 +1,6 @@
 # Omgevingsvariabelen en gevoelige informatie
 .env
+env.properties
 set-env.sh
 backend/src/main/resources/application-local.yml
 

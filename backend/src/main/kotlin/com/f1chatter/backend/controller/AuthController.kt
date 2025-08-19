@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import mu.KotlinLogging
+import org.springframework.web.client.RestTemplate
+import org.springframework.beans.factory.annotation.Value
 
 @RestController
 @RequestMapping("/auth")
@@ -60,5 +62,47 @@ class AuthController(
             "message" to "OAuth2 endpoint accessible",
             "timestamp" to System.currentTimeMillis()
         ))
+    }
+
+    @GetMapping("/test-facebook-config")
+    fun testFacebookConfig(
+        @Value("\${spring.security.oauth2.client.registration.facebook.client-id:}") clientId: String,
+        @Value("\${spring.security.oauth2.client.registration.facebook.client-secret:}") clientSecret: String,
+        @Value("\${spring.security.oauth2.client.registration.facebook.redirect-uri:}") redirectUri: String
+    ): ResponseEntity<Map<String, Any>> {
+        logger.info { "Facebook config test endpoint called" }
+        
+        val config = mutableMapOf<String, Any>()
+        
+        // Check credentials
+        config["clientIdConfigured"] = clientId.isNotBlank() && clientId != "dummy-client-id"
+        config["clientSecretConfigured"] = clientSecret.isNotBlank() && clientSecret != "dummy-client-secret"
+        config["redirectUriTemplate"] = redirectUri
+        config["expectedRedirectUri"] = "https://formula1chatter.onrender.com/api/login/oauth2/code/facebook"
+        config["successRedirectUrl"] = "https://formula1chatter.vercel.app/#/"
+        
+        // Test Facebook app accessibility
+        if (clientId.isNotBlank() && clientId != "dummy-client-id") {
+            try {
+                val testUrl = "https://graph.facebook.com/$clientId"
+                val restTemplate = RestTemplate()
+                val response = restTemplate.getForObject(testUrl, String::class.java)
+                
+                config["facebookAppAccessible"] = response != null && response.contains("name")
+                config["facebookAppResponse"] = response?.take(200) ?: "null"
+            } catch (e: Exception) {
+                config["facebookAppAccessible"] = false
+                config["facebookAppError"] = e.message ?: "Unknown error"
+            }
+        } else {
+            config["facebookAppAccessible"] = false
+            config["facebookAppError"] = "Client ID not configured"
+        }
+        
+        // OAuth2 endpoints
+        config["oauth2AuthorizationUrl"] = "https://formula1chatter.onrender.com/api/oauth2/authorization/facebook"
+        config["oauth2CallbackUrl"] = "https://formula1chatter.onrender.com/api/login/oauth2/code/facebook"
+        
+        return ResponseEntity.ok(config)
     }
 } 

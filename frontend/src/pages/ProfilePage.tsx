@@ -66,7 +66,7 @@ const ProfilePage: React.FC = () => {
 
               <div className="mb-3">
                 <p className="text-xs uppercase tracking-wide text-gray-600 mb-1">Te typen naam</p>
-                <div className="px-3 py-2 rounded-md bg-white border border-gray-200 text-gray-900 inline-block">
+                <div className="px-3 py-2 rounded-md bg-white border border-gray-200 text-gray-900 inline-block select-none">
                   {user.name}
                 </div>
               </div>
@@ -79,8 +79,20 @@ const ProfilePage: React.FC = () => {
                 onChange={(e) => setConfirmName(e.target.value)}
                 className="input w-full mb-3"
                 placeholder="Typ exact je naam"
+                autoComplete="off"
+                spellCheck={false}
+                onPaste={(e) => e.preventDefault()}
+                onDrop={(e) => e.preventDefault()}
+                onContextMenu={(e) => e.preventDefault()}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'v')) {
+                    e.preventDefault();
+                  }
+                }}
                 autoFocus
               />
+
+              <p className="text-xs text-gray-500 mb-3">Kopieer-plakken is uitgeschakeld voor dit veld.</p>
 
               <div className="flex items-center gap-3">
                 <button

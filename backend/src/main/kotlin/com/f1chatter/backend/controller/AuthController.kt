@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestHeader
 import mu.KotlinLogging
 import org.springframework.web.client.RestTemplate
 import org.springframework.beans.factory.annotation.Value
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @RestController
 @RequestMapping("/auth")
@@ -104,7 +106,7 @@ class AuthController(
             
             logger.info { "OAuth2 callback successful, generated JWT for user: ${user.name}" }
             
-            // Redirect to frontend with token as URL parameters
+            // Redirect to frontend with token and URL-encoded user JSON as URL parameters
             val userJson = """
                 {
                     "id": ${user.id},
@@ -112,9 +114,10 @@ class AuthController(
                     "email": "${user.email}",
                     "profilePictureUrl": "${user.profilePictureUrl ?: ""}"
                 }
-            """.trimIndent().replace("\n", "").replace(" ", "")
-            
-            val redirectUrl = "https://formula1chatter.vercel.app/#/?token=${jwtToken}&user=${userJson}"
+            """.trimIndent().replace("\n", "")
+
+            val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())
+            val redirectUrl = "https://formula1chatter.vercel.app/#/?token=${jwtToken}&user=${encodedUserJson}"
             
             return ResponseEntity.status(302)
                 .header("Location", redirectUrl)

@@ -68,10 +68,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.log('AuthContext: Token:', tokenParam.substring(0, 20) + '...');
           console.log('AuthContext: User param:', userParam.substring(0, 50) + '...');
           try {
-            const userData = JSON.parse(userParam);
+            // Support both plain JSON and URL-encoded JSON for the user param
+            let userJsonString = userParam;
+            try {
+              userJsonString = decodeURIComponent(userParam);
+            } catch (_) {
+              // Not URL-encoded; proceed with original string
+            }
+            const userData = JSON.parse(userJsonString);
             console.log('AuthContext: Parsed user data:', userData);
             localStorage.setItem('authToken', tokenParam);
-            localStorage.setItem('user', userParam);
+            localStorage.setItem('user', JSON.stringify(userData));
             setUser(userData);
             
             // Clean up URL parameters

@@ -30,10 +30,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('AuthContext: Checking URL parameters...');
         console.log('AuthContext: Current URL:', window.location.href);
         console.log('AuthContext: Search params:', window.location.search);
+        console.log('AuthContext: Hash:', window.location.hash);
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const tokenParam = urlParams.get('token');
-        const userParam = urlParams.get('user');
+        // Check both search params and hash fragment
+        let urlParams = new URLSearchParams(window.location.search);
+        let tokenParam = urlParams.get('token');
+        let userParam = urlParams.get('user');
+        
+        // If not found in search params, check hash fragment
+        if (!tokenParam || !userParam) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the #
+          tokenParam = tokenParam || hashParams.get('token');
+          userParam = userParam || hashParams.get('user');
+        }
         
         console.log('AuthContext: tokenParam exists:', !!tokenParam);
         console.log('AuthContext: userParam exists:', !!userParam);

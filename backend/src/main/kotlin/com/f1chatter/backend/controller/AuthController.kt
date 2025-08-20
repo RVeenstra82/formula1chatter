@@ -104,32 +104,21 @@ class AuthController(
             
             logger.info { "OAuth2 callback successful, generated JWT for user: ${user.name}" }
             
-            // Return HTML that saves the token and redirects
-            val html = """
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Login Successful</title>
-                </head>
-                <body>
-                    <script>
-                        localStorage.setItem('authToken', '$jwtToken');
-                        localStorage.setItem('user', JSON.stringify({
-                            id: ${user.id},
-                            name: '${user.name}',
-                            email: '${user.email}',
-                            profilePictureUrl: '${user.profilePictureUrl ?: ""}'
-                        }));
-                        window.location.href = 'https://formula1chatter.vercel.app/#/';
-                    </script>
-                    <p>Login successful, redirecting...</p>
-                </body>
-                </html>
-            """.trimIndent()
+            // Redirect to frontend with token as URL parameters
+            val userJson = """
+                {
+                    "id": ${user.id},
+                    "name": "${user.name}",
+                    "email": "${user.email}",
+                    "profilePictureUrl": "${user.profilePictureUrl ?: ""}"
+                }
+            """.trimIndent().replace("\n", "").replace(" ", "")
             
-            return ResponseEntity.ok()
-                .header("Content-Type", "text/html")
-                .body(html)
+            val redirectUrl = "https://formula1chatter.vercel.app/#/?token=${jwtToken}&user=${userJson}"
+            
+            return ResponseEntity.status(302)
+                .header("Location", redirectUrl)
+                .build()
         }
         
         logger.warn { "OAuth2 callback failed - no principal" }

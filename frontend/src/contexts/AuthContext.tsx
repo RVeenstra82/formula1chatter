@@ -26,6 +26,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         setIsLoading(true);
         
+        // Check for URL parameters from OAuth2 callback
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenParam = urlParams.get('token');
+        const userParam = urlParams.get('user');
+        
+        if (tokenParam && userParam) {
+          console.log('AuthContext: Found token and user in URL parameters');
+          try {
+            const userData = JSON.parse(userParam);
+            localStorage.setItem('authToken', tokenParam);
+            localStorage.setItem('user', userParam);
+            setUser(userData);
+            
+            // Clean up URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+            return;
+          } catch (err) {
+            console.log('AuthContext: Failed to parse user data from URL:', err);
+          }
+        }
+        
         // First check localStorage for stored user and token
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('user');

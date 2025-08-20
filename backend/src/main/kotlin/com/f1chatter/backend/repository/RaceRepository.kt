@@ -25,5 +25,7 @@ interface RaceRepository : JpaRepository<Race, String> {
     fun findBySeasonLessThan(season: Int): List<Race>
     
     @Query("SELECT MIN(r.season) FROM Race r")
-    fun findOldestSeason(): Int?
+fun findOldestSeason(): Int?
+
+fun findByRaceCompletedTrue(): List<Race>
 } 

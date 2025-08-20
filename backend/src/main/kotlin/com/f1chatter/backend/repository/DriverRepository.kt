@@ -12,5 +12,7 @@ interface DriverRepository : JpaRepository<Driver, String> {
     fun findByPermanentNumber(permanentNumber: String): Driver?
 
     @Query("SELECT d FROM Driver d WHERE LOWER(CONCAT(d.givenName, ' ', d.familyName)) = LOWER(CONCAT(:givenName, ' ', :familyName))")
-    fun findByFullNameIgnoreCase(givenName: String, familyName: String): Driver?
+fun findByFullNameIgnoreCase(givenName: String, familyName: String): Driver?
+
+fun findByConstructorId(constructorId: String): List<Driver>
 }

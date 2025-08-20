@@ -194,4 +194,40 @@ export const api = {
     const response = await apiClient.get(`/predictions/race/${raceId}/results`);
     return response.data;
   },
+
+  // Stats
+  getStatsOverview: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/overview');
+    return response.data;
+  },
+
+  getDriverPerformanceStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/driver-performance');
+    return response.data;
+  },
+
+  getPredictionAccuracyStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/prediction-accuracy');
+    return response.data;
+  },
+
+  getCircuitDifficultyStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/circuit-difficulty');
+    return response.data;
+  },
+
+  getUserComparisonStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/user-comparison');
+    return response.data;
+  },
+
+  getSeasonProgressStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/season-progress');
+    return response.data;
+  },
+
+  getConstructorPerformanceStats: async (): Promise<any> => {
+    const response = await apiClient.get('/stats/constructor-performance');
+    return response.data;
+  },
 }; 

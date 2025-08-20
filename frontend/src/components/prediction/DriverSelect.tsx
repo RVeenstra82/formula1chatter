@@ -60,10 +60,8 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
       </label>
       <Select
         inputId={id}
-        // discourage password managers from overlaying icons
         instanceId={`${id}-drivers`}
         name={`${id}-drivers`}
-        autoComplete="off"
         value={selectedOption}
         onChange={(option: SingleValue<DriverOption>) => {
           if (option) onChange(option.value);

@@ -37,6 +37,12 @@ const Navbar: React.FC = () => {
               >
                 {t('nav.leaderboard')}
               </Link>
+              <Link 
+                to="/stats" 
+                className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+              >
+                Statistieken
+              </Link>
             </div>
             
             <div className="border-l border-gray-600 pl-6">
@@ -58,7 +64,7 @@ const Navbar: React.FC = () => {
                   <span>{user.name}</span>
                 </Link>
                 <button 
-                  onClick={logout} 
+                  onClick={() => logout()} 
                   className="ml-4 text-sm btn btn-primary"
                 >
                   {t('nav.logout')}
@@ -133,6 +139,13 @@ const Navbar: React.FC = () => {
                 >
                   {t('nav.leaderboard')}
                 </Link>
+                <Link 
+                  to="/stats" 
+                  className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Statistieken
+                </Link>
                 
                 {isLoading ? (
                   <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse"></div>
@@ -153,11 +166,11 @@ const Navbar: React.FC = () => {
                       <span>{user.name}</span>
                     </Link>
                     <button 
-                      onClick={() => {
-                        logout();
+                      onClick={async () => {
+                        await logout();
                         setIsMenuOpen(false);
                       }} 
-                      className="text-left px-4 py-3 btn btn-primary"
+                      className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
                     >
                       {t('nav.logout')}
                     </button>

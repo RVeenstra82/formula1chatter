@@ -136,14 +136,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = `${apiClient.defaults.baseURL}/oauth2/authorization/facebook`;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Call backend logout endpoint first
+      await apiClient.post('/logout');
+    } catch (error) {
+      console.log('Logout API call failed, but continuing with local cleanup');
+    }
+    
     // Clear JWT token and user data
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     setUser(null);
     
-    // Optionally call backend logout endpoint
-    window.location.href = `${apiClient.defaults.baseURL}/logout`;
+    // Redirect to home page
+    window.location.href = '/';
   };
 
   // Test login functie alleen in development mode

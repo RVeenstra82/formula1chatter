@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (storedToken && storedUser) {
           try {
-            const userData = JSON.parse(storedUser);
             // Verify token is still valid by making API call
             const currentUserData = await api.getCurrentUser();
             setUser(currentUserData);

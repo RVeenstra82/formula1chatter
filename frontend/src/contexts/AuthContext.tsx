@@ -48,14 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const hashQueryString = hashString.substring(hashString.indexOf('?') + 1);
             console.log('AuthContext: Hash query string:', hashQueryString);
             const hashParams = new URLSearchParams(hashQueryString);
-            tokenParam = tokenParam || hashParams.get('token');
-            userParam = userParam || hashParams.get('user');
+            if (!tokenParam) tokenParam = hashParams.get('token');
+            if (!userParam) userParam = hashParams.get('user');
             console.log('AuthContext: From hash params - token:', !!tokenParam, 'user:', !!userParam);
           } else {
             // Hash contains direct parameters like #token=...&user=...
             const hashParams = new URLSearchParams(hashString);
-            tokenParam = tokenParam || hashParams.get('token');
-            userParam = userParam || hashParams.get('user');
+            if (!tokenParam) tokenParam = hashParams.get('token');
+            if (!userParam) userParam = hashParams.get('user');
             console.log('AuthContext: From direct hash params - token:', !!tokenParam, 'user:', !!userParam);
           }
         }

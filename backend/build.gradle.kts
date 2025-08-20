@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
+    id("jacoco")
 }
 
 group = "com.f1chatter"
@@ -58,3 +59,15 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 } 
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.named<JacocoReport>("jacocoTestReport").configure {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}

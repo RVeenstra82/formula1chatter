@@ -32,8 +32,9 @@ const RaceDetailPage: React.FC = () => {
   });
   
   const { data: drivers, isLoading: isLoadingDrivers } = useQuery<Driver[]>({
-    queryKey: ['drivers'],
-    queryFn: api.getAllDrivers,
+    queryKey: ['active-drivers', raceId],
+    queryFn: () => (raceId ? api.getActiveDriversForRace(raceId) : Promise.resolve([] as Driver[])),
+    enabled: !!raceId,
   });
   
   useEffect(() => {
@@ -102,7 +103,7 @@ const RaceDetailPage: React.FC = () => {
   
   return (
     <div>
-      <div className="mb-8 flex justify-between items-center">
+      <div className="mb-8 flex justify-between items-center z-10 relative">
         <button
           onClick={() => navigate(-1)}
           className="btn btn-secondary"
@@ -113,7 +114,7 @@ const RaceDetailPage: React.FC = () => {
         {canPredict && (
           <Link 
             to={`/races/${race.id}/predict`}
-            className="btn btn-primary"
+            className="btn btn-primary relative z-20"
           >
             {t('races.makePredict')}
           </Link>

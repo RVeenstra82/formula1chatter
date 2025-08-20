@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.NoSuchElementException
-import java.util.Optional
+import org.springframework.data.repository.findByIdOrNull
+import io.mockk.mockkStatic
 
 class RaceServiceTest {
     
@@ -24,6 +25,7 @@ class RaceServiceTest {
     fun setup() {
         raceRepository = mockk()
         raceService = RaceService(raceRepository)
+        mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
     
     @Test
@@ -74,7 +76,7 @@ class RaceServiceTest {
         val today = LocalDate.now()
         val race = createSampleRace("2023-5", 2023, 5)
         
-        every { raceRepository.findNextRace(today) } returns Optional.of(race)
+        every { raceRepository.findNextRace(today) } returns race
         
         // Act
         val result = raceService.getNextRace()
@@ -89,7 +91,7 @@ class RaceServiceTest {
         // Arrange
         val today = LocalDate.now()
         
-        every { raceRepository.findNextRace(today) } returns Optional.empty()
+        every { raceRepository.findNextRace(today) } returns null
         
         // Act
         val result = raceService.getNextRace()
@@ -105,14 +107,14 @@ class RaceServiceTest {
         val raceId = "2023-6"
         val race = createSampleRace(raceId, 2023, 6)
         
-        every { raceRepository.findById(raceId) } returns Optional.of(race)
+        every { raceRepository.findByIdOrNull(raceId) } returns race
         
         // Act
         val result = raceService.getRaceById(raceId)
         
         // Assert
         assertEquals(raceId, result.id)
-        verify { raceRepository.findById(raceId) }
+        verify { raceRepository.findByIdOrNull(raceId) }
     }
     
     @Test
@@ -120,14 +122,14 @@ class RaceServiceTest {
         // Arrange
         val raceId = "2023-7"
         
-        every { raceRepository.findById(raceId) } returns Optional.empty()
+        every { raceRepository.findByIdOrNull(raceId) } returns null
         
         // Act & Assert
         org.junit.jupiter.api.assertThrows<NoSuchElementException> {
             raceService.getRaceById(raceId)
         }
         
-        verify { raceRepository.findById(raceId) }
+        verify { raceRepository.findByIdOrNull(raceId) }
     }
     
     private fun createSampleRace(id: String, season: Int, round: Int): Race {

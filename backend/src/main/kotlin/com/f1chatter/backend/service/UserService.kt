@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.dto.UserDto
 import com.f1chatter.backend.model.User
 import com.f1chatter.backend.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.NoSuchElementException
@@ -17,11 +18,12 @@ class UserService(
         
         val existingUser = userRepository.findByFacebookId(facebookId)
         
-        val user = if (existingUser.isPresent) {
-            existingUser.get()
+        val user = if (existingUser != null) {
+            existingUser
         } else {
             val name = attributes["name"].toString()
-            val email = "${facebookId}@f1chatter.local" // Generate email from Facebook ID
+            val email = (attributes["email"] as? String)?.takeIf { it.isNotBlank() }
+                ?: "${facebookId}@f1chatter.local" // Fallback email when provider doesn't share it
             val profilePictureUrl = "https://graph.facebook.com/$facebookId/picture?type=large"
             
             val newUser = User(
@@ -43,8 +45,8 @@ class UserService(
     }
     
     fun getUserById(id: Long): UserDto {
-        val user = userRepository.findById(id)
-            .orElseThrow { NoSuchElementException("User not found with id: $id") }
+        val user = userRepository.findByIdOrNull(id)
+            ?: throw NoSuchElementException("User not found with id: $id")
         
         return UserDto(
             id = user.id!!,

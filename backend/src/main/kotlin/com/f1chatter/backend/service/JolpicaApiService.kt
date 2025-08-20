@@ -9,6 +9,7 @@ import com.f1chatter.backend.repository.RaceRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
@@ -319,13 +320,12 @@ class JolpicaApiService(
                 if (constructorsList.isNotEmpty()) {
                     val constructorId = constructorsList[0]["constructorId"].toString()
                     
-                    val driver = driverRepository.findById(driverId)
-                    val constructor = constructorRepository.findById(constructorId)
+                    val driver = driverRepository.findByIdOrNull(driverId)
+                    val constructor = constructorRepository.findByIdOrNull(constructorId)
                     
-                    if (driver.isPresent && constructor.isPresent) {
-                        val driverEntity = driver.get()
-                        driverEntity.constructor = constructor.get()
-                        driverRepository.save(driverEntity)
+                    if (driver != null && constructor != null) {
+                        driver.constructor = constructor
+                        driverRepository.save(driver)
                     }
                 }
             }
@@ -333,7 +333,7 @@ class JolpicaApiService(
     }
     
     fun updateRaceResults(raceId: String) {
-        val race = raceRepository.findById(raceId).orElse(null) ?: return
+        val race = raceRepository.findByIdOrNull(raceId) ?: return
         
         // If the race is already completed, no need to fetch results again
         if (race.raceCompleted) {

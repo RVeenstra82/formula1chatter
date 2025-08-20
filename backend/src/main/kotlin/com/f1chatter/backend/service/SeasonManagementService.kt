@@ -81,7 +81,7 @@ class SeasonManagementService(
                 // Check if prediction already exists
                 val existingPrediction = predictionRepository.findByUserAndRace(user, race)
                 
-                if (existingPrediction.isEmpty) {
+                if (existingPrediction == null) {
                     // Create a zero-score prediction to initialize the user for this race
                     // We'll use empty strings for unset predictions
                     val prediction = com.f1chatter.backend.model.Prediction(

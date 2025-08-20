@@ -139,6 +139,11 @@ export const api = {
     return response.data;
   },
 
+  getActiveDriversForRace: async (raceId: string): Promise<Driver[]> => {
+    const response = await apiClient.get(`/drivers/active/${raceId}`);
+    return response.data;
+  },
+
   getDriverById: async (id: string): Promise<Driver> => {
     const response = await apiClient.get(`/drivers/${id}`);
     return response.data;

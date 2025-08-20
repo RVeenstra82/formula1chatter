@@ -96,6 +96,7 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.forDriverOfDay': 'for correctly predicting driver of the day',
     'predict.canUpdateBeforeStart': 'You can update your prediction until 5 minutes before the race starts',
     'predict.noMorePredictions': 'It is no longer possible to submit or modify predictions!',
+    'predict.alreadySelected': 'Already selected for',
     
     // Results
     'results.title': 'Prediction Results',
@@ -228,6 +229,7 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.forDriverOfDay': 'voor het correct voorspellen van de coureur van de dag',
     'predict.canUpdateBeforeStart': 'Je kunt je voorspelling bijwerken tot 5 minuten voor de race begint',
     'predict.noMorePredictions': 'Het is niet meer mogelijk om voorspellingen in te dienen of te wijzigen!',
+    'predict.alreadySelected': 'Al gekozen voor',
     
     // Results
     'results.title': 'Voorspellingsresultaten',

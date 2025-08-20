@@ -70,4 +70,14 @@ class DriverController(
             ))
         }
     }
+
+    @GetMapping("/active/{raceId}")
+    fun getActiveDriversForRace(@PathVariable raceId: String): ResponseEntity<List<DriverDto>> {
+        return try {
+            val drivers = driverService.getActiveDriversForRace(raceId)
+            ResponseEntity.ok(drivers)
+        } catch (e: Exception) {
+            ResponseEntity.notFound().build()
+        }
+    }
 } 

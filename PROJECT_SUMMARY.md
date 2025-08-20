@@ -6,10 +6,11 @@ This application allows users to predict Formula 1 race outcomes and compete aga
 ## Architecture
 
 ### Backend
-- **Spring Boot with Kotlin**: REST API for all data operations
+- **Spring Boot with Kotlin**: REST API for all data operations with idiomatic Kotlin nullables
 - **PostgreSQL**: Relational database for storing predictions, race results, and user data
 - **OAuth2**: Authentication with Facebook
 - **Jolpica API**: Integration with Formula 1 data source
+- **Kotlin Extensions**: Spring Data Kotlin extensions for better null-safety and cleaner code
 
 ### Frontend
 - **React with TypeScript**: Modern component-based architecture

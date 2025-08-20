@@ -6,11 +6,10 @@ import com.f1chatter.backend.model.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.util.Optional
 
 @Repository
 interface PredictionRepository : JpaRepository<Prediction, Long> {
-    fun findByUserAndRace(user: User, race: Race): Optional<Prediction>
+    fun findByUserAndRace(user: User, race: Race): Prediction?
     
     fun findByRaceOrderByScoreDesc(race: Race): List<Prediction>
     

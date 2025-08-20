@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.dto.RaceDto
 import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.repository.RaceRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.NoSuchElementException
@@ -26,12 +27,12 @@ class RaceService(
     fun getNextRace(): RaceDto? {
         val today = LocalDate.now()
         val nextRace = raceRepository.findNextRace(today)
-        return nextRace.map { mapToDto(it) }.orElse(null)
+        return nextRace?.let { mapToDto(it) }
     }
     
     fun getRaceById(id: String): RaceDto {
-        val race = raceRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Race not found with id: $id") }
+        val race = raceRepository.findByIdOrNull(id)
+            ?: throw NoSuchElementException("Race not found with id: $id")
         
         return mapToDto(race)
     }

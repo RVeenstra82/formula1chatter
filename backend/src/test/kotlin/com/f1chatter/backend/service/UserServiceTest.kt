@@ -13,7 +13,8 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import java.util.NoSuchElementException
-import java.util.Optional
+import org.springframework.data.repository.findByIdOrNull
+import io.mockk.mockkStatic
 
 class UserServiceTest {
     
@@ -24,6 +25,7 @@ class UserServiceTest {
     fun setup() {
         userRepository = mockk()
         userService = UserService(userRepository)
+        mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
     
     @Test
@@ -47,7 +49,7 @@ class UserServiceTest {
         every { auth.principal } returns principal
         
         // No existing user
-        every { userRepository.findByFacebookId(facebookId) } returns Optional.empty()
+        every { userRepository.findByFacebookId(facebookId) } returns null
         
         val userSlot = slot<User>()
         val savedUser = User(
@@ -105,7 +107,7 @@ class UserServiceTest {
             email = email,
             profilePictureUrl = profilePictureUrl
         )
-        every { userRepository.findByFacebookId(facebookId) } returns Optional.of(existingUser)
+        every { userRepository.findByFacebookId(facebookId) } returns existingUser
         
         // Act
         val result = userService.processOAuthPostLogin(auth)
@@ -134,13 +136,15 @@ class UserServiceTest {
             profilePictureUrl = "https://example.com/profile.jpg"
         )
         
-        every { userRepository.findById(userId) } returns Optional.of(user)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { userRepository.findByIdOrNull(userId) } returns user
         
         // Act
         val result = userService.getUserById(userId)
         
         // Assert
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findByIdOrNull(userId) }
         
         assertEquals(userId, result.id)
         assertEquals(user.name, result.name)
@@ -153,13 +157,13 @@ class UserServiceTest {
         // Arrange
         val userId = 1L
         
-        every { userRepository.findById(userId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns null
         
         // Act & Assert
         assertThrows<NoSuchElementException> {
             userService.getUserById(userId)
         }
         
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findByIdOrNull(userId) }
     }
 } 

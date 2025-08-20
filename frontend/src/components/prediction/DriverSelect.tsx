@@ -2,6 +2,8 @@ import React from 'react';
 import Select from 'react-select';
 import type { GroupBase, SingleValue } from 'react-select';
 import type { Driver } from '../../api/client';
+import { teamLogos } from '../../assets/teamLogos';
+const proxy = (src?: string | null) => (src ? `/api/images/proxy?src=${encodeURIComponent(src)}` : undefined);
 
 interface DriverSelectProps {
   drivers: Driver[];
@@ -10,6 +12,8 @@ interface DriverSelectProps {
   label: string;
   id: string;
   disabled?: boolean;
+  disabledReasons?: Record<string, string>; // driverId -> reason text
+  showTeamLogo?: boolean;
 }
 
 interface DriverOption {
@@ -25,6 +29,8 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
   label,
   id,
   disabled = false,
+  disabledReasons = {},
+  showTeamLogo = true,
 }) => {
   // Group drivers by constructor
   const groupedOptions: GroupBase<DriverOption>[] = Object.entries(
@@ -54,34 +60,77 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
       </label>
       <Select
         inputId={id}
+        // discourage password managers from overlaying icons
+        instanceId={`${id}-drivers`}
+        name={`${id}-drivers`}
+        autoComplete="off"
         value={selectedOption}
         onChange={(option: SingleValue<DriverOption>) => {
           if (option) onChange(option.value);
         }}
         options={groupedOptions}
         isDisabled={disabled}
+        isOptionDisabled={(option) => !!disabledReasons[option.value]}
         isSearchable
         placeholder="Select a driver"
-        formatOptionLabel={({ driver }) => (
-          <div className="flex items-center gap-2">
-            {driver.profilePictureUrl ? (
-              <img
-                src={driver.profilePictureUrl}
-                alt={`${driver.firstName} ${driver.lastName}`}
-                className="w-8 h-8 rounded-full object-cover"
-                onError={(e) => {
-                  // Hide the image if it fails to load
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-600">
-                {driver.firstName.charAt(0)}{driver.lastName.charAt(0)}
+        formatOptionLabel={({ driver }, { context }) => {
+          const reason = disabledReasons[driver.id];
+          const logoSrc = showTeamLogo && driver.constructorName ? teamLogos[driver.constructorName] : undefined;
+          // Only show the disabled reason in the dropdown menu, not in the selected value
+          const showReason = context === 'menu' && !!reason;
+
+          const avatar = driver.profilePictureUrl ? (
+            <img
+              src={proxy(driver.profilePictureUrl)}
+              alt={`${driver.firstName} ${driver.lastName}`}
+              className="w-8 h-8 rounded-full object-cover"
+              referrerPolicy="no-referrer"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-600">
+              {driver.firstName.charAt(0)}{driver.lastName.charAt(0)}
+            </div>
+          );
+
+          if (context === 'value') {
+            // Selected value rendering (compact, no reason)
+            return (
+              <div className="flex items-center gap-2">
+                {avatar}
+                <span>{driver.firstName} {driver.lastName}</span>
               </div>
-            )}
-            <span>{driver.firstName} {driver.lastName}</span>
-          </div>
-        )}
+            );
+          }
+
+          // Dropdown option rendering (include reason and optional team logo)
+          return (
+            <div className="flex items-center gap-2 w-full">
+              {avatar}
+              <span className={showReason ? 'text-gray-500' : ''}>{driver.firstName} {driver.lastName}</span>
+              {showReason && (
+                <span
+                  className="ml-auto text-[10px] leading-none px-2 py-1 rounded-full border font-semibold"
+                  style={{
+                    backgroundColor: '#fef3c7', // amber-100
+                    color: '#92400e',          // amber-700
+                    borderColor: '#fcd34d',    // amber-300
+                  }}
+                >
+                  {reason}
+                </span>
+              )}
+              {logoSrc && (
+                <img
+                  src={logoSrc}
+                  alt={driver.constructorName || 'Team'}
+                  className="w-5 h-5 ml-2 opacity-80"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              )}
+            </div>
+          );
+        }}
         styles={{
           option: (base) => ({
             ...base,

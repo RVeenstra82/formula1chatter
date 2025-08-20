@@ -20,7 +20,8 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.NoSuchElementException
-import java.util.Optional
+import org.springframework.data.repository.findByIdOrNull
+import io.mockk.mockkStatic
 
 class PredictionServiceTest {
     
@@ -42,6 +43,7 @@ class PredictionServiceTest {
             userRepository,
             driverService
         )
+        mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
     
     @Test
@@ -60,9 +62,9 @@ class PredictionServiceTest {
         val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
         val race = createSampleRace(raceId, 2023, 1)
         
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { raceRepository.findById(raceId) } returns Optional.of(race)
-        every { predictionRepository.findByUserAndRace(user, race) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+        every { predictionRepository.findByUserAndRace(user, race) } returns null
         
         val predictionSlot = slot<Prediction>()
         every { predictionRepository.save(capture(predictionSlot)) } answers { predictionSlot.captured }
@@ -103,9 +105,9 @@ class PredictionServiceTest {
             driverOfTheDayId = "alonso"
         )
         
-        every { userRepository.findById(userId) } returns Optional.of(existingPrediction.user)
-        every { raceRepository.findById(raceId) } returns Optional.of(existingPrediction.race)
-        every { predictionRepository.findByUserAndRace(existingPrediction.user, existingPrediction.race) } returns Optional.of(existingPrediction)
+        every { userRepository.findByIdOrNull(userId) } returns existingPrediction.user
+        every { raceRepository.findByIdOrNull(raceId) } returns existingPrediction.race
+        every { predictionRepository.findByUserAndRace(existingPrediction.user, existingPrediction.race) } returns existingPrediction
         
         val predictionSlot = slot<Prediction>()
         every { predictionRepository.save(capture(predictionSlot)) } answers { predictionSlot.captured }
@@ -132,9 +134,9 @@ class PredictionServiceTest {
         val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
         val race = createSampleRace(raceId, 2023, 1)
         
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { raceRepository.findById(raceId) } returns Optional.of(race)
-        every { predictionRepository.findByUserAndRace(user, race) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+        every { predictionRepository.findByUserAndRace(user, race) } returns null
         
         // Act
         val result = predictionService.getUserPredictionForRace(userId, raceId)
@@ -149,7 +151,7 @@ class PredictionServiceTest {
         val raceId = "2023-1"
         val race = createSampleRace(raceId, 2023, 1).copy(raceCompleted = false)
         
-        every { raceRepository.findById(raceId) } returns Optional.of(race)
+        every { raceRepository.findByIdOrNull(raceId) } returns race
         
         // Act & Assert
         assertThrows<IllegalStateException> {
@@ -192,7 +194,7 @@ class PredictionServiceTest {
             driverOfTheDayId = "alonso"         // +1 point
         )
         
-        every { raceRepository.findById(raceId) } returns Optional.of(race)
+        every { raceRepository.findByIdOrNull(raceId) } returns race
         every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(prediction1, prediction2)
         every { predictionRepository.save(any()) } answers { firstArg() }
         

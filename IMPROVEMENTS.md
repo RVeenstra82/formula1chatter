@@ -54,6 +54,13 @@ Dit document beschrijft alle verbeteringen en uitbreidingen die zijn toegevoegd 
 
 ## 🔧 Technische Verbeteringen
 
+### Kotlin Idiomatische Code
+- **Optional naar nullables**: Alle `java.util.Optional` vervangen door idiomatische Kotlin nullables
+- **findByIdOrNull**: Gebruik van Spring Data Kotlin extensions voor betere null-safety
+- **Repository signatures**: Repository methods aangepast naar `Entity?` return types
+- **Service layer**: Null-checks i.p.v. `.isPresent()/.get()` patterns
+- **Test updates**: Mocks en verifications aangepast naar nieuwe nullable signatures
+
 ### Development Experience
 - **Mockdata integratie**: Automatisch gebruik van mockdata in development mode
 - **Consistent API patterns**: Uniforme implementatie van mockdata across alle pagina's

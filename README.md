@@ -13,11 +13,12 @@ A Formula 1 prediction and discussion platform where users can make predictions 
 ## Tech Stack
 
 ### Backend
-- **Kotlin** with **Spring Boot**
+- **Kotlin** with **Spring Boot** and idiomatic nullables
 - **PostgreSQL** database
 - **JPA/Hibernate** for data persistence
 - **Spring Security** for authentication
 - **Scheduled tasks** for data synchronization
+- **Spring Data Kotlin extensions** for better null-safety
 
 ### Frontend
 - **React** with **TypeScript**

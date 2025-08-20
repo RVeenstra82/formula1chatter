@@ -24,10 +24,10 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
     driverOfTheDayId: '',
   });
   
-  // Fetch drivers
+  // Fetch active drivers for this race
   const { data: drivers = [], isLoading: isLoadingDrivers } = useQuery<Driver[]>({
-    queryKey: ['drivers'],
-    queryFn: api.getAllDrivers,
+    queryKey: ['active-drivers', race.id],
+    queryFn: () => api.getActiveDriversForRace(race.id),
   });
   
   // Fetch existing prediction if any
@@ -64,6 +64,27 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
       [field]: driverId,
     }));
   };
+
+  // Build disabled reasons for top-3 only (first/second/third). 
+  // Fastest lap and driver of the day may reuse the same driver.
+  const disabledTop3: Record<string, string> = {};
+  const top3Selected: Array<[string, keyof Prediction]> = [
+    [prediction.firstPlaceDriverId, 'firstPlaceDriverId'],
+    [prediction.secondPlaceDriverId, 'secondPlaceDriverId'],
+    [prediction.thirdPlaceDriverId, 'thirdPlaceDriverId'],
+  ];
+  const fieldLabels: Record<keyof Prediction, string> = {
+    firstPlaceDriverId: t('predict.firstPlace'),
+    secondPlaceDriverId: t('predict.secondPlace'),
+    thirdPlaceDriverId: t('predict.thirdPlace'),
+    fastestLapDriverId: t('predict.fastestLap'),
+    driverOfTheDayId: t('predict.driverOfDay'),
+  };
+  top3Selected.forEach(([driverId, field]) => {
+    if (driverId) {
+      disabledTop3[driverId] = fieldLabels[field];
+    }
+  });
   
   const isLoading = isLoadingDrivers || isLoadingPrediction;
   const isPast = new Date(race.date) < new Date();
@@ -109,6 +130,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         value={prediction.firstPlaceDriverId}
         onChange={(driverId) => handleDriverChange('firstPlaceDriverId', driverId)}
         disabled={isDisabled}
+        disabledReasons={disabledTop3}
       />
       
       <DriverSelect
@@ -118,6 +140,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         value={prediction.secondPlaceDriverId}
         onChange={(driverId) => handleDriverChange('secondPlaceDriverId', driverId)}
         disabled={isDisabled}
+        disabledReasons={disabledTop3}
       />
       
       <DriverSelect
@@ -127,6 +150,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         value={prediction.thirdPlaceDriverId}
         onChange={(driverId) => handleDriverChange('thirdPlaceDriverId', driverId)}
         disabled={isDisabled}
+        disabledReasons={disabledTop3}
       />
       
       <DriverSelect
@@ -136,6 +160,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         value={prediction.fastestLapDriverId}
         onChange={(driverId) => handleDriverChange('fastestLapDriverId', driverId)}
         disabled={isDisabled}
+        disabledReasons={{}}
       />
       
       <DriverSelect
@@ -145,6 +170,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         value={prediction.driverOfTheDayId}
         onChange={(driverId) => handleDriverChange('driverOfTheDayId', driverId)}
         disabled={isDisabled}
+        disabledReasons={{}}
       />
       
       <div className="mt-8">

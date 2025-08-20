@@ -39,9 +39,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // If not found in search params, check hash fragment
         if (!tokenParam || !userParam) {
-          const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the #
-          tokenParam = tokenParam || hashParams.get('token');
-          userParam = userParam || hashParams.get('user');
+          // Handle hash fragment that might contain query parameters
+          const hashString = window.location.hash.substring(1); // Remove the #
+          console.log('AuthContext: Parsing hash string:', hashString);
+          
+          if (hashString.includes('?')) {
+            // Hash contains query parameters like #/?token=...&user=...
+            const hashQueryString = hashString.substring(hashString.indexOf('?') + 1);
+            console.log('AuthContext: Hash query string:', hashQueryString);
+            const hashParams = new URLSearchParams(hashQueryString);
+            tokenParam = tokenParam || hashParams.get('token');
+            userParam = userParam || hashParams.get('user');
+            console.log('AuthContext: From hash params - token:', !!tokenParam, 'user:', !!userParam);
+          } else {
+            // Hash contains direct parameters like #token=...&user=...
+            const hashParams = new URLSearchParams(hashString);
+            tokenParam = tokenParam || hashParams.get('token');
+            userParam = userParam || hashParams.get('user');
+            console.log('AuthContext: From direct hash params - token:', !!tokenParam, 'user:', !!userParam);
+          }
         }
         
         console.log('AuthContext: tokenParam exists:', !!tokenParam);
@@ -49,6 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (tokenParam && userParam) {
           console.log('AuthContext: Found token and user in URL parameters');
+          console.log('AuthContext: Token:', tokenParam.substring(0, 20) + '...');
+          console.log('AuthContext: User param:', userParam.substring(0, 50) + '...');
           try {
             const userData = JSON.parse(userParam);
             console.log('AuthContext: Parsed user data:', userData);
@@ -57,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(userData);
             
             // Clean up URL parameters
-            window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+            window.history.replaceState({}, document.title, window.location.pathname);
             console.log('AuthContext: URL cleaned up, user set');
             return;
           } catch (err) {
@@ -65,6 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           console.log('AuthContext: No token or user in URL parameters');
+          console.log('AuthContext: tokenParam:', tokenParam);
+          console.log('AuthContext: userParam:', userParam);
         }
         
         // First check localStorage for stored user and token

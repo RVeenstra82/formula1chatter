@@ -100,13 +100,14 @@ class DataSyncService(
         openF1ApiService.updateDriverProfilePictures()
     }
     
-    // Check for completed races on Sundays only
-    @Scheduled(cron = "0 0 3 * * SUN") // At 3 AM on Sunday
+    // Check for completed races every hour on Sundays (when most races happen)
+    @Scheduled(cron = "0 0 * * * SUN") // Every hour on Sunday
     fun checkForCompletedRaces() {
         logger.info { "Checking for completed races to update results" }
         
-        val yesterday = LocalDate.now().minusDays(1)
-        val recentRaces = raceRepository.findUpcomingRaces(yesterday)
+        // Look for races from the last 7 days that haven't been processed yet
+        val weekAgo = LocalDate.now().minusDays(7)
+        val recentRaces = raceRepository.findUpcomingRaces(weekAgo)
             .filter { !it.raceCompleted && it.date.isBefore(LocalDate.now()) }
         
         if (recentRaces.isEmpty()) {

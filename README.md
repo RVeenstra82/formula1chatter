@@ -84,8 +84,8 @@ The backend contains several scheduled jobs (Spring `@Scheduled`) that keep data
   - Method: `DataSyncService.checkForNewSeason()`
   - Behavior: If the new season has no races in DB yet, triggers a races sync
 
-- Completed races processing: Every Sunday at 03:00
-  - Cron: `0 0 3 * * SUN`
+- Completed races processing: Every hour on Sundays
+  - Cron: `0 0 * * * SUN`
   - Method: `DataSyncService.checkForCompletedRaces()`
   - Behavior: Looks for recently finished races, updates results from Jolpica, then recalculates prediction scores
 

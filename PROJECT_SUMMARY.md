@@ -55,7 +55,7 @@ The backend uses Spring Boot scheduling for periodic tasks:
 - Drivers & constructors sync (weekly, Sun 01:00): `DataSyncService.syncDriverData()`
 - Driver profile pictures update (weekly, Sun 02:00): `DataSyncService.updateDriverProfilePictures()` → `OpenF1ApiService.updateDriverProfilePictures()`
 - New season check (daily, 06:00): `DataSyncService.checkForNewSeason()`
-- Completed races processing (weekly, Sun 03:00): `DataSyncService.checkForCompletedRaces()`
+- Completed races processing (hourly on Sundays): `DataSyncService.checkForCompletedRaces()`
 
 Environment flag:
 

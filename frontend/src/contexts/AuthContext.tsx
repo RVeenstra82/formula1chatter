@@ -30,18 +30,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('user');
         
+        console.log('AuthContext: storedToken exists:', !!storedToken);
+        console.log('AuthContext: storedUser exists:', !!storedUser);
+        
         if (storedToken && storedUser) {
           try {
+            console.log('AuthContext: Verifying token with API call...');
             // Verify token is still valid by making API call
             const currentUserData = await api.getCurrentUser();
+            console.log('AuthContext: API call successful, user:', currentUserData);
             setUser(currentUserData);
           } catch (err) {
+            console.log('AuthContext: API call failed, clearing storage:', err);
             // Token invalid, clear storage
             localStorage.removeItem('authToken');
             localStorage.removeItem('user');
             setUser(null);
           }
         } else {
+          console.log('AuthContext: No stored data, user not logged in');
           // No stored data, user is not logged in
           setUser(null);
         }

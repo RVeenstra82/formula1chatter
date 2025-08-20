@@ -29,8 +29,8 @@ apiClient.interceptors.response.use(
       // Token expired or invalid, clear stored data
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
-      // Optionally redirect to login or refresh page
-      window.location.reload();
+      // Don't reload the page, just let the error propagate
+      // The AuthContext will handle setting user to null
     }
     return Promise.reject(error);
   }

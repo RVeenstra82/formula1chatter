@@ -36,16 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const currentUserData = await api.getCurrentUser();
             setUser(currentUserData);
           } catch (err) {
-            // Token invalid, clear storage and try API call
+            // Token invalid, clear storage
             localStorage.removeItem('authToken');
             localStorage.removeItem('user');
-            const userData = await api.getCurrentUser();
-            setUser(userData);
+            setUser(null);
           }
         } else {
-          // No stored data, try API call (for OAuth2 callback)
-          const userData = await api.getCurrentUser();
-          setUser(userData);
+          // No stored data, user is not logged in
+          setUser(null);
         }
       } catch (err) {
         setUser(null);

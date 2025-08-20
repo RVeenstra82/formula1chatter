@@ -47,6 +47,24 @@ This application allows users to predict Formula 1 race outcomes and compete aga
 - **/races/:id/results** - View prediction results
 - **/leaderboard** - Season leaderboard
 
+## Background Jobs (Scheduling)
+
+The backend uses Spring Boot scheduling for periodic tasks:
+
+- Races sync (weekly, Sun 00:00): `DataSyncService.syncCurrentSeasonData()`
+- Drivers & constructors sync (weekly, Sun 01:00): `DataSyncService.syncDriverData()`
+- Driver profile pictures update (weekly, Sun 02:00): `DataSyncService.updateDriverProfilePictures()` → `OpenF1ApiService.updateDriverProfilePictures()`
+- New season check (daily, 06:00): `DataSyncService.checkForNewSeason()`
+- Completed races processing (weekly, Sun 03:00): `DataSyncService.checkForCompletedRaces()`
+
+Environment flag:
+
+- `UPDATE_PROFILE_PICTURES_ON_STARTUP=true` to update driver headshots once during app startup (default false)
+
+Manual admin endpoint (base path `/api`):
+
+- `POST /admin/update-driver-photos` → triggers an immediate refresh of driver photos
+
 ## Scoring System
 - 5 points for correct 1st place prediction
 - 3 points for correct 2nd place prediction

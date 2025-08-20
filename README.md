@@ -59,6 +59,46 @@ The original implementation was making too many API calls to the OpenF1 API duri
 4. **Increased timeouts** in RestTemplate configuration
 5. **Scheduled updates** that run weekly instead of during startup
 
+## Background jobs and scheduling
+
+The backend contains several scheduled jobs (Spring `@Scheduled`) that keep data fresh and compute results. All times below are in server time.
+
+- Races sync: Every Sunday at 00:00
+  - Cron: `0 0 0 * * SUN`
+  - Method: `DataSyncService.syncCurrentSeasonData()`
+  - Behavior: Downloads current season races if not present
+
+- Drivers & constructors sync: Every Sunday at 01:00
+  - Cron: `0 0 1 * * SUN`
+  - Method: `DataSyncService.syncDriverData()`
+  - Behavior: Fetches drivers/constructors if missing
+
+- Driver profile pictures update: Every Sunday at 02:00
+  - Cron: `0 0 2 * * SUN`
+  - Method: `DataSyncService.updateDriverProfilePictures()` → `OpenF1ApiService.updateDriverProfilePictures()`
+  - Behavior: Refreshes driver headshots from OpenF1
+  - Startup option: Set `UPDATE_PROFILE_PICTURES_ON_STARTUP=true` to also run once during app startup (default false). See `openf1.api.startup.update-profile-pictures` in `application.yml`.
+
+- New season check: Daily at 06:00
+  - Cron: `0 0 6 * * *`
+  - Method: `DataSyncService.checkForNewSeason()`
+  - Behavior: If the new season has no races in DB yet, triggers a races sync
+
+- Completed races processing: Every Sunday at 03:00
+  - Cron: `0 0 3 * * SUN`
+  - Method: `DataSyncService.checkForCompletedRaces()`
+  - Behavior: Looks for recently finished races, updates results from Jolpica, then recalculates prediction scores
+
+### Manual admin trigger
+
+For immediate refresh of driver photos you can call the admin endpoint (base path `/api`):
+
+```bash
+curl -X POST "https://<your-backend-domain>/api/admin/update-driver-photos"
+```
+
+This is useful right after a deployment to Render to ensure headshots are up to date without waiting for the weekly job.
+
 ## Development Setup
 
 ### Prerequisites

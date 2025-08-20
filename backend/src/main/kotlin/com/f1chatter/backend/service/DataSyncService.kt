@@ -100,8 +100,8 @@ class DataSyncService(
         openF1ApiService.updateDriverProfilePictures()
     }
     
-    // Keep checking for completed races more frequently
-    @Scheduled(fixedRate = 3600000) // Once per hour
+    // Check for completed races on Sundays only
+    @Scheduled(cron = "0 0 3 * * SUN") // At 3 AM on Sunday
     fun checkForCompletedRaces() {
         logger.info { "Checking for completed races to update results" }
         

@@ -14,6 +14,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import DataDeletion from './pages/DataDeletion';
 import StatsPage from './pages/StatsPage';
+import AdminPage from './pages/AdminPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -41,7 +42,8 @@ function App() {
                 <Route path="/:country/predict" element={<PredictionPage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/stats" element={<StatsPage />} />
-        <Route path="/stats/:tab" element={<StatsPage />} />
+                <Route path="/stats/:tab" element={<StatsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/data-deletion" element={<DataDeletion />} />
                 <Route path="*" element={<div>Page not found</div>} />

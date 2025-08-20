@@ -115,27 +115,25 @@ class DataSyncService(
             return
         }
         
-        // Process races one at a time with a small delay to avoid rate limiting
-        recentRaces.forEachIndexed { index, race ->
-            if (index > 0) {
-                try {
-                    // Add a delay between processing different races
-                    Thread.sleep(2000)
-                } catch (e: InterruptedException) {
-                    Thread.currentThread().interrupt()
-                }
-            }
-            
-            logger.info { "Updating results for race: ${race.raceName}" }
-            jolpicaApiService.updateRaceResults(race.id)
-            
+        // Process races and stop if all are completed to avoid unnecessary API calls
+        var processedRaces = 0
+        for (race in recentRaces) {
             try {
+                logger.info { "Updating results for race: ${race.raceName}" }
+                jolpicaApiService.updateRaceResults(race.id)
+                
                 predictionService.calculateScores(race.id)
                 logger.info { "Calculated prediction scores for race: ${race.raceName}" }
+                processedRaces++
+                
+                // Add delay between races to avoid rate limiting
+                Thread.sleep(2000)
             } catch (e: Exception) {
-                logger.error(e) { "Failed to calculate scores for race: ${race.raceName}" }
+                logger.error(e) { "Failed to process race: ${race.raceName}" }
             }
         }
+        
+        logger.info { "Processed $processedRaces races. If all races are completed, no more API calls needed until next race." }
     }
     
     // Run at startup to initialize data if needed

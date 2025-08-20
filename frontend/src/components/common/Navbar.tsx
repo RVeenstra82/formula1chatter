@@ -37,12 +37,21 @@ const Navbar: React.FC = () => {
               >
                 {t('nav.leaderboard')}
               </Link>
-              <Link 
-                to="/stats" 
-                className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
-              >
-                Statistieken
-              </Link>
+                              <Link 
+                  to="/stats" 
+                  className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                >
+                  Statistieken
+                </Link>
+                
+                {user?.email === 'rickveenstra@gmail.com' && (
+                  <Link 
+                    to="/admin" 
+                    className="px-4 py-2 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"
+                  >
+                    Admin
+                  </Link>
+                )}
             </div>
             
             <div className="border-l border-gray-600 pl-6">
@@ -146,6 +155,16 @@ const Navbar: React.FC = () => {
                 >
                   Statistieken
                 </Link>
+                
+                {user?.email === 'rickveenstra@gmail.com' && (
+                  <Link 
+                    to="/admin" 
+                    className="px-4 py-3 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Admin
+                  </Link>
+                )}
                 
                 {isLoading ? (
                   <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse"></div>

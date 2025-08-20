@@ -31,8 +31,8 @@ class SecurityConfig(
             }
             .oauth2Login { oauth2 ->
                 oauth2
-                    .defaultSuccessUrl("/api/auth/oauth2/callback", true)
-                    .failureUrl("/api/auth/login-failed")
+                    .defaultSuccessUrl("/auth/oauth2/callback", true)
+                    .failureUrl("/auth/login-failed")
                     .authorizationEndpoint { auth ->
                         auth.baseUri("/oauth2/authorization")
                     }

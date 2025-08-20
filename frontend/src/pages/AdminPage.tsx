@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
+// import { useLanguage } from '../contexts/LanguageContext';
 
 interface AdminAction {
   name: string;
@@ -11,7 +11,6 @@ interface AdminAction {
 
 const AdminPage: React.FC = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, any>>({});
   const [systemStatus, setSystemStatus] = useState<any>(null);

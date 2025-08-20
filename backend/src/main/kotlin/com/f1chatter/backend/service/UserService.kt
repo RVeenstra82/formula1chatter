@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.dto.UserDto
 import com.f1chatter.backend.model.User
 import com.f1chatter.backend.repository.UserRepository
+import com.f1chatter.backend.repository.PredictionRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
@@ -10,7 +11,8 @@ import java.util.NoSuchElementException
 
 @Service
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val predictionRepository: PredictionRepository
 ) {
     fun processOAuthPostLogin(auth: OAuth2AuthenticationToken): UserDto {
         val attributes = auth.principal.attributes
@@ -54,5 +56,18 @@ class UserService(
             email = user.email,
             profilePictureUrl = user.profilePictureUrl
         )
+    }
+
+    fun deleteUserAndData(userId: Long) {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw NoSuchElementException("User not found with id: $userId")
+        // Remove all predictions for this user
+        val allPredictions = predictionRepository.findAll()
+        val userPredictions = allPredictions.filter { it.user.id == userId }
+        if (userPredictions.isNotEmpty()) {
+            predictionRepository.deleteAll(userPredictions)
+        }
+        // Finally delete the user
+        userRepository.delete(user)
     }
 } 

@@ -40,7 +40,9 @@ const ProfilePage: React.FC = () => {
             )}
             <div>
               <h1 className="text-2xl font-bold">{user.name}</h1>
-              <p className="text-gray-600">{user.email}</p>
+              {user.email && !user.email.endsWith('@f1chatter.local') && (
+                <p className="text-gray-600">{user.email}</p>
+              )}
             </div>
           </div>
 

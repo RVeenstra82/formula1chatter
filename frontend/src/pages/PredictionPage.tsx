@@ -6,7 +6,7 @@ import type { Race } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import PredictionForm from '../components/prediction/PredictionForm';
-import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes } from '../utils/timeUtils';
+import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes, hasRaceStarted } from '../utils/timeUtils';
 
 // Helper function to get race ID from country name
 const getRaceIdFromCountry = (country?: string): string | null => {
@@ -110,8 +110,8 @@ const PredictionPage: React.FC = () => {
     );
   }
   
-  const isPast = new Date(race.date) < new Date();
-  if (isPast) {
+  const started = hasRaceStarted(race.date, race.time);
+  if (started) {
     return (
       <div className="text-center py-12">
         <h1 className="text-3xl font-bold mb-4">{race.raceName} {t('predict.isInProgress')}</h1>

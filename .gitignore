@@ -53,3 +53,10 @@ playwright-report/
 *.png
 *.jpg
 *.jpeg 
+# Git configuratie bestanden (lokaal)
+setup-git-accounts*.sh
+git-helper*.sh
+show-ssh-keys*.sh
+README_GIT_SETUP*.md
+GIT_SETUP*.md
+switch-git-config.sh

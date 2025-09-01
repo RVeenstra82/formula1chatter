@@ -59,7 +59,9 @@ class DataSyncServiceTest {
             raceCompleted = false
         )
 
-        every { raceRepo.findUpcomingRaces(yesterday) } returns listOf(pastRace)
+        // Mock the repository to return the past race when looking for races from a week ago
+        val weekAgo = LocalDate.now().minusDays(7)
+        every { raceRepo.findUpcomingRaces(weekAgo) } returns listOf(pastRace)
 
         val service = DataSyncService(jolpica, openf1, raceRepo, driverRepo, constructorRepo, predictionService)
         service.checkForCompletedRaces()

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race, Driver } from '../api/client';
 import { useLanguage } from '../contexts/LanguageContext';
-import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour } from '../utils/timeUtils';
+import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour, hasRaceStarted } from '../utils/timeUtils';
 import { mockRaces } from '../mocks/mockLeaderboardData';
 
 const RaceDetailPage: React.FC = () => {
@@ -40,8 +40,8 @@ const RaceDetailPage: React.FC = () => {
   useEffect(() => {
     if (!race || race.completed) return;
     
-    const isPast = new Date(race.date) < new Date();
-    if (isPast) return;
+    const started = hasRaceStarted(race.date, race.time);
+    if (started) return;
     
     const updateTimeRemaining = () => {
       setTimeRemaining(calculateTimeRemaining(race.date, race.time, language));
@@ -98,8 +98,8 @@ const RaceDetailPage: React.FC = () => {
   const fastestLapDriver = getDriverById(race.fastestLapDriverId);
   const driverOfTheDayDriver = getDriverById(race.driverOfTheDayId);
   
-  const isPast = new Date(race.date) < new Date();
-  const canPredict = !race.completed && !isPast;
+  const started = hasRaceStarted(race.date, race.time);
+  const canPredict = !race.completed && !started;
   
   return (
     <div>
@@ -143,7 +143,7 @@ const RaceDetailPage: React.FC = () => {
             <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
               {t('races.completed')}
             </span>
-          ) : new Date(race.date) < new Date() ? (
+          ) : started ? (
             <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
               {t('races.inProgress')}
             </span>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour } from '../../utils/timeUtils';
+import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour, hasRaceStarted } from '../../utils/timeUtils';
 
 interface RaceCardProps {
   race: any;
@@ -20,8 +20,8 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
     ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
     : 'TBA';
     
-  const isPast = new Date(race.date) < new Date();
-  const canPredict = !race.completed && !isPast;
+  const hasStarted = hasRaceStarted(race.date, race.time);
+  const canPredict = !race.completed && !hasStarted;
   
   // Update time remaining every minute
   useEffect(() => {
@@ -87,7 +87,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
             <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
               {t('races.completed')}
             </span>
-          ) : isPast ? (
+          ) : hasStarted ? (
             <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
               {t('races.inProgress')}
             </span>
@@ -104,7 +104,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
           <Link to={`/races/${race.id}/results`} className="btn btn-primary text-center">
             {t('races.viewResults')}
           </Link>
-        ) : isPast ? (
+        ) : hasStarted ? (
           <Link to={`/races/${race.id}`} className="btn btn-primary text-center">
             {t('races.viewRace')}
           </Link>

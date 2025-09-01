@@ -82,8 +82,8 @@ Manual admin endpoint (base path `/api`):
    ```
 
 ## To-Do / Future Enhancements
-1. Add unit and integration tests
-2. Implement mobile-responsive design improvements
+1. ~~Add unit and integration tests~~ ✅ **COMPLETED**
+2. ~~Implement mobile-responsive design improvements~~ ✅ **COMPLETED**
 3. Add email notifications for upcoming races
 4. Create private prediction leagues
 5. Add additional stats and visualizations 

@@ -111,3 +111,33 @@ export const isLessThanFiveMinutes = (
   
   return diffInMinutes <= 5 && diffInMinutes > 0;
 }; 
+
+/**
+ * Build a Date object representing the race start (date + time, or noon if time unknown)
+ */
+export const getRaceStartDate = (
+  dateString: string,
+  timeString: string | null
+): Date => {
+  const date = parseISO(dateString);
+  if (timeString) {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    date.setHours(hours, minutes, 0, 0);
+  } else {
+    // Fallback to midday if no explicit time is provided
+    date.setHours(12, 0, 0, 0);
+  }
+  return date;
+};
+
+/**
+ * Determine if the race has started using date + time
+ */
+export const hasRaceStarted = (
+  dateString: string,
+  timeString: string | null
+): boolean => {
+  const start = getRaceStartDate(dateString, timeString);
+  const now = new Date();
+  return now >= start;
+};

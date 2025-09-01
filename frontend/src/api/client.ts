@@ -42,6 +42,7 @@ export interface User {
   name: string;
   email: string;
   profilePictureUrl: string | null;
+  isAdmin?: boolean;
 }
 
 export interface Race {

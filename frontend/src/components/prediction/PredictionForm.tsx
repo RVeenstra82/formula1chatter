@@ -5,7 +5,7 @@ import type { Driver, Prediction, Race } from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import DriverSelect from './DriverSelect';
-import { isLessThanFiveMinutes } from '../../utils/timeUtils';
+import { isLessThanFiveMinutes, hasRaceStarted } from '../../utils/timeUtils';
 
 interface PredictionFormProps {
   race: Race;
@@ -87,7 +87,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   });
   
   const isLoading = isLoadingDrivers || isLoadingPrediction;
-  const isPast = new Date(race.date) < new Date();
+  const isPast = hasRaceStarted(race.date, race.time);
   const isWithinFiveMinutes = isLessThanFiveMinutes(race.date, race.time);
   const isDisabled = isLoading || isSaving || race.completed || isPast || isWithinFiveMinutes;
   

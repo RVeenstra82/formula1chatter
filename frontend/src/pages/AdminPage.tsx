@@ -16,7 +16,7 @@ const AdminPage: React.FC = () => {
   const [systemStatus, setSystemStatus] = useState<any>(null);
 
   // Check if user is admin (you can customize this logic)
-  const isAdmin = user?.email === 'rickveenstra@gmail.com'; // Replace with your email
+  const isAdmin = user?.email === 'rickveenstra@gmail.com' || user?.isAdmin === true; // Include test user
 
   const adminActions: AdminAction[] = [
     {

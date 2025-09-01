@@ -147,6 +147,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear JWT token and user data
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    // Clean up any onboarding-related localStorage items
+    localStorage.removeItem('f1chatter_onboarding_completed');
+    localStorage.removeItem('f1chatter_first_time_user');
     setUser(null);
     
     // Redirect to home page
@@ -155,12 +158,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Test login functie alleen in development mode
   const testLogin = () => {
-    setUser({
+    const testUser = {
       id: 0,
       name: 'Test User',
       email: 'testuser@f1chatter.com',
       profilePictureUrl: null,
-    });
+      isAdmin: true, // Give test user admin rights
+    };
+    setUser(testUser);
+    // Store test user in localStorage for persistence
+    localStorage.setItem('user', JSON.stringify(testUser));
+    localStorage.setItem('authToken', 'test-token');
   };
 
   const value: AuthContextType = {

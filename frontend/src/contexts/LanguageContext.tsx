@@ -98,6 +98,24 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.noMorePredictions': 'It is no longer possible to submit or modify predictions!',
     'predict.alreadySelected': 'Already selected for',
     
+    // Prediction form
+    'prediction.title': 'Make Your Prediction',
+    'prediction.subtitle': 'Predict the race outcome and earn points!',
+    'prediction.firstPlace': '1st Place',
+    'prediction.secondPlace': '2nd Place',
+    'prediction.thirdPlace': '3rd Place',
+    'prediction.fastestLap': 'Fastest Lap',
+    'prediction.driverOfDay': 'Driver of the Day',
+    'prediction.selectDriver': 'Select a driver',
+    'prediction.savePrediction': 'Save Prediction',
+    'prediction.predictionSaved': 'Prediction saved successfully!',
+    'prediction.errorSaving': 'Error saving prediction. Please try again.',
+    'prediction.alreadyPredicted': 'You have already made a prediction for this race.',
+    'prediction.raceCompleted': 'This race has already been completed.',
+    'prediction.raceStarted': 'This race has already started.',
+    'prediction.timeRemaining': 'Time remaining to predict',
+    'prediction.selectAll': 'Please select all predictions before saving.',
+    
     // Results
     'results.title': 'Prediction Results',
     'results.notAvailable': 'Results Not Available',
@@ -110,6 +128,15 @@ const translations: Record<Language, Record<string, string>> = {
     'results.user': 'User',
     'results.score': 'Score',
     'results.pts': 'pts',
+    
+    // Results page
+    'results.subtitle': 'See how your predictions performed!',
+    'results.yourScore': 'Your Score',
+    'results.totalScore': 'Total Score',
+    'results.correctPredictions': 'Correct Predictions',
+    'results.incorrectPredictions': 'Incorrect Predictions',
+    'results.noResults': 'Results not available yet.',
+    'results.loading': 'Loading results...',
     
     // Leaderboard
     'leaderboard.title': 'Season Leaderboard',
@@ -128,23 +155,17 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.selectRace': 'Select Race',
     'leaderboard.noCompletedRaces': 'No completed races available.',
     'leaderboard.raceNotCompleted': 'This race has not been completed yet.',
-    'leaderboard.loginRequired': 'Login Required',
     'leaderboard.loginToView': 'You need to be logged in to view the leaderboard.',
     'leaderboard.change': 'Change',
     
-    // Common
-    'common.loading': 'Loading...',
-    'common.save': 'Save',
-    'common.error': 'Error',
-    'common.success': 'Success',
-    'common.back': '← Back',
-    'common.notFound': 'Not Found',
-    'common.language': 'Language',
-    'common.points': 'points',
-    'common.point': 'point',
-    'common.raceIdRequired': 'Race ID is required',
-    'common.important': 'Important',
-    'common.login': 'Login',
+    // Leaderboard page
+    'leaderboard.subtitle': 'Track your performance against other users',
+    'leaderboard.score': 'Score',
+    'leaderboard.noData': 'No leaderboard data available.',
+    'leaderboard.race': 'Race',
+    'leaderboard.overall': 'Overall',
+    'leaderboard.loading': 'Loading leaderboard...',
+    'leaderboard.error': 'Error loading leaderboard data.',
     
     // Statistics
     'stats.title': 'F1 Chatter Statistics',
@@ -199,6 +220,32 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.driverOfDay': 'Driver of the Day',
     'stats.shareThisStat': 'Share this statistic',
     'stats.copiedToClipboard': 'Link copied to clipboard!',
+    
+    // Common
+    'common.loading': 'Loading...',
+    'common.save': 'Save',
+    'common.error': 'Error',
+    'common.success': 'Success',
+    'common.back': '← Back',
+    'common.notFound': 'Not Found',
+    'common.language': 'Language',
+    'common.points': 'points',
+    'common.point': 'point',
+    'common.raceIdRequired': 'Race ID is required',
+    'common.important': 'Important',
+    'common.login': 'Login',
+    
+    // Common additional
+    'common.next': 'Next',
+    'common.previous': 'Previous',
+    'common.cancel': 'Cancel',
+    'common.close': 'Close',
+    'common.yes': 'Yes',
+    'common.no': 'No',
+    'common.ok': 'OK',
+    'common.copiedToClipboard': 'Link copied to clipboard!',
+    
+
   },
   nl: {
     // Navigation
@@ -210,14 +257,14 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Home page
     'home.title': 'Chatter Kampioenschap',
-    'home.subtitle': 'Voorspel raceresultaten en strijd met vrienden!',
-    'home.loginToStart': 'Login met Facebook om te beginnen met voorspellen',
+    'home.subtitle': 'Voorspel race resultaten en wedijver met vrienden!',
+    'home.loginToStart': 'Log in met Facebook om te beginnen met voorspellen',
     'home.howItWorks': 'Hoe het werkt',
     'home.noUpcomingRaces': 'Geen aankomende races gevonden.',
-    'home.step1': 'Log in met je Facebook-account om deel te nemen',
+    'home.step1': 'Log in met je Facebook account om deel te nemen',
     'home.step2': 'Maak voorspellingen voor aankomende races voordat ze beginnen',
     'home.step3': 'Verdien punten op basis van de nauwkeurigheid van je voorspellingen',
-    'home.step4': 'Strijd tegen vrienden en volg je positie gedurende het seizoen',
+    'home.step4': 'Wedijver met vrienden en volg je positie gedurende het seizoen',
     
     // Races
     'races.upcomingRaces': 'Aankomende Races',
@@ -285,6 +332,24 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.noMorePredictions': 'Het is niet meer mogelijk om voorspellingen in te dienen of te wijzigen!',
     'predict.alreadySelected': 'Al gekozen voor',
     
+    // Prediction form
+    'prediction.title': 'Maak Je Voorspelling',
+    'prediction.subtitle': 'Voorspel de race uitkomst en verdien punten!',
+    'prediction.firstPlace': '1e Plaats',
+    'prediction.secondPlace': '2e Plaats',
+    'prediction.thirdPlace': '3e Plaats',
+    'prediction.fastestLap': 'Snelste Ronde',
+    'prediction.driverOfDay': 'Coureur van de Dag',
+    'prediction.selectDriver': 'Selecteer een coureur',
+    'prediction.savePrediction': 'Voorspelling Opslaan',
+    'prediction.predictionSaved': 'Voorspelling succesvol opgeslagen!',
+    'prediction.errorSaving': 'Fout bij opslaan voorspelling. Probeer het opnieuw.',
+    'prediction.alreadyPredicted': 'Je hebt al een voorspelling gedaan voor deze race.',
+    'prediction.raceCompleted': 'Deze race is al voltooid.',
+    'prediction.raceStarted': 'Deze race is al begonnen.',
+    'prediction.timeRemaining': 'Tijd over om te voorspellen',
+    'prediction.selectAll': 'Selecteer alle voorspellingen voordat je opslaat.',
+    
     // Results
     'results.title': 'Voorspellingsresultaten',
     'results.notAvailable': 'Resultaten Niet Beschikbaar',
@@ -297,6 +362,15 @@ const translations: Record<Language, Record<string, string>> = {
     'results.user': 'Gebruiker',
     'results.score': 'Score',
     'results.pts': 'ptn',
+    
+    // Results page
+    'results.subtitle': 'Bekijk hoe je voorspellingen het hebben gedaan!',
+    'results.yourScore': 'Jouw Score',
+    'results.totalScore': 'Totaal Score',
+    'results.correctPredictions': 'Correcte Voorspellingen',
+    'results.incorrectPredictions': 'Incorrecte Voorspellingen',
+    'results.noResults': 'Resultaten nog niet beschikbaar.',
+    'results.loading': 'Resultaten laden...',
     
     // Leaderboard
     'leaderboard.title': 'Seizoensranglijst',
@@ -315,24 +389,18 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.viewMode': 'Weergave Modus',
     'leaderboard.seasonTotal': 'Seizoen Totaal',
     'leaderboard.raceResults': 'Race Resultaten',
-    'leaderboard.selectRace': 'Selecteer Race',
     'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
     'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
     'leaderboard.change': 'Verandering',
     
-    // Common
-    'common.loading': 'Laden...',
-    'common.save': 'Opslaan',
-    'common.error': 'Fout',
-    'common.success': 'Succes',
-    'common.back': '← Terug',
-    'common.notFound': 'Niet Gevonden',
-    'common.language': 'Taal',
-    'common.points': 'punten',
-    'common.point': 'punt',
-    'common.raceIdRequired': 'Race ID is vereist',
-    'common.important': 'Belangrijk',
-    'common.login': 'Inloggen',
+    // Leaderboard page
+    'leaderboard.subtitle': 'Volg je prestaties tegen andere gebruikers',
+    'leaderboard.score': 'Score',
+    'leaderboard.noData': 'Geen ranglijst gegevens beschikbaar.',
+    'leaderboard.race': 'Race',
+    'leaderboard.overall': 'Algemeen',
+    'leaderboard.loading': 'Ranglijst laden...',
+    'leaderboard.error': 'Fout bij laden ranglijst gegevens.',
     
     // Statistics
     'stats.title': 'F1 Chatter Statistieken',
@@ -387,7 +455,35 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.driverOfDay': 'Coureur van de Dag',
     'stats.shareThisStat': 'Deel deze statistiek',
     'stats.copiedToClipboard': 'Link gekopieerd naar klembord!',
-  }
+    'stats.loading': 'Statistieken laden...',
+    'stats.error': 'Fout bij laden statistieken.',
+    'stats.noData': 'Geen statistieken beschikbaar.',
+    'stats.loginRequired': 'Log in om gebruikersstatistieken te bekijken.',
+    
+    // Common
+    'common.loading': 'Laden...',
+    'common.save': 'Opslaan',
+    'common.error': 'Fout',
+    'common.success': 'Succes',
+    'common.back': '← Terug',
+    'common.notFound': 'Niet Gevonden',
+    'common.language': 'Taal',
+    'common.points': 'punten',
+    'common.point': 'punt',
+    'common.raceIdRequired': 'Race ID is vereist',
+    'common.important': 'Belangrijk',
+    'common.login': 'Inloggen',
+    'common.next': 'Volgende',
+    'common.previous': 'Vorige',
+    'common.cancel': 'Annuleren',
+    'common.close': 'Sluiten',
+    'common.yes': 'Ja',
+    'common.no': 'Nee',
+    'common.ok': 'OK',
+    'common.copiedToClipboard': 'Link gekopieerd naar klembord!',
+    
+
+  },
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {

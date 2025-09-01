@@ -2,6 +2,7 @@ package com.f1chatter.backend.service
 
 import com.f1chatter.backend.model.User
 import com.f1chatter.backend.repository.UserRepository
+import com.f1chatter.backend.repository.PredictionRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -19,12 +20,14 @@ import io.mockk.mockkStatic
 class UserServiceTest {
     
     private lateinit var userRepository: UserRepository
+    private lateinit var predictionRepository: PredictionRepository
     private lateinit var userService: UserService
     
     @BeforeEach
     fun setup() {
         userRepository = mockk()
-        userService = UserService(userRepository)
+        predictionRepository = mockk()
+        userService = UserService(userRepository, predictionRepository)
         mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
     

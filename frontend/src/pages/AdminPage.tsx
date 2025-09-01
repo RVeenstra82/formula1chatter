@@ -35,7 +35,19 @@ const AdminPage: React.FC = () => {
       name: 'Sync Race Data',
       endpoint: '/api/admin/sync-race-data',
       method: 'POST',
-      description: 'Fetch latest race calendar and data from Jolpica API'
+      description: 'Fetch latest race calendar and data from Jolpica API (skips if data exists)'
+    },
+    {
+      name: 'Force Sync Race Data',
+      endpoint: '/api/admin/force-sync-race-data',
+      method: 'POST',
+      description: 'Force sync race data by deleting existing data and fetching fresh data'
+    },
+    {
+      name: 'Force Sync Weekend Schedules',
+      endpoint: '/api/admin/force-sync-weekend-schedules',
+      method: 'POST',
+      description: 'Force sync weekend schedules (practice & qualifying times) for all races in current season'
     },
     {
       name: 'Sync Driver Data',

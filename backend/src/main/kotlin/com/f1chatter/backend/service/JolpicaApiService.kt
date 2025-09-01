@@ -3,9 +3,11 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.model.Constructor
 import com.f1chatter.backend.model.Driver
 import com.f1chatter.backend.model.Race
+import com.f1chatter.backend.model.ApiCache
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
@@ -142,6 +144,8 @@ class JolpicaApiService(
         
         if (existingRaces.isNotEmpty()) {
             logger.info { "Using ${existingRaces.size} existing races for season $currentSeason from database" }
+            // Still fetch weekend schedules for existing races
+            fetchWeekendSchedules(currentSeason)
             return
         }
         
@@ -374,6 +378,72 @@ class JolpicaApiService(
                 raceRepository.save(race)
                 logger.info { "Successfully updated results for race ${race.raceName}" }
             }
+        }
+    }
+    
+    fun fetchWeekendSchedules(season: Int) {
+        logger.info { "Fetching weekend schedules for season $season" }
+        
+        val races = raceRepository.findBySeason(season)
+        if (races.isEmpty()) {
+            logger.warn { "No races found for season $season, cannot fetch weekend schedules" }
+            return
+        }
+        
+        races.forEach { race ->
+            try {
+                fetchWeekendScheduleForRace(race)
+                // Rate limiting between requests
+                Thread.sleep(1000L / requestsPerSecond)
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to fetch weekend schedule for race ${race.raceName}" }
+            }
+        }
+        
+        logger.info { "Completed fetching weekend schedules for ${races.size} races" }
+    }
+    
+    private fun fetchWeekendScheduleForRace(race: Race) {
+        val url = "$baseUrl/${race.season}/${race.round}.json"
+        logger.debug { "Fetching weekend schedule from $url for race ${race.raceName}" }
+        
+        val response = makeApiRequest(url, Map::class.java) ?: return
+        val raceData = response["MRData"] as? Map<*, *>
+        val raceTable = raceData?.get("RaceTable") as? Map<*, *>
+        val races = raceTable?.get("Races") as? List<Map<*, *>> ?: emptyList()
+        
+        if (races.isNotEmpty()) {
+            val raceData = races[0]
+            
+            // Extract practice and qualifying times
+            val practice1 = raceData["FirstPractice"] as? Map<*, *>
+            val practice2 = raceData["SecondPractice"] as? Map<*, *>
+            val practice3 = raceData["ThirdPractice"] as? Map<*, *>
+            val qualifying = raceData["Qualifying"] as? Map<*, *>
+            
+            // Update race with weekend schedule
+            if (practice1 != null) {
+                race.practice1Date = LocalDate.parse(practice1["date"].toString())
+                race.practice1Time = LocalTime.parse(practice1["time"].toString().replace("Z", ""))
+            }
+            
+            if (practice2 != null) {
+                race.practice2Date = LocalDate.parse(practice2["date"].toString())
+                race.practice2Time = LocalTime.parse(practice2["time"].toString().replace("Z", ""))
+            }
+            
+            if (practice3 != null) {
+                race.practice3Date = LocalDate.parse(practice3["date"].toString())
+                race.practice3Time = LocalTime.parse(practice3["time"].toString().replace("Z", ""))
+            }
+            
+            if (qualifying != null) {
+                race.qualifyingDate = LocalDate.parse(qualifying["date"].toString())
+                race.qualifyingTime = LocalTime.parse(qualifying["time"].toString().replace("Z", ""))
+            }
+            
+            raceRepository.save(race)
+            logger.debug { "Updated weekend schedule for race ${race.raceName}" }
         }
     }
     

@@ -30,10 +30,10 @@ if [ -z "$FACEBOOK_CLIENT_ID" ] || [ -z "$FACEBOOK_CLIENT_SECRET" ]; then
   echo "-------------------------------------------------------------"
 fi
 
-# Start the backend with PostgreSQL profile
-echo "Starting the backend with PostgreSQL profile..."
+# Start the backend with PostgreSQL profile and debug logging
+echo "Starting the backend with PostgreSQL profile and debug logging..."
 cd backend
-./gradlew bootRun --args='--spring.profiles.active=postgres,local' &
+./gradlew bootRun --args='--spring.profiles.active=postgres,local --logging.level.com.f1chatter.backend=DEBUG --logging.level.org.springframework.web=DEBUG' &
 BACKEND_PID=$!
 cd ..
 

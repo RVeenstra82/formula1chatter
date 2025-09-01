@@ -13,6 +13,19 @@ data class RaceDto(
     val locality: String,
     val date: LocalDate,
     val time: LocalTime,
+    
+    // Practice sessions
+    val practice1Date: LocalDate?,
+    val practice1Time: LocalTime?,
+    val practice2Date: LocalDate?,
+    val practice2Time: LocalTime?,
+    val practice3Date: LocalDate?,
+    val practice3Time: LocalTime?,
+    
+    // Qualifying
+    val qualifyingDate: LocalDate?,
+    val qualifyingTime: LocalTime?,
+    
     val firstPlaceDriverId: String?,
     val secondPlaceDriverId: String?,
     val thirdPlaceDriverId: String?,

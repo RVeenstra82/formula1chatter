@@ -1,0 +1,41 @@
+# Kotlin Backend Development Guidelines
+
+## Code Style
+- Use Kotlin idioms and best practices
+- Prefer `val` over `var` when possible
+- Use data classes for DTOs and entities
+- Use extension functions for utility methods
+
+## Spring Boot Patterns
+- Controllers should return `ResponseEntity<T>` for proper HTTP status control
+- Use `@RestController` and `@RequestMapping` annotations
+- Services should contain business logic, controllers should only handle HTTP concerns
+- Use `@Repository` for data access layer
+
+## Type Safety
+- Always specify return types for public functions
+- Use nullable types (`String?`) when values can be null
+- Convert numeric types to strings when returning in JSON maps: `value.toString()`
+- Use `Map<String, Any>` when returning mixed types in JSON responses
+
+## Error Handling
+- Wrap operations in try-catch blocks in controllers
+- Return appropriate HTTP status codes (500 for server errors)
+- Include meaningful error messages in responses
+- Use Spring's `ResponseEntity.status()` for status control
+
+## Database Operations
+- Use Spring Data JPA repositories for database operations
+- Implement proper transaction boundaries
+- Use `@Transactional` where appropriate
+- Handle database exceptions gracefully
+
+## API Design
+- Use RESTful URL patterns
+- Return consistent JSON response structures
+- Include proper HTTP status codes
+- Use meaningful endpoint names
+description:
+globs:
+alwaysApply: true
+---

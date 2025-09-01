@@ -1,0 +1,81 @@
+# Development Workflow & Troubleshooting
+
+## Starting the Application
+Use the startup script to launch the entire stack:
+```bash
+./start.sh
+```
+
+This will:
+1. Start PostgreSQL and pgAdmin via Docker Compose
+2. Wait for database to be ready
+3. Start the Spring Boot backend
+4. Start the Vite frontend dev server
+
+## Service Ports
+- **Backend**: http://localhost:8080
+- **Frontend**: http://localhost:5173
+- **PostgreSQL**: localhost:5432
+- **pgAdmin**: http://localhost:5050
+
+## Common Development Tasks
+
+### Backend Development
+- Use `./gradlew build` to compile and test
+- Use `./gradlew compileKotlin` for quick compilation check
+- Check logs in the terminal where backend is running
+- Use Spring Boot Actuator endpoints for health checks
+
+### Frontend Development
+- Frontend auto-reloads on file changes
+- Use `npm run build` to create production build
+- Check browser console for errors
+- Use React DevTools for debugging
+
+### Database Operations
+- Use pgAdmin at http://localhost:5050 for database management
+- Check Docker Compose logs: `docker-compose logs postgres`
+- Database schema is managed by JPA/Hibernate
+
+## Troubleshooting
+
+### Compilation Errors
+- Check Kotlin type mismatches (common issue: Int vs String in JSON maps)
+- Ensure all dependencies are resolved
+- Check import statements
+
+### Service Not Starting
+- Verify Docker is running
+- Check if ports are already in use
+- Review application logs for specific errors
+- Ensure environment variables are set correctly
+
+### Database Connection Issues
+- Verify PostgreSQL container is running
+- Check connection settings in [application-postgres.yml](mdc:backend/src/main/resources/application-postgres.yml)
+- Ensure database credentials match environment variables
+
+### Frontend Build Issues
+- Clear node_modules and reinstall: `rm -rf node_modules && npm install`
+- Check TypeScript compilation errors
+- Verify Vite configuration in [vite.config.ts](mdc:frontend/vite.config.ts)
+
+## Useful Commands
+```bash
+# Check running services
+ps aux | grep java
+ps aux | grep node
+lsof -i :8080
+lsof -i :5173
+
+# View logs
+docker-compose logs -f postgres
+./gradlew bootRun
+
+# Database operations
+docker-compose exec postgres psql -U postgres -d f1chatter
+```
+description:
+globs:
+alwaysApply: true
+---

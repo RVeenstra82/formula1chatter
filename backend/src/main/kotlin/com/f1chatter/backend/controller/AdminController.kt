@@ -41,7 +41,7 @@ class AdminController(
             if (recentRaces.isEmpty()) {
                 return ResponseEntity.ok(mapOf(
                     "message" to "No races need processing",
-                    "processedRaces" to 0
+                    "processedRaces" to "0"
                 ))
             }
             
@@ -60,7 +60,7 @@ class AdminController(
                 } catch (e: Exception) {
                     return ResponseEntity.status(500).body(mapOf(
                         "error" to "Failed to process race ${race.raceName}: ${e.message}",
-                        "processedRaces" to processedRaces,
+                        "processedRaces" to processedRaces.toString(),
                         "processedRaceNames" to processedRaceNames
                     ))
                 }
@@ -68,7 +68,7 @@ class AdminController(
             
             ResponseEntity.ok(mapOf(
                 "message" to "Successfully processed $processedRaces races",
-                "processedRaces" to processedRaces,
+                "processedRaces" to processedRaces.toString(),
                 "processedRaceNames" to processedRaceNames
             ))
         } catch (e: Exception) {
@@ -83,6 +83,52 @@ class AdminController(
             ResponseEntity.ok(mapOf("message" to "Race data synced successfully"))
         } catch (e: Exception) {
             ResponseEntity.status(500).body(mapOf("error" to "Failed to sync race data: ${e.message}"))
+        }
+    }
+    
+    @PostMapping("/force-sync-race-data")
+    fun forceSyncRaceData(): ResponseEntity<Map<String, Any>> {
+        return try {
+            // Delete all existing race data for current season
+            val currentSeason = dataSyncService.getCurrentSeason()
+            val existingRaces = raceRepository.findBySeason(currentSeason)
+            raceRepository.deleteAll(existingRaces)
+            
+            // Force sync new data
+            jolpicaApiService.fetchCurrentSeasonRaces()
+            
+            ResponseEntity.ok(mapOf(
+                "message" to "Race data force synced successfully",
+                "deletedRaces" to existingRaces.size.toString(),
+                // "season" to currentSeason.toString()
+            ))
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(mapOf("error" to "Failed to force sync race data: ${e.message}"))
+        }
+    }
+    
+    @PostMapping("/force-sync-weekend-schedules")
+    fun forceSyncWeekendSchedules(): ResponseEntity<Map<String, Any>> {
+        return try {
+            val currentSeason = dataSyncService.getCurrentSeason()
+            val existingRaces = raceRepository.findBySeason(currentSeason)
+            
+            if (existingRaces.isEmpty()) {
+                return ResponseEntity.badRequest().body(mapOf(
+                    "error" to "No races found for season $currentSeason. Please sync race data first."
+                ))
+            }
+            
+            // Force sync weekend schedules for all races
+            jolpicaApiService.fetchWeekendSchedules(currentSeason)
+            
+            ResponseEntity.ok(mapOf(
+                "message" to "Weekend schedules force synced successfully",
+                "updatedRaces" to existingRaces.size.toString(),
+                "season" to currentSeason.toString()
+            ))
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(mapOf("error" to "Failed to force sync weekend schedules: ${e.message}"))
         }
     }
     

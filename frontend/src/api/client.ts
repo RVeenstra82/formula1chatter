@@ -55,6 +55,19 @@ export interface Race {
   locality: string;
   date: string;
   time: string;
+  
+  // Practice sessions
+  practice1Date?: string;
+  practice1Time?: string;
+  practice2Date?: string;
+  practice2Time?: string;
+  practice3Date?: string;
+  practice3Time?: string;
+  
+  // Qualifying
+  qualifyingDate?: string;
+  qualifyingTime?: string;
+  
   firstPlaceDriverId: string | null;
   secondPlaceDriverId: string | null;
   thirdPlaceDriverId: string | null;

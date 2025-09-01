@@ -1,0 +1,48 @@
+# Formula 1 Chatter Project Structure
+
+## Overview
+This is a Formula 1 prediction and discussion platform with a Kotlin Spring Boot backend and React TypeScript frontend.
+
+## Backend Structure
+The main backend entry point is [Application.kt](mdc:backend/src/main/kotlin/com/f1chatter/backend/Application.kt) which is a Spring Boot application.
+
+### Key Backend Components:
+- **Controllers**: REST API endpoints in [backend/src/main/kotlin/com/f1chatter/backend/controller/](mdc:backend/src/main/kotlin/com/f1chatter/backend/controller/)
+- **Services**: Business logic in [backend/src/main/kotlin/com/f1chatter/backend/service/](mdc:backend/src/main/kotlin/com/f1chatter/backend/service/)
+- **Repositories**: Data access layer in [backend/src/main/kotlin/com/f1chatter/backend/repository/](mdc:backend/src/main/kotlin/com/f1chatter/backend/repository/)
+- **Configuration**: Application configs in [backend/src/main/resources/](mdc:backend/src/main/resources/)
+
+### Important Backend Files:
+- [build.gradle.kts](mdc:backend/build.gradle.kts) - Kotlin build configuration
+- [AdminController.kt](mdc:backend/src/main/kotlin/com/f1chatter/backend/controller/AdminController.kt) - Admin API endpoints
+- [Dockerfile](mdc:backend/Dockerfile) - Backend containerization
+
+## Frontend Structure
+The main frontend entry point is [main.tsx](mdc:frontend/src/main.tsx) which renders the React application.
+
+### Key Frontend Components:
+- **Pages**: Main application views in [frontend/src/pages/](mdc:frontend/src/pages/)
+- **Components**: Reusable UI components in [frontend/src/components/](mdc:frontend/src/components/)
+- **Services**: API client and data services in [frontend/src/api/](mdc:frontend/src/api/)
+- **Contexts**: React context providers in [frontend/src/contexts/](mdc:frontend/src/contexts/)
+
+### Important Frontend Files:
+- [package.json](mdc:frontend/package.json) - Node.js dependencies
+- [vite.config.ts](mdc:frontend/vite.config.ts) - Vite build configuration
+- [App.tsx](mdc:frontend/src/App.tsx) - Main application component
+- [timeUtils.ts](mdc:frontend/src/utils/timeUtils.ts) - Time handling utilities
+
+## Infrastructure
+- [docker-compose.yml](mdc:docker-compose.yml) - PostgreSQL and pgAdmin services
+- [start.sh](mdc:start.sh) - Application startup script
+- [env.properties](mdc:env.properties) - Environment configuration
+
+## Development Workflow
+- Backend runs on port 8080 (Spring Boot)
+- Frontend runs on port 5173 (Vite dev server)
+- PostgreSQL runs on port 5432
+- Use `./start.sh` to start the entire application stack
+description:
+globs:
+alwaysApply: true
+---

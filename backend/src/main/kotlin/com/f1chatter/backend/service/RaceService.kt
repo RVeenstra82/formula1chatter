@@ -48,6 +48,19 @@ class RaceService(
             locality = race.locality,
             date = race.date,
             time = race.time,
+            
+            // Practice sessions
+            practice1Date = race.practice1Date,
+            practice1Time = race.practice1Time,
+            practice2Date = race.practice2Date,
+            practice2Time = race.practice2Time,
+            practice3Date = race.practice3Date,
+            practice3Time = race.practice3Time,
+            
+            // Qualifying
+            qualifyingDate = race.qualifyingDate,
+            qualifyingTime = race.qualifyingTime,
+            
             firstPlaceDriverId = race.firstPlaceDriverId,
             secondPlaceDriverId = race.secondPlaceDriverId,
             thirdPlaceDriverId = race.thirdPlaceDriverId,

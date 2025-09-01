@@ -1,0 +1,47 @@
+# React TypeScript Frontend Guidelines
+
+## Code Style
+- Use TypeScript strict mode
+- Prefer functional components with hooks over class components
+- Use meaningful variable and function names
+- Follow React best practices and hooks rules
+
+## Component Structure
+- Use PascalCase for component names
+- Separate concerns: one component per file
+- Use proper TypeScript interfaces for props and state
+- Implement proper error boundaries
+
+## State Management
+- Use React Context for global state (AuthContext, LanguageContext)
+- Prefer local state with `useState` for component-specific state
+- Use `useEffect` for side effects and API calls
+- Implement proper loading and error states
+
+## API Integration
+- Use the API client from [api/client.ts](mdc:frontend/src/api/client.ts)
+- Handle API responses and errors gracefully
+- Implement proper loading states during API calls
+- Use TypeScript interfaces for API response types
+
+## Styling
+- Use Tailwind CSS for styling (configured in [tailwind.config.js](mdc:frontend/tailwind.config.js))
+- Follow mobile-first responsive design principles
+- Use consistent spacing and color schemes
+- Implement proper accessibility features
+
+## File Organization
+- Keep components in [components/](mdc:frontend/src/components/)
+- Organize pages in [pages/](mdc:frontend/src/pages/)
+- Store utilities in [utils/](mdc:frontend/src/utils/)
+- Use proper import/export patterns
+
+## Testing
+- Write tests for critical components
+- Use Playwright for E2E testing (configured in [playwright.config.ts](mdc:frontend/playwright.config.ts))
+- Test accessibility and user interactions
+- Maintain good test coverage
+description:
+globs:
+alwaysApply: true
+---

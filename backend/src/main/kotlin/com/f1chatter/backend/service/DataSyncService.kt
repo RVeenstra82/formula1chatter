@@ -30,7 +30,7 @@ class DataSyncService(
      * F1 seasons typically start in March, so if we're in January or February,
      * we use the previous year's season data.
      */
-    private fun getCurrentSeason(): Int {
+    fun getCurrentSeason(): Int {
         val currentDate = LocalDate.now()
         val currentYear = currentDate.year
         val currentMonth = currentDate.monthValue

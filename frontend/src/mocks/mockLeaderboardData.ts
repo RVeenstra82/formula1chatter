@@ -62,6 +62,19 @@ export const mockRaces: Race[] = [
     locality: 'Sakhir',
     date: '2025-03-02',
     time: '15:00:00',
+    
+    // Practice sessions
+    practice1Date: '2025-02-28',
+    practice1Time: '11:30:00',
+    practice2Date: '2025-02-28',
+    practice2Time: '15:00:00',
+    practice3Date: '2025-03-01',
+    practice3Time: '12:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-03-01',
+    qualifyingTime: '15:00:00',
+    
     completed: true,
     firstPlaceDriverId: 'VER',
     secondPlaceDriverId: 'PER',
@@ -79,6 +92,19 @@ export const mockRaces: Race[] = [
     locality: 'Jeddah',
     date: '2025-03-09',
     time: '17:00:00',
+    
+    // Practice sessions
+    practice1Date: '2025-03-07',
+    practice1Time: '13:30:00',
+    practice2Date: '2025-03-07',
+    practice2Time: '17:00:00',
+    practice3Date: '2025-03-08',
+    practice3Time: '13:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-03-08',
+    qualifyingTime: '16:00:00',
+    
     completed: true,
     firstPlaceDriverId: 'VER',
     secondPlaceDriverId: 'PER',
@@ -96,6 +122,19 @@ export const mockRaces: Race[] = [
     locality: 'Melbourne',
     date: '2025-03-24',
     time: '04:00:00',
+    
+    // Practice sessions
+    practice1Date: '2025-03-22',
+    practice1Time: '00:30:00',
+    practice2Date: '2025-03-22',
+    practice2Time: '04:00:00',
+    practice3Date: '2025-03-23',
+    practice3Time: '01:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-03-23',
+    qualifyingTime: '04:00:00',
+    
     completed: true,
     firstPlaceDriverId: 'SAI',
     secondPlaceDriverId: 'LEC',
@@ -113,6 +152,19 @@ export const mockRaces: Race[] = [
     locality: 'Suzuka',
     date: '2025-04-07',
     time: '05:00:00',
+    
+    // Practice sessions
+    practice1Date: '2025-04-05',
+    practice1Time: '01:30:00',
+    practice2Date: '2025-04-05',
+    practice2Time: '05:00:00',
+    practice3Date: '2025-04-06',
+    practice3Time: '02:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-04-06',
+    qualifyingTime: '05:00:00',
+    
     completed: true,
     firstPlaceDriverId: 'VER',
     secondPlaceDriverId: 'PER',
@@ -130,12 +182,25 @@ export const mockRaces: Race[] = [
     locality: 'Shanghai',
     date: '2025-04-21',
     time: '07:00:00',
-    completed: true,
-    firstPlaceDriverId: 'VER',
-    secondPlaceDriverId: 'NOR',
-    thirdPlaceDriverId: 'PER',
-    fastestLapDriverId: 'VER',
-    driverOfTheDayId: 'NOR'
+    
+    // Practice sessions
+    practice1Date: '2025-04-19',
+    practice1Time: '03:30:00',
+    practice2Date: '2025-04-19',
+    practice2Time: '07:00:00',
+    practice3Date: '2025-04-20',
+    practice3Time: '04:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-04-20',
+    qualifyingTime: '07:00:00',
+    
+    completed: false,
+    firstPlaceDriverId: null,
+    secondPlaceDriverId: null,
+    thirdPlaceDriverId: null,
+    fastestLapDriverId: null,
+    driverOfTheDayId: null
   },
   {
     id: '2025-6',
@@ -146,13 +211,26 @@ export const mockRaces: Race[] = [
     country: 'United States',
     locality: 'Miami',
     date: '2025-05-05',
-    time: '20:00:00',
-    completed: true,
-    firstPlaceDriverId: 'VER',
-    secondPlaceDriverId: 'PER',
-    thirdPlaceDriverId: 'LEC',
-    fastestLapDriverId: 'VER',
-    driverOfTheDayId: 'VER'
+    time: '21:00:00',
+    
+    // Practice sessions
+    practice1Date: '2025-05-03',
+    practice1Time: '17:30:00',
+    practice2Date: '2025-05-03',
+    practice2Time: '21:00:00',
+    practice3Date: '2025-05-04',
+    practice3Time: '18:00:00',
+    
+    // Qualifying
+    qualifyingDate: '2025-05-04',
+    qualifyingTime: '21:00:00',
+    
+    completed: false,
+    firstPlaceDriverId: null,
+    secondPlaceDriverId: null,
+    thirdPlaceDriverId: null,
+    fastestLapDriverId: null,
+    driverOfTheDayId: null
   },
   {
     id: '2025-7',

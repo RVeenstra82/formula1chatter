@@ -25,6 +25,18 @@ data class Race(
     val date: LocalDate,
     val time: LocalTime,
     
+    // Practice sessions
+    var practice1Date: LocalDate? = null,
+    var practice1Time: LocalTime? = null,
+    var practice2Date: LocalDate? = null,
+    var practice2Time: LocalTime? = null,
+    var practice3Date: LocalDate? = null,
+    var practice3Time: LocalTime? = null,
+    
+    // Qualifying
+    var qualifyingDate: LocalDate? = null,
+    var qualifyingTime: LocalTime? = null,
+    
     var firstPlaceDriverId: String? = null,
     var secondPlaceDriverId: String? = null,
     var thirdPlaceDriverId: String? = null,

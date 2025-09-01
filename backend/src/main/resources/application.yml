@@ -19,11 +19,6 @@ jwt:
   secret: ${JWT_SECRET:f1-chatter-super-secret-key-that-is-at-least-32-characters-long-for-hmac-sha256}
   expiration: ${JWT_EXPIRATION:86400}
 
-logging:
-  level:
-    root: INFO
-    com.f1chatter.backend.service.JolpicaApiService: DEBUG
-
 jolpica:
   api:
     base-url: https://api.jolpi.ca/ergast/f1

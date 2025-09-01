@@ -36,21 +36,23 @@ export const formatTimeLocalized = (
 
 /**
  * Calculate the time remaining until a given date and time
+ * Note: Backend stores race times as UTC times without timezone info (LocalTime)
+ * We need to treat them as UTC times for correct calculation
  */
 export const calculateTimeRemaining = (
   dateString: string, 
   timeString: string | null,
   locale: Language
 ): string => {
-  // Parse the date
-  const date = parseISO(dateString);
+  // Parse the date in UTC to avoid timezone issues
+  const date = parseISO(dateString + 'T00:00:00Z');
   
-  // Set the time if provided, otherwise use noon
+  // Set the time if provided, otherwise use noon UTC
   if (timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
-    date.setHours(hours, minutes, 0);
+    date.setUTCHours(hours, minutes, 0, 0);
   } else {
-    date.setHours(12, 0, 0);
+    date.setUTCHours(12, 0, 0, 0);
   }
   
   // Calculate the difference from now
@@ -70,18 +72,19 @@ export const calculateTimeRemaining = (
 
 /**
  * Check if the race starts in less than one hour
+ * Note: Backend stores race times as UTC times without timezone info
  */
 export const isLessThanOneHour = (
   dateString: string, 
   timeString: string | null
 ): boolean => {
-  const date = parseISO(dateString);
+  const date = parseISO(dateString + 'T00:00:00Z');
   
   if (timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
-    date.setHours(hours, minutes, 0);
+    date.setUTCHours(hours, minutes, 0, 0);
   } else {
-    date.setHours(12, 0, 0);
+    date.setUTCHours(12, 0, 0, 0);
   }
   
   const now = new Date();
@@ -92,18 +95,19 @@ export const isLessThanOneHour = (
 
 /**
  * Check if the race starts in less than five minutes
+ * Note: Backend stores race times as UTC times without timezone info
  */
 export const isLessThanFiveMinutes = (
   dateString: string, 
   timeString: string | null
 ): boolean => {
-  const date = parseISO(dateString);
+  const date = parseISO(dateString + 'T00:00:00Z');
   
   if (timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
-    date.setHours(hours, minutes, 0);
+    date.setUTCHours(hours, minutes, 0, 0);
   } else {
-    date.setHours(12, 0, 0);
+    date.setUTCHours(12, 0, 0, 0);
   }
   
   const now = new Date();
@@ -114,18 +118,19 @@ export const isLessThanFiveMinutes = (
 
 /**
  * Build a Date object representing the race start (date + time, or noon if time unknown)
+ * Note: Backend stores race times as UTC times without timezone info
  */
 export const getRaceStartDate = (
   dateString: string,
   timeString: string | null
 ): Date => {
-  const date = parseISO(dateString);
+  const date = parseISO(dateString + 'T00:00:00Z');
   if (timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
-    date.setHours(hours, minutes, 0, 0);
+    date.setUTCHours(hours, minutes, 0, 0);
   } else {
-    // Fallback to midday if no explicit time is provided
-    date.setHours(12, 0, 0, 0);
+    // Fallback to midday UTC if no explicit time is provided
+    date.setUTCHours(12, 0, 0, 0);
   }
   return date;
 };

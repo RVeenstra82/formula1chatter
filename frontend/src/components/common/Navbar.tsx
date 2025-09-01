@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -7,18 +7,6 @@ const Navbar: React.FC = () => {
   const { user, isLoading, login, logout, testLogin } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'nl' : 'en');

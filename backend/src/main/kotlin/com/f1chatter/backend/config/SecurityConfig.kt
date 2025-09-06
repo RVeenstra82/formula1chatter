@@ -26,6 +26,7 @@ class SecurityConfig(
                 auth
                     .requestMatchers("/api/auth/user").authenticated()
                     .requestMatchers("/api/predictions/user/**").authenticated()
+                    .requestMatchers("/api/admin/**").authenticated()
                     .requestMatchers("/api/**").permitAll()
                     .requestMatchers("/**").permitAll()
             }

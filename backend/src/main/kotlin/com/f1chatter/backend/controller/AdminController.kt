@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import mu.KotlinLogging
 
 @RestController
 @RequestMapping("/admin")
@@ -20,6 +21,7 @@ class AdminController(
     private val predictionService: PredictionService,
     private val raceRepository: RaceRepository
 ) {
+    private val logger = KotlinLogging.logger {}
     
     @PostMapping("/update-driver-photos")
     fun updateDriverPhotos(): ResponseEntity<Map<String, String>> {
@@ -88,20 +90,29 @@ class AdminController(
     
     @PostMapping("/force-sync-race-data")
     fun forceSyncRaceData(): ResponseEntity<Map<String, Any>> {
+        logger.info { "Force sync race data endpoint called" }
         return try {
             // Delete all existing race data for current season
             val currentSeason = dataSyncService.getCurrentSeason()
+            logger.info { "Current season: $currentSeason" }
+            
             val existingRaces = raceRepository.findBySeason(currentSeason)
+            logger.info { "Found ${existingRaces.size} existing races to delete" }
+            
             raceRepository.deleteAll(existingRaces)
+            logger.info { "Deleted ${existingRaces.size} existing races" }
             
             // Force sync new data
+            logger.info { "Starting to fetch current season races" }
             jolpicaApiService.fetchCurrentSeasonRaces()
+            logger.info { "Successfully fetched current season races" }
             
             ResponseEntity.ok(mapOf(
                 "message" to "Race data force synced successfully",
                 "deletedRaces" to existingRaces.size.toString()
             ))
         } catch (e: Exception) {
+            logger.error(e) { "Failed to force sync race data: ${e.message}" }
             ResponseEntity.status(500).body(mapOf("error" to "Failed to force sync race data: ${e.message}"))
         }
     }

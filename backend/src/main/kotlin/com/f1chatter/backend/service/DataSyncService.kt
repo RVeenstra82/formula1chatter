@@ -100,6 +100,25 @@ class DataSyncService(
         openF1ApiService.updateDriverProfilePictures()
     }
     
+    // Sync weekend schedules and sprint data weekly
+    @Scheduled(cron = "0 0 3 * * SUN") // At 3 AM on Sunday
+    fun syncWeekendSchedulesAndSprintData() {
+        logger.info { "Starting scheduled sync of weekend schedules and sprint data" }
+        val currentSeason = getCurrentSeason()
+        
+        try {
+            // First sync weekend schedules (this will also update sprint weekend flags)
+            jolpicaApiService.fetchWeekendSchedules(currentSeason)
+            
+            // Then sync sprint race data
+            jolpicaApiService.fetchSprintRaces(currentSeason)
+            
+            logger.info { "Successfully synced weekend schedules and sprint data for season $currentSeason" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to sync weekend schedules and sprint data for season $currentSeason" }
+        }
+    }
+    
     // Check for completed races every hour on Sundays (when most races happen)
     @Scheduled(cron = "0 0 * * * SUN") // Every hour on Sunday
     fun checkForCompletedRaces() {

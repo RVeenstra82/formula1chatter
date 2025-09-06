@@ -99,11 +99,32 @@ class AdminController(
             
             ResponseEntity.ok(mapOf(
                 "message" to "Race data force synced successfully",
-                "deletedRaces" to existingRaces.size.toString(),
-                // "season" to currentSeason.toString()
+                "deletedRaces" to existingRaces.size.toString()
             ))
         } catch (e: Exception) {
             ResponseEntity.status(500).body(mapOf("error" to "Failed to force sync race data: ${e.message}"))
+        }
+    }
+    
+    @PostMapping("/sync-sprint-data")
+    fun syncSprintData(): ResponseEntity<Map<String, String>> {
+        return try {
+            val currentSeason = dataSyncService.getCurrentSeason()
+            jolpicaApiService.fetchSprintRaces(currentSeason)
+            ResponseEntity.ok(mapOf("message" to "Sprint data synced successfully"))
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(mapOf("error" to "Failed to sync sprint data: ${e.message}"))
+        }
+    }
+    
+    @PostMapping("/sync-weekend-schedules")
+    fun syncWeekendSchedules(): ResponseEntity<Map<String, String>> {
+        return try {
+            val currentSeason = dataSyncService.getCurrentSeason()
+            jolpicaApiService.fetchWeekendSchedules(currentSeason)
+            ResponseEntity.ok(mapOf("message" to "Weekend schedules synced successfully"))
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(mapOf("error" to "Failed to sync weekend schedules: ${e.message}"))
         }
     }
     

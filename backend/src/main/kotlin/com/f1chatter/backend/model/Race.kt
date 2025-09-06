@@ -37,6 +37,13 @@ data class Race(
     var qualifyingDate: LocalDate? = null,
     var qualifyingTime: LocalTime? = null,
     
+    // Sprint weekend information
+    var isSprintWeekend: Boolean? = null,
+    var sprintDate: LocalDate? = null,
+    var sprintTime: LocalTime? = null,
+    var sprintQualifyingDate: LocalDate? = null,
+    var sprintQualifyingTime: LocalTime? = null,
+    
     var firstPlaceDriverId: String? = null,
     var secondPlaceDriverId: String? = null,
     var thirdPlaceDriverId: String? = null,

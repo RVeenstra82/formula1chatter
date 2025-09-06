@@ -61,6 +61,13 @@ class RaceService(
             qualifyingDate = race.qualifyingDate,
             qualifyingTime = race.qualifyingTime,
             
+            // Sprint weekend information
+            isSprintWeekend = race.isSprintWeekend ?: false,
+            sprintDate = race.sprintDate,
+            sprintTime = race.sprintTime,
+            sprintQualifyingDate = race.sprintQualifyingDate,
+            sprintQualifyingTime = race.sprintQualifyingTime,
+            
             firstPlaceDriverId = race.firstPlaceDriverId,
             secondPlaceDriverId = race.secondPlaceDriverId,
             thirdPlaceDriverId = race.thirdPlaceDriverId,

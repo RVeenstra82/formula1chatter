@@ -58,6 +58,11 @@ const translations: Record<Language, Record<string, string>> = {
     'races.localTime': 'English time',
     'races.timeRemaining': 'Time remaining to predict',
     'races.saveBeforeStart': 'Don\'t forget to save your prediction before the race starts!',
+    'races.sprintWeekend': 'Sprint Weekend',
+    'races.sprint': 'Sprint',
+    'races.sprintQualifying': 'Sprint Qualifying',
+    'races.saturday': 'Saturday',
+    'races.sunday': 'Sunday',
     
     // Race detail
     'race.raceInfo': 'Race Information',
@@ -104,6 +109,12 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.canUpdateBeforeStart': 'You can update your prediction until 5 minutes before the race starts',
     'predict.noMorePredictions': 'It is no longer possible to submit or modify predictions!',
     'predict.alreadySelected': 'Already selected for',
+    'predict.makePredictionFor': 'Make your prediction for',
+    'predict.sprintWeekendInfo': 'This race weekend includes a sprint race on Saturday and the main race on Sunday.',
+    'predict.sprintPrediction': 'Sprint Prediction',
+    'predict.sprintPredictionInfo': 'Make your prediction for the sprint race (top 3 only)',
+    'predict.submitSprintPrediction': 'Submit Sprint Prediction',
+    'predict.racePrediction': 'Race Prediction',
     
     // Prediction form
     'prediction.title': 'Make Your Prediction',
@@ -238,6 +249,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.language': 'Language',
     'common.points': 'points',
     'common.point': 'point',
+    'common.selectDriver': 'Select a driver',
     'common.raceIdRequired': 'Race ID is required',
     'common.important': 'Important',
     'common.login': 'Login',
@@ -247,6 +259,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.previous': 'Previous',
     'common.cancel': 'Cancel',
     'common.close': 'Close',
+    'common.at': 'at',
     'common.yes': 'Yes',
     'common.no': 'No',
     'common.ok': 'OK',
@@ -299,6 +312,11 @@ const translations: Record<Language, Record<string, string>> = {
     'races.localTime': 'Nederlandse tijd',
     'races.timeRemaining': 'Tijd over om te voorspellen',
     'races.saveBeforeStart': 'Vergeet niet je voorspelling op te slaan voordat de race begint!',
+    'races.sprintWeekend': 'Sprint Weekend',
+    'races.sprint': 'Sprint',
+    'races.sprintQualifying': 'Sprint Kwalificatie',
+    'races.saturday': 'Zaterdag',
+    'races.sunday': 'Zondag',
     
     // Race detail
     'race.raceInfo': 'Race Informatie',
@@ -345,6 +363,12 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.canUpdateBeforeStart': 'Je kunt je voorspelling bijwerken tot 5 minuten voor de race begint',
     'predict.noMorePredictions': 'Het is niet meer mogelijk om voorspellingen in te dienen of te wijzigen!',
     'predict.alreadySelected': 'Al gekozen voor',
+    'predict.makePredictionFor': 'Maak je voorspelling voor',
+    'predict.sprintWeekendInfo': 'Dit race weekend omvat een sprint race op zaterdag en de hoofdrace op zondag.',
+    'predict.sprintPrediction': 'Sprint Voorspelling',
+    'predict.sprintPredictionInfo': 'Maak je voorspelling voor de sprint race (alleen top 3)',
+    'predict.submitSprintPrediction': 'Sprint Voorspelling Indienen',
+    'predict.racePrediction': 'Race Voorspelling',
     
     // Prediction form
     'prediction.title': 'Maak Je Voorspelling',
@@ -484,6 +508,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.language': 'Taal',
     'common.points': 'punten',
     'common.point': 'punt',
+    'common.selectDriver': 'Selecteer een coureur',
     'common.raceIdRequired': 'Race ID is vereist',
     'common.important': 'Belangrijk',
     'common.login': 'Inloggen',
@@ -491,6 +516,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.previous': 'Vorige',
     'common.cancel': 'Annuleren',
     'common.close': 'Sluiten',
+    'common.at': 'om',
     'common.yes': 'Ja',
     'common.no': 'Nee',
     'common.ok': 'OK',

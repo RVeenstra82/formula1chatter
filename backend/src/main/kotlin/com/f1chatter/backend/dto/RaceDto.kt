@@ -26,6 +26,13 @@ data class RaceDto(
     val qualifyingDate: LocalDate?,
     val qualifyingTime: LocalTime?,
     
+    // Sprint weekend information
+    val isSprintWeekend: Boolean?,
+    val sprintDate: LocalDate?,
+    val sprintTime: LocalTime?,
+    val sprintQualifyingDate: LocalDate?,
+    val sprintQualifyingTime: LocalTime?,
+    
     val firstPlaceDriverId: String?,
     val secondPlaceDriverId: String?,
     val thirdPlaceDriverId: String?,

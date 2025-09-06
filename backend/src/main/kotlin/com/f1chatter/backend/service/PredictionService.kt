@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import java.util.NoSuchElementException
 
 @Service
@@ -27,8 +28,20 @@ class PredictionService(
 ) {
     @Transactional
     fun savePrediction(userId: Long, raceId: String, predictionDto: PredictionDto): Prediction {
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw NoSuchElementException("User not found")
+        // Handle TestUser case
+        val user = if (userId == 0L) {
+            // Create a virtual TestUser for predictions
+            User(
+                id = 0L,
+                facebookId = "test-user",
+                name = "Test User",
+                email = "testuser@f1chatter.com",
+                profilePictureUrl = null
+            )
+        } else {
+            userRepository.findByIdOrNull(userId)
+                ?: throw NoSuchElementException("User not found")
+        }
         
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
@@ -49,7 +62,8 @@ class PredictionService(
     }
     
     private fun isRaceStartingWithinFiveMinutes(race: Race): Boolean {
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(ZoneOffset.UTC)
+        // Treat race time as UTC time to match frontend behavior
         val raceDateTime = LocalDateTime.of(race.date, race.time)
         val minutesUntilRace = java.time.Duration.between(now, raceDateTime).toMinutes()
         
@@ -83,8 +97,20 @@ class PredictionService(
     }
     
     fun getUserPredictionForRace(userId: Long, raceId: String): PredictionDto? {
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw NoSuchElementException("User not found")
+        // Handle TestUser case
+        val user = if (userId == 0L) {
+            // Create a virtual TestUser for predictions
+            User(
+                id = 0L,
+                facebookId = "test-user",
+                name = "Test User",
+                email = "testuser@f1chatter.com",
+                profilePictureUrl = null
+            )
+        } else {
+            userRepository.findByIdOrNull(userId)
+                ?: throw NoSuchElementException("User not found")
+        }
         
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")

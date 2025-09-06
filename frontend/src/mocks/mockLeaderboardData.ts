@@ -75,6 +75,9 @@ export const mockRaces: Race[] = [
     qualifyingDate: '2025-03-01',
     qualifyingTime: '15:00:00',
     
+    // Sprint weekend information
+    isSprintWeekend: false,
+    
     completed: true,
     firstPlaceDriverId: 'VER',
     secondPlaceDriverId: 'PER',
@@ -104,6 +107,13 @@ export const mockRaces: Race[] = [
     // Qualifying
     qualifyingDate: '2025-03-08',
     qualifyingTime: '16:00:00',
+    
+    // Sprint weekend information
+    isSprintWeekend: true,
+    sprintDate: '2025-03-08',
+    sprintTime: '12:00:00',
+    sprintQualifyingDate: '2025-03-07',
+    sprintQualifyingTime: '17:00:00',
     
     completed: true,
     firstPlaceDriverId: 'VER',

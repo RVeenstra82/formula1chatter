@@ -34,7 +34,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   const { data: existingPrediction, isLoading: isLoadingPrediction } = useQuery({
     queryKey: ['prediction', user?.id, race.id],
     queryFn: () => api.getUserPredictionForRace(user!.id, race.id),
-    enabled: !!user,
+    enabled: !!user && user.id !== undefined && user.id !== null,
   });
   
   // Update prediction state when existing prediction is loaded
@@ -46,7 +46,12 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   
   // Mutation to save prediction
   const { mutate: savePrediction, isPending: isSaving, error: saveError } = useMutation({
-    mutationFn: () => api.savePrediction(user!.id, race.id, prediction),
+    mutationFn: () => {
+      if (!user || user.id === undefined || user.id === null) {
+        throw new Error('User not authenticated');
+      }
+      return api.savePrediction(user.id, race.id, prediction);
+    },
     onSuccess: () => {
       if (onSuccess) onSuccess();
     },
@@ -54,7 +59,10 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || user.id === undefined || user.id === null) {
+      console.error('Cannot submit prediction: user not authenticated');
+      return;
+    }
     savePrediction();
   };
   
@@ -89,7 +97,8 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   const isLoading = isLoadingDrivers || isLoadingPrediction;
   const isPast = hasRaceStarted(race.date, race.time);
   const isWithinFiveMinutes = isLessThanFiveMinutes(race.date, race.time);
-  const isDisabled = isLoading || isSaving || race.completed || isPast || isWithinFiveMinutes;
+  const isNotAuthenticated = !user || user.id === undefined || user.id === null;
+  const isDisabled = isLoading || isSaving || race.completed || isPast || isWithinFiveMinutes || isNotAuthenticated;
   
   if (isLoading) {
     return <div className="card p-6">{t('common.loading')}</div>;
@@ -111,15 +120,17 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
         <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
           ⚠️ {t('predict.noMorePredictions')}
         </div>
-      ) : (
+      ) : isNotAuthenticated ? (
         <div className="bg-blue-100 text-blue-800 p-4 rounded-md mb-6">
-          {t('predict.makeFor')} {race.raceName}!
+          Please log in to make predictions
         </div>
-      )}
+      ) : null}
       
       {saveError && (
         <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
-          ⚠️ {t('predict.noMorePredictions')}
+          ⚠️ {saveError.message?.includes('not authenticated') 
+            ? 'Please log in to make predictions' 
+            : t('predict.noMorePredictions')}
         </div>
       )}
       

@@ -3,10 +3,12 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.model.Constructor
 import com.f1chatter.backend.model.Driver
 import com.f1chatter.backend.model.Race
+import com.f1chatter.backend.model.SprintRace
 import com.f1chatter.backend.model.ApiCache
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
+import com.f1chatter.backend.repository.SprintRaceRepository
 import com.f1chatter.backend.repository.ApiCacheRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
@@ -25,6 +27,7 @@ class JolpicaApiService(
     private val restTemplate: RestTemplate,
     private val objectMapper: ObjectMapper,
     private val raceRepository: RaceRepository,
+    private val sprintRaceRepository: SprintRaceRepository,
     private val driverRepository: DriverRepository,
     private val constructorRepository: ConstructorRepository,
     @Value("\${jolpica.api.base-url}")
@@ -403,6 +406,28 @@ class JolpicaApiService(
         logger.info { "Completed fetching weekend schedules for ${races.size} races" }
     }
     
+    fun fetchSprintRaces(season: Int) {
+        logger.info { "Fetching sprint races for season $season" }
+        
+        val races = raceRepository.findBySeason(season)
+        if (races.isEmpty()) {
+            logger.warn { "No races found for season $season, cannot fetch sprint races" }
+            return
+        }
+        
+        races.forEach { race ->
+            try {
+                fetchSprintRaceForRace(race)
+                // Rate limiting between requests
+                Thread.sleep(1000L / requestsPerSecond)
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to fetch sprint race for race ${race.raceName}" }
+            }
+        }
+        
+        logger.info { "Completed fetching sprint races for ${races.size} races" }
+    }
+    
     private fun fetchWeekendScheduleForRace(race: Race) {
         val url = "$baseUrl/${race.season}/${race.round}.json"
         logger.debug { "Fetching weekend schedule from $url for race ${race.raceName}" }
@@ -420,6 +445,10 @@ class JolpicaApiService(
             val practice2 = raceData["SecondPractice"] as? Map<*, *>
             val practice3 = raceData["ThirdPractice"] as? Map<*, *>
             val qualifying = raceData["Qualifying"] as? Map<*, *>
+            
+            // Extract sprint weekend information
+            val sprint = raceData["Sprint"] as? Map<*, *>
+            val sprintQualifying = raceData["SprintQualifying"] as? Map<*, *>
             
             // Update race with weekend schedule
             if (practice1 != null) {
@@ -442,8 +471,63 @@ class JolpicaApiService(
                 race.qualifyingTime = LocalTime.parse(qualifying["time"].toString().replace("Z", ""))
             }
             
+            // Update sprint weekend information
+            if (sprint != null) {
+                race.isSprintWeekend = true
+                race.sprintDate = LocalDate.parse(sprint["date"].toString())
+                race.sprintTime = LocalTime.parse(sprint["time"].toString().replace("Z", ""))
+            }
+            
+            if (sprintQualifying != null) {
+                race.sprintQualifyingDate = LocalDate.parse(sprintQualifying["date"].toString())
+                race.sprintQualifyingTime = LocalTime.parse(sprintQualifying["time"].toString().replace("Z", ""))
+            }
+            
             raceRepository.save(race)
             logger.debug { "Updated weekend schedule for race ${race.raceName}" }
+        }
+    }
+    
+    private fun fetchSprintRaceForRace(race: Race) {
+        // Only fetch sprint race data if this is a sprint weekend
+        if (race.isSprintWeekend != true) {
+            return
+        }
+        
+        val url = "$baseUrl/${race.season}/${race.round}/sprint.json"
+        logger.debug { "Fetching sprint race data from $url for race ${race.raceName}" }
+        
+        val response = makeApiRequest(url, Map::class.java) ?: return
+        val sprintData = response["MRData"] as? Map<*, *>
+        val sprintTable = sprintData?.get("SprintTable") as? Map<*, *>
+        val sprints = sprintTable?.get("Sprints") as? List<Map<*, *>> ?: emptyList()
+        
+        if (sprints.isNotEmpty()) {
+            val sprintData = sprints[0]
+            
+            // Check if sprint race already exists
+            val existingSprintRace = sprintRaceRepository.findBySeasonAndRound(race.season, race.round)
+            
+            if (existingSprintRace == null) {
+                // Create new sprint race
+                val sprintRace = SprintRace(
+                    id = "${race.season}-${race.round}-sprint",
+                    season = race.season,
+                    round = race.round,
+                    raceName = "${race.raceName} Sprint",
+                    circuitId = race.circuitId,
+                    circuitName = race.circuitName,
+                    country = race.country,
+                    locality = race.locality,
+                    date = race.sprintDate ?: race.date,
+                    time = race.sprintTime ?: race.time,
+                    sprintQualifyingDate = race.sprintQualifyingDate,
+                    sprintQualifyingTime = race.sprintQualifyingTime
+                )
+                
+                sprintRaceRepository.save(sprintRace)
+                logger.debug { "Created sprint race for ${race.raceName}" }
+            }
         }
     }
     

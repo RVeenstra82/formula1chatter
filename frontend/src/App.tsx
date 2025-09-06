@@ -40,7 +40,6 @@ function App() {
                 <Route path="/races/:raceId" element={<RaceDetailPage />} />
                 <Route path="/races/:raceId/predict" element={<PredictionPage />} />
                 <Route path="/races/:raceId/results" element={<ResultsPage />} />
-                <Route path="/:country/predict" element={<PredictionPage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/stats" element={<StatsPage />} />
                 <Route path="/stats/:tab" element={<StatsPage />} />

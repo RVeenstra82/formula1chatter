@@ -42,7 +42,8 @@ class UserService(
             id = user.id!!,
             name = user.name,
             email = user.email,
-            profilePictureUrl = user.profilePictureUrl
+            profilePictureUrl = user.profilePictureUrl,
+            isAdmin = user.email == "wub66@hotmail.com"
         )
     }
     
@@ -54,7 +55,8 @@ class UserService(
             id = user.id!!,
             name = user.name,
             email = user.email,
-            profilePictureUrl = user.profilePictureUrl
+            profilePictureUrl = user.profilePictureUrl,
+            isAdmin = user.email == "wub66@hotmail.com"
         )
     }
 

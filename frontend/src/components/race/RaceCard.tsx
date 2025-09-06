@@ -83,6 +83,15 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
             {t('races.round')} {race.round}
           </div>
           
+          {/* Sprint Weekend Badge */}
+          {race.isSprintWeekend && (
+            <div className="mt-2">
+              <span className="inline-block px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                🏁 Sprint Weekend
+              </span>
+            </div>
+          )}
+          
           {race.completed ? (
             <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
               {t('races.completed')}
@@ -109,7 +118,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
             {t('races.viewRace')}
           </Link>
         ) : (
-          <Link to={`/${race.country.toLowerCase().replace(/\s+/g, '')}/predict`} className="btn btn-primary text-center">
+          <Link to={`/races/${race.id}/predict`} className="btn btn-primary text-center">
             {t('races.makePredict')}
           </Link>
         )}

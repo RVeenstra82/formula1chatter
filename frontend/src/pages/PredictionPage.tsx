@@ -6,53 +6,40 @@ import type { Race } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import PredictionForm from '../components/prediction/PredictionForm';
-import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes, hasRaceStarted } from '../utils/timeUtils';
-
-// Helper function to get race ID from country name
-const getRaceIdFromCountry = (country?: string): string | null => {
-  if (!country) return null;
-  
-  // Map country names to race IDs (this could be made more dynamic)
-  const countryToRaceMap: Record<string, string> = {
-    'netherlands': '2025-15', // Dutch GP
-    'belgium': '2025-14',     // Belgian GP
-    'hungary': '2025-13',     // Hungarian GP
-    'britain': '2025-12',     // British GP
-    'austria': '2025-11',     // Austrian GP
-    'spain': '2025-10',       // Spanish GP
-    'monaco': '2025-9',       // Monaco GP
-    'italy': '2025-8',        // Italian GP
-    'france': '2025-7',       // French GP
-    'canada': '2025-6',       // Canadian GP
-    'miami': '2025-5',        // Miami GP
-    'china': '2025-4',        // Chinese GP
-    'japan': '2025-3',        // Japanese GP
-    'australia': '2025-2',    // Australian GP
-    'bahrain': '2025-1',      // Bahrain GP
-  };
-  
-  return countryToRaceMap[country.toLowerCase()] || null;
-};
+import DriverSelect from '../components/prediction/DriverSelect';
+import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes, hasRaceStarted, formatTimeWithoutSeconds } from '../utils/timeUtils';
 
 const PredictionPage: React.FC = () => {
-  const { raceId, country } = useParams<{ raceId?: string; country?: string }>();
+  const { raceId } = useParams<{ raceId: string }>();
   const navigate = useNavigate();
   const { user, isLoading: isLoadingAuth } = useAuth();
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   
-  // Determine the actual race ID based on URL format
-  const actualRaceId = raceId || getRaceIdFromCountry(country);
-  
-  if (!actualRaceId) {
-    return <div>Race ID is required</div>;
+  if (!raceId) {
+    return (
+      <div className="text-center py-12">
+        <h1 className="text-3xl font-bold mb-4">{t('common.error')}</h1>
+        <p className="mb-8">Race ID is required</p>
+        <Link to="/races" className="btn btn-primary">
+          {t('races.viewAllRaces')}
+        </Link>
+      </div>
+    );
   }
-  
+
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
-    queryKey: ['race', actualRaceId],
-    queryFn: () => api.getRaceById(actualRaceId),
+    queryKey: ['race', raceId],
+    queryFn: () => api.getRaceById(raceId),
   });
-  
+
+  // Fetch active drivers for this race
+  const { data: drivers = [] } = useQuery({
+    queryKey: ['active-drivers', raceId],
+    queryFn: () => api.getActiveDriversForRace(raceId),
+    enabled: !!raceId,
+  });
+
   // Update countdown timer every second
   useEffect(() => {
     if (!race) return;
@@ -163,19 +150,112 @@ const PredictionPage: React.FC = () => {
       
       <h1 className="text-3xl font-bold mb-8">{t('predict.title')}: {race.raceName}</h1>
       
+      {/* Sprint Weekend Badge */}
+      {race.isSprintWeekend && (
+        <div className="mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-lg font-semibold">
+            🏁 {t('races.sprintWeekend')}
+          </div>
+          <p className="mt-2 text-gray-600">
+            {t('predict.sprintWeekendInfo')}
+          </p>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <PredictionForm 
-            race={race}
-            onSuccess={() => {
-              navigate(`/races/${race.id}`);
-            }}
-          />
+                    {/* Weekend Prediction Header */}
+          <div className="mb-6">
+            <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-center">
+              <p className="text-blue-800 text-lg font-medium">
+                {t('predict.makePredictionFor')} {race.raceName}!
+              </p>
+            </div>
+          </div>
+
+          {/* Sprint Prediction Form */}
+          {race.isSprintWeekend && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4 text-blue-700">
+                🏁 {t('predict.sprintPrediction')} - {t('races.saturday')}
+              </h2>
+              <div className="card p-6 bg-blue-50 border border-blue-200">
+                <p className="text-blue-700 mb-4">
+                  {t('predict.sprintPredictionInfo')}
+                </p>
+                <div className="space-y-4">
+                  <DriverSelect
+                    id="sprint-first-place"
+                    label={`${t('predict.firstPlace')} (3 ${t('common.points')})`}
+                    drivers={drivers}
+                    value=""
+                    onChange={() => {}} // TODO: Handle sprint prediction changes
+                    disabled={false}
+                    disabledReasons={{}}
+                  />
+                  <DriverSelect
+                    id="sprint-second-place"
+                    label={`${t('predict.secondPlace')} (2 ${t('common.points')})`}
+                    drivers={drivers}
+                    value=""
+                    onChange={() => {}} // TODO: Handle sprint prediction changes
+                    disabled={false}
+                    disabledReasons={{}}
+                  />
+                  <DriverSelect
+                    id="sprint-third-place"
+                    label={`${t('predict.thirdPlace')} (1 ${t('common.point')})`}
+                    drivers={drivers}
+                    value=""
+                    onChange={() => {}} // TODO: Handle sprint prediction changes
+                    disabled={false}
+                    disabledReasons={{}}
+                  />
+                  <button className="w-full btn btn-primary bg-blue-600 hover:bg-blue-700">
+                    {t('predict.submitSprintPrediction')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Race Prediction Form */}
+          <div>
+            <h2 className="text-2xl font-bold mb-4 text-blue-700">
+              🏎️ {t('predict.racePrediction')} - {t('races.sunday')}
+            </h2>
+            <PredictionForm
+              race={race}
+              onSuccess={() => {
+                navigate(`/races/${race.id}`);
+              }}
+            />
+          </div>
         </div>
         
         <div>
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">{t('race.raceInfo')}</h2>
+            
+            {/* Sprint Weekend Information */}
+            {race.isSprintWeekend && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+                <h3 className="text-lg font-semibold text-green-800 mb-2">
+                  🏁 {t('races.sprintWeekend')}
+                </h3>
+                <div className="space-y-2 text-sm">
+                  {race.sprintQualifyingDate && (
+                    <p>
+                      <span className="font-semibold">{t('races.sprintQualifying')}:</span> {new Date(race.sprintQualifyingDate).toLocaleDateString(language === 'nl' ? 'nl-NL' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} {t('common.at')} {formatTimeWithoutSeconds(race.sprintQualifyingTime)}
+                    </p>
+                  )}
+                  <p>
+                    <span className="font-semibold">{t('races.sprint')}:</span> {race.sprintDate && new Date(race.sprintDate).toLocaleDateString(language === 'nl' ? 'nl-NL' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} {t('common.at')} {formatTimeWithoutSeconds(race.sprintTime)}
+                  </p>
+                </div>
+              </div>
+            )}
+            
             <p className="text-lg mb-2">
               <span className="font-semibold">{race.raceName}</span> - {t('races.round')} {race.round}
             </p>

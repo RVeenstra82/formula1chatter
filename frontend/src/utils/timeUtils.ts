@@ -35,6 +35,21 @@ export const formatTimeLocalized = (
 };
 
 /**
+ * Format a time string to show only hours and minutes (remove seconds)
+ */
+export const formatTimeWithoutSeconds = (timeString: string | null): string => {
+  if (!timeString) return '';
+  
+  // Split by colon and take only hours and minutes
+  const parts = timeString.split(':');
+  if (parts.length >= 2) {
+    return `${parts[0]}:${parts[1]}`;
+  }
+  
+  return timeString;
+};
+
+/**
  * Calculate the time remaining until a given date and time
  * Note: Backend stores race times as UTC times without timezone info (LocalTime)
  * We need to treat them as UTC times for correct calculation

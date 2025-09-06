@@ -68,6 +68,13 @@ export interface Race {
   qualifyingDate?: string;
   qualifyingTime?: string;
   
+  // Sprint weekend information
+  isSprintWeekend?: boolean;
+  sprintDate?: string;
+  sprintTime?: string;
+  sprintQualifyingDate?: string;
+  sprintQualifyingTime?: string;
+  
   firstPlaceDriverId: string | null;
   secondPlaceDriverId: string | null;
   thirdPlaceDriverId: string | null;
@@ -113,6 +120,34 @@ export interface LeaderboardEntry {
   totalScore: number;
 }
 
+export interface SprintRace {
+  id: string;
+  season: number;
+  round: number;
+  raceName: string;
+  circuitName: string;
+  country: string;
+  locality: string;
+  date: string;
+  time: string;
+  
+  // Sprint qualifying
+  sprintQualifyingDate?: string;
+  sprintQualifyingTime?: string;
+  
+  // Sprint race results
+  firstPlaceDriverId: string | null;
+  secondPlaceDriverId: string | null;
+  thirdPlaceDriverId: string | null;
+  completed: boolean;
+}
+
+export interface SprintPrediction {
+  firstPlaceDriverId: string;
+  secondPlaceDriverId: string;
+  thirdPlaceDriverId: string;
+}
+
 // API Functions
 export const api = {
   // Auth
@@ -147,6 +182,31 @@ export const api = {
     return response.data;
   },
 
+  // Sprint Races
+  getCurrentSeasonSprintRaces: async (): Promise<SprintRace[]> => {
+    const response = await apiClient.get('/sprint-races/current-season');
+    return response.data;
+  },
+
+  getUpcomingSprintRaces: async (): Promise<SprintRace[]> => {
+    const response = await apiClient.get('/sprint-races/upcoming');
+    return response.data;
+  },
+
+  getSprintRaceById: async (id: string): Promise<SprintRace> => {
+    const response = await apiClient.get(`/sprint-races/${id}`);
+    return response.data;
+  },
+
+  getSprintRaceBySeasonAndRound: async (season: number, round: number): Promise<SprintRace | null> => {
+    try {
+      const response = await apiClient.get(`/sprint-races/season/${season}/round/${round}`);
+      return response.data;
+    } catch {
+      return null;
+    }
+  },
+
   // Drivers
   getAllDrivers: async (): Promise<Driver[]> => {
     const response = await apiClient.get('/drivers');
@@ -166,6 +226,25 @@ export const api = {
   // Predictions
   savePrediction: async (userId: number, raceId: string, prediction: Prediction): Promise<void> => {
     await apiClient.post(`/predictions/${raceId}?userId=${userId}`, prediction);
+  },
+
+  // Sprint Predictions
+  saveSprintPrediction: async (userId: number, sprintRaceId: string, prediction: SprintPrediction): Promise<void> => {
+    await apiClient.post(`/sprint-predictions/${sprintRaceId}?userId=${userId}`, prediction);
+  },
+
+  getUserSprintPredictionForRace: async (userId: number, sprintRaceId: string): Promise<SprintPrediction | null> => {
+    try {
+      const response = await apiClient.get(`/sprint-predictions/user/${userId}/sprint-race/${sprintRaceId}`);
+      return response.data;
+    } catch {
+      return null;
+    }
+  },
+
+  getSprintRaceResults: async (sprintRaceId: string): Promise<any[]> => {
+    const response = await apiClient.get(`/sprint-predictions/sprint-race/${sprintRaceId}/results`);
+    return response.data;
   },
 
   getUserPredictionForRace: async (userId: number, raceId: string): Promise<Prediction | null> => {

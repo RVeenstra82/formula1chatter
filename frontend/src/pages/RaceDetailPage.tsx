@@ -271,6 +271,45 @@ const RaceDetailPage: React.FC = () => {
                 <p className="text-gray-600 italic">{t('race.scheduleTBA')}</p>
               )}
             </div>
+            
+            {/* Sprint Weekend Information */}
+            {race.isSprintWeekend && (
+              <div className="card border-2 border-purple-200">
+                <div className="flex items-center mb-3">
+                  <h3 className="text-lg font-bold text-purple-800">🏁 Sprint Weekend</h3>
+                </div>
+                
+                {/* Sprint Qualifying */}
+                {race.sprintQualifyingDate && race.sprintQualifyingTime && (
+                  <div className="mb-3 p-3 bg-purple-50 rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-semibold text-purple-800">Sprint Qualifying</span>
+                      <span className="text-sm text-purple-600">
+                        {formatDateLocalized(race.sprintQualifyingDate, 'PP', language)}
+                      </span>
+                    </div>
+                    <p className="text-lg font-medium text-purple-900">
+                      {formatTimeLocalized(race.sprintQualifyingTime, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Sprint Race */}
+                {race.sprintDate && race.sprintTime && (
+                  <div className="p-3 bg-purple-50 rounded">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-semibold text-purple-800">Sprint Race</span>
+                      <span className="text-sm text-purple-600">
+                        {formatDateLocalized(race.sprintDate, 'PP', language)}
+                      </span>
+                    </div>
+                    <p className="text-lg font-medium text-purple-900">
+                      {formatTimeLocalized(race.sprintTime, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
         

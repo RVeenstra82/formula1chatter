@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race } from '../api/client';
-import { mockRaces } from '../mocks/mockLeaderboardData';
 import RaceCard from '../components/race/RaceCard';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -14,17 +13,7 @@ const HomePage: React.FC = () => {
   
   const { data: nextRace, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['nextRace'],
-    queryFn: () => {
-      if (import.meta.env.DEV) {
-        // Use mock data in development - find the next upcoming race
-        const today = new Date();
-        const upcomingRace = mockRaces.find(race => new Date(race.date) > today);
-        if (upcomingRace) {
-          return Promise.resolve(upcomingRace);
-        }
-      }
-      return api.getNextRace();
-    },
+    queryFn: () => api.getNextRace(),
   });
   
   return (

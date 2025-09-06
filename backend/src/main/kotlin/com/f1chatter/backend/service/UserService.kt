@@ -8,12 +8,14 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 import java.util.NoSuchElementException
+import mu.KotlinLogging
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val predictionRepository: PredictionRepository
 ) {
+    private val logger = KotlinLogging.logger {}
     fun processOAuthPostLogin(auth: OAuth2AuthenticationToken): UserDto {
         val attributes = auth.principal.attributes
         val facebookId = attributes["id"].toString()
@@ -38,12 +40,15 @@ class UserService(
             userRepository.save(newUser)
         }
         
+        val isAdmin = user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
+        logger.info { "User ${user.name} (${user.email}) - isAdmin: $isAdmin" }
+        
         return UserDto(
             id = user.id!!,
             name = user.name,
             email = user.email,
             profilePictureUrl = user.profilePictureUrl,
-            isAdmin = user.email == "wub66@hotmail.com"
+            isAdmin = isAdmin
         )
     }
     
@@ -51,12 +56,15 @@ class UserService(
         val user = userRepository.findByIdOrNull(id)
             ?: throw NoSuchElementException("User not found with id: $id")
         
+        val isAdmin = user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
+        logger.info { "User ${user.name} (${user.email}) - isAdmin: $isAdmin" }
+        
         return UserDto(
             id = user.id!!,
             name = user.name,
             email = user.email,
             profilePictureUrl = user.profilePictureUrl,
-            isAdmin = user.email == "wub66@hotmail.com"
+            isAdmin = isAdmin
         )
     }
 

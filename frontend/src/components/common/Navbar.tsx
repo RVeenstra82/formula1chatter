@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
                   Statistieken
                 </Link>
                 
-                {user?.email === 'rickveenstra@gmail.com' || user?.isAdmin ? (
+                {user?.email === 'wub66@hotmail.com' || user?.isAdmin ? (
                   <Link 
                     to="/admin" 
                     className="px-4 py-2 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"
@@ -168,7 +168,7 @@ const Navbar: React.FC = () => {
                   Statistieken
                 </Link>
                 
-                {user?.email === 'rickveenstra@gmail.com' || user?.isAdmin ? (
+                {user?.email === 'wub66@hotmail.com' || user?.isAdmin ? (
                   <Link 
                     to="/admin" 
                     className="px-4 py-3 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"

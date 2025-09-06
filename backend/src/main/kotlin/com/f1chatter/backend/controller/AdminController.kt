@@ -13,7 +13,7 @@ import java.time.LocalDate
 import mu.KotlinLogging
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 class AdminController(
     private val openF1ApiService: OpenF1ApiService,
     private val dataSyncService: DataSyncService,

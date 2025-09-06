@@ -30,35 +30,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('AuthContext: Checking URL parameters...');
         console.log('AuthContext: Current URL:', window.location.href);
         console.log('AuthContext: Search params:', window.location.search);
-        console.log('AuthContext: Hash:', window.location.hash);
         
-        // Check both search params and hash fragment
-        let urlParams = new URLSearchParams(window.location.search);
-        let tokenParam = urlParams.get('token');
-        let userParam = urlParams.get('user');
-        
-        // If not found in search params, check hash fragment
-        if (!tokenParam || !userParam) {
-          // Handle hash fragment that might contain query parameters
-          const hashString = window.location.hash.substring(1); // Remove the #
-          console.log('AuthContext: Parsing hash string:', hashString);
-          
-          if (hashString.includes('?')) {
-            // Hash contains query parameters like #/?token=...&user=...
-            const hashQueryString = hashString.substring(hashString.indexOf('?') + 1);
-            console.log('AuthContext: Hash query string:', hashQueryString);
-            const hashParams = new URLSearchParams(hashQueryString);
-            if (!tokenParam) tokenParam = hashParams.get('token');
-            if (!userParam) userParam = hashParams.get('user');
-            console.log('AuthContext: From hash params - token:', !!tokenParam, 'user:', !!userParam);
-          } else {
-            // Hash contains direct parameters like #token=...&user=...
-            const hashParams = new URLSearchParams(hashString);
-            if (!tokenParam) tokenParam = hashParams.get('token');
-            if (!userParam) userParam = hashParams.get('user');
-            console.log('AuthContext: From direct hash params - token:', !!tokenParam, 'user:', !!userParam);
-          }
-        }
+        // Check URL search parameters for OAuth callback data
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenParam = urlParams.get('token');
+        const userParam = urlParams.get('user');
         
         console.log('AuthContext: tokenParam exists:', !!tokenParam);
         console.log('AuthContext: userParam exists:', !!userParam);

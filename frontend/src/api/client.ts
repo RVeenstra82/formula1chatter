@@ -323,4 +323,40 @@ export const api = {
     const response = await apiClient.get('/stats/constructor-performance');
     return response.data;
   },
+
+  // Admin
+  updateDriverPhotos: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/update-driver-photos');
+    return response.data;
+  },
+
+  processCompletedRaces: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/process-completed-races');
+    return response.data;
+  },
+
+  syncRaceData: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/sync-race-data');
+    return response.data;
+  },
+
+  forceSyncRaceData: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/force-sync-race-data');
+    return response.data;
+  },
+
+  forceSyncWeekendSchedules: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/force-sync-weekend-schedules');
+    return response.data;
+  },
+
+  syncDriverData: async (): Promise<any> => {
+    const response = await apiClient.post('/admin/sync-driver-data');
+    return response.data;
+  },
+
+  getSystemStatus: async (): Promise<any> => {
+    const response = await apiClient.get('/admin/system-status');
+    return response.data;
+  },
 }; 

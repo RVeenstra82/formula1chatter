@@ -41,7 +41,7 @@ class SecurityConfig(
             .logout { logout ->
                 logout
                     .logoutUrl("/api/logout")
-                    .logoutSuccessUrl("https://formula1chatter.vercel.app/#/")
+                    .logoutSuccessUrl("https://formula1chatter.vercel.app/")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .permitAll()

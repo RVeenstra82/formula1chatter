@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../api/client';
 // import { useLanguage } from '../contexts/LanguageContext';
 
 interface AdminAction {
   name: string;
-  endpoint: string;
-  method: 'GET' | 'POST';
+  apiFunction: () => Promise<any>;
   description: string;
 }
 
@@ -21,44 +21,37 @@ const AdminPage: React.FC = () => {
   const adminActions: AdminAction[] = [
     {
       name: 'Update Driver Photos',
-      endpoint: '/api/admin/update-driver-photos',
-      method: 'POST',
+      apiFunction: api.updateDriverPhotos,
       description: 'Fetch latest driver profile pictures from OpenF1 API'
     },
     {
       name: 'Process Completed Races',
-      endpoint: '/api/admin/process-completed-races',
-      method: 'POST',
+      apiFunction: api.processCompletedRaces,
       description: 'Update race results and calculate prediction scores for completed races'
     },
     {
       name: 'Sync Race Data',
-      endpoint: '/api/admin/sync-race-data',
-      method: 'POST',
+      apiFunction: api.syncRaceData,
       description: 'Fetch latest race calendar and data from Jolpica API (skips if data exists)'
     },
     {
       name: 'Force Sync Race Data',
-      endpoint: '/api/admin/force-sync-race-data',
-      method: 'POST',
+      apiFunction: api.forceSyncRaceData,
       description: 'Force sync race data by deleting existing data and fetching fresh data'
     },
     {
       name: 'Force Sync Weekend Schedules',
-      endpoint: '/api/admin/force-sync-weekend-schedules',
-      method: 'POST',
+      apiFunction: api.forceSyncWeekendSchedules,
       description: 'Force sync weekend schedules (practice & qualifying times) for all races in current season'
     },
     {
       name: 'Sync Driver Data',
-      endpoint: '/api/admin/sync-driver-data',
-      method: 'POST',
+      apiFunction: api.syncDriverData,
       description: 'Fetch latest driver and constructor data from Jolpica API'
     },
     {
       name: 'Get System Status',
-      endpoint: '/api/admin/system-status',
-      method: 'GET',
+      apiFunction: api.getSystemStatus,
       description: 'View current system status and race statistics'
     }
   ];
@@ -68,26 +61,20 @@ const AdminPage: React.FC = () => {
     setResults(prev => ({ ...prev, [action.name]: null }));
 
     try {
-      const response = await fetch(action.endpoint, {
-        method: action.method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-
-      const data = await response.json();
+      const data = await action.apiFunction();
       
-      if (response.ok) {
-        setResults(prev => ({ ...prev, [action.name]: { success: true, data } }));
-        if (action.name === 'Get System Status') {
-          setSystemStatus(data);
-        }
-      } else {
-        setResults(prev => ({ ...prev, [action.name]: { success: false, error: data.error || 'Unknown error' } }));
+      setResults(prev => ({ ...prev, [action.name]: { success: true, data } }));
+      if (action.name === 'Get System Status') {
+        setSystemStatus(data);
       }
-    } catch (error) {
-      setResults(prev => ({ ...prev, [action.name]: { success: false, error: error instanceof Error ? error.message : 'Network error' } }));
+    } catch (error: any) {
+      setResults(prev => ({ 
+        ...prev, 
+        [action.name]: { 
+          success: false, 
+          error: error.response?.data?.error || error.message || 'Unknown error' 
+        } 
+      }));
     } finally {
       setLoading(null);
     }

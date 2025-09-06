@@ -24,7 +24,7 @@ This guide explains how to deploy the Formula 1 Chatter Championship application
    https://formula1chatter.onrender.com/api/login/oauth2/code/facebook
    http://localhost:8090/api/login/oauth2/code/facebook
    ```
-3. **Important**: The backend will redirect to `https://formula1chatter.vercel.app/#/` after successful login to work with HashRouter
+3. **Important**: The backend will redirect to `https://formula1chatter.vercel.app/` after successful login
 
 ### 1.3 Get App Credentials
 1. Go to Settings > Basic

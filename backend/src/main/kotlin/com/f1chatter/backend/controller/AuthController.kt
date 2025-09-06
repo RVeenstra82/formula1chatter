@@ -130,7 +130,7 @@ class AuthController(
             """.trimIndent().replace("\n", "")
 
             val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())
-            val redirectUrl = "https://formula1chatter.vercel.app/#/?token=${jwtToken}&user=${encodedUserJson}"
+            val redirectUrl = "https://formula1chatter.vercel.app/?token=${jwtToken}&user=${encodedUserJson}"
             
             return ResponseEntity.status(302)
                 .header("Location", redirectUrl)

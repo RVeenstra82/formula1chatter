@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
+import java.util.NoSuchElementException
 
 @RestController
 @RequestMapping("/sprint-predictions")
@@ -34,6 +35,8 @@ class SprintPredictionController(
             ResponseEntity.ok(predictionDto)
         } catch (e: IllegalStateException) {
             ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        } catch (e: NoSuchElementException) {
+            ResponseEntity.status(404).body(mapOf("error" to e.message))
         }
     }
     

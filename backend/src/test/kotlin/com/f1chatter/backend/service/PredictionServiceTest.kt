@@ -206,6 +206,164 @@ class PredictionServiceTest {
         verify { predictionRepository.save(match { it.id == 2L && it.score == 2 }) }
     }
     
+    @Test
+    fun `savePrediction allows prediction for race far in the future`() {
+        val userId = 1L
+        val raceId = "2026-1"
+        val predictionDto = PredictionDto(
+            firstPlaceDriverId = "verstappen",
+            secondPlaceDriverId = "norris",
+            thirdPlaceDriverId = "leclerc",
+            fastestLapDriverId = "hamilton",
+            driverOfTheDayId = "russell"
+        )
+
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
+        val race = Race(
+            id = raceId, season = 2026, round = 1,
+            raceName = "Australian Grand Prix", circuitId = "albert_park",
+            circuitName = "Albert Park", country = "Australia", locality = "Melbourne",
+            date = LocalDate.now().plusDays(23), time = LocalTime.of(4, 0),
+            raceCompleted = false
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+        every { predictionRepository.findByUserAndRace(user, race) } returns null
+        every { predictionRepository.save(any()) } answers { firstArg() }
+
+        // Should NOT throw - race is 23 days away
+        val result = predictionService.savePrediction(userId, raceId, predictionDto)
+        assertNotNull(result)
+        assertEquals("verstappen", result.firstPlaceDriverId)
+    }
+
+    @Test
+    fun `savePrediction blocks prediction for completed race`() {
+        val userId = 1L
+        val raceId = "2025-1"
+        val predictionDto = PredictionDto(
+            firstPlaceDriverId = "verstappen",
+            secondPlaceDriverId = "norris",
+            thirdPlaceDriverId = "leclerc",
+            fastestLapDriverId = "hamilton",
+            driverOfTheDayId = "russell"
+        )
+
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
+        val race = Race(
+            id = raceId, season = 2025, round = 1,
+            raceName = "Completed Grand Prix", circuitId = "test",
+            circuitName = "Test Circuit", country = "Test", locality = "Test",
+            date = LocalDate.now().minusDays(7), time = LocalTime.of(14, 0),
+            raceCompleted = true,
+            firstPlaceDriverId = "verstappen"
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+
+        val exception = assertThrows<IllegalStateException> {
+            predictionService.savePrediction(userId, raceId, predictionDto)
+        }
+        assertEquals("Predictions are no longer accepted. Race has been completed.", exception.message)
+    }
+
+    @Test
+    fun `savePrediction blocks prediction for race that has already started`() {
+        val userId = 1L
+        val raceId = "2025-2"
+        val predictionDto = PredictionDto(
+            firstPlaceDriverId = "verstappen",
+            secondPlaceDriverId = "norris",
+            thirdPlaceDriverId = "leclerc",
+            fastestLapDriverId = "hamilton",
+            driverOfTheDayId = "russell"
+        )
+
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
+        val race = Race(
+            id = raceId, season = 2025, round = 2,
+            raceName = "Started Grand Prix", circuitId = "test",
+            circuitName = "Test Circuit", country = "Test", locality = "Test",
+            date = LocalDate.now().minusDays(1), time = LocalTime.of(14, 0),
+            raceCompleted = false
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+
+        val exception = assertThrows<IllegalStateException> {
+            predictionService.savePrediction(userId, raceId, predictionDto)
+        }
+        assertEquals("Predictions are no longer accepted. Race starts within 5 minutes or has already started.", exception.message)
+    }
+
+    @Test
+    fun `savePrediction blocks prediction within 5 minutes of race start`() {
+        val userId = 1L
+        val raceId = "2025-3"
+        val predictionDto = PredictionDto(
+            firstPlaceDriverId = "verstappen",
+            secondPlaceDriverId = "norris",
+            thirdPlaceDriverId = "leclerc",
+            fastestLapDriverId = "hamilton",
+            driverOfTheDayId = "russell"
+        )
+
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
+        // Race starts 3 minutes from now (within 5-minute window)
+        val raceDateTime = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(3)
+        val race = Race(
+            id = raceId, season = 2025, round = 3,
+            raceName = "Soon Grand Prix", circuitId = "test",
+            circuitName = "Test Circuit", country = "Test", locality = "Test",
+            date = raceDateTime.toLocalDate(), time = raceDateTime.toLocalTime(),
+            raceCompleted = false
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+
+        val exception = assertThrows<IllegalStateException> {
+            predictionService.savePrediction(userId, raceId, predictionDto)
+        }
+        assertEquals("Predictions are no longer accepted. Race starts within 5 minutes or has already started.", exception.message)
+    }
+
+    @Test
+    fun `savePrediction allows prediction 10 minutes before race start`() {
+        val userId = 1L
+        val raceId = "2025-4"
+        val predictionDto = PredictionDto(
+            firstPlaceDriverId = "verstappen",
+            secondPlaceDriverId = "norris",
+            thirdPlaceDriverId = "leclerc",
+            fastestLapDriverId = "hamilton",
+            driverOfTheDayId = "russell"
+        )
+
+        val user = User(id = userId, facebookId = "fb123", name = "Test User", email = "test@example.com", profilePictureUrl = null)
+        // Race starts 10 minutes from now (outside 5-minute window)
+        val raceDateTime = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(10)
+        val race = Race(
+            id = raceId, season = 2025, round = 4,
+            raceName = "Upcoming Grand Prix", circuitId = "test",
+            circuitName = "Test Circuit", country = "Test", locality = "Test",
+            date = raceDateTime.toLocalDate(), time = raceDateTime.toLocalTime(),
+            raceCompleted = false
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+        every { predictionRepository.findByUserAndRace(user, race) } returns null
+        every { predictionRepository.save(any()) } answers { firstArg() }
+
+        // Should NOT throw - race is 10 minutes away
+        val result = predictionService.savePrediction(userId, raceId, predictionDto)
+        assertNotNull(result)
+    }
+
     private fun createSampleRace(id: String, season: Int, round: Int): Race {
         return Race(
             id = id,

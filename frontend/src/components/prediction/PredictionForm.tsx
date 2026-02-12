@@ -128,9 +128,13 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
 
       {saveError && (
         <div className="bg-red-500/10 text-f1-red p-4 rounded-lg border border-red-500/30 mb-6">
-          {saveError.message?.includes('not authenticated')
-            ? 'Please log in to make predictions'
-            : t('predict.noMorePredictions')}
+          {(() => {
+            const axiosError = saveError as { response?: { data?: { error?: string } } };
+            const backendMessage = axiosError.response?.data?.error;
+            if (backendMessage) return backendMessage;
+            if (saveError.message?.includes('not authenticated')) return t('predict.loginRequired');
+            return t('predict.saveError');
+          })()}
         </div>
       )}
       

@@ -29,9 +29,12 @@ class SprintPredictionService(
         val sprintRace = sprintRaceRepository.findByIdOrNull(sprintRaceId)
             ?: throw NoSuchElementException("Sprint race not found")
         
-        // Check if sprint race starts within 5 minutes
-        if (isSprintRaceStartingWithinFiveMinutes(sprintRace)) {
-            throw IllegalStateException("Sprint predictions are no longer accepted. Sprint race starts within 5 minutes.")
+        // Check if predictions are still allowed
+        if (sprintRace.sprintCompleted) {
+            throw IllegalStateException("Sprint predictions are no longer accepted. Sprint race has been completed.")
+        }
+        if (isSprintPredictionsClosed(sprintRace)) {
+            throw IllegalStateException("Sprint predictions are no longer accepted. Sprint race starts within 5 minutes or has already started.")
         }
         
         val existingPrediction = sprintPredictionRepository.findByUserAndSprintRace(user, sprintRace)
@@ -44,13 +47,14 @@ class SprintPredictionService(
         }
     }
     
-    private fun isSprintRaceStartingWithinFiveMinutes(sprintRace: SprintRace): Boolean {
+    private fun isSprintPredictionsClosed(sprintRace: SprintRace): Boolean {
         val now = LocalDateTime.now(ZoneOffset.UTC)
         // Treat sprint race time as UTC time to match frontend behavior
         val sprintRaceDateTime = LocalDateTime.of(sprintRace.date, sprintRace.time)
         val minutesUntilSprintRace = java.time.Duration.between(now, sprintRaceDateTime).toMinutes()
-        
-        return minutesUntilSprintRace <= 5 && minutesUntilSprintRace > 0
+
+        // Block predictions if sprint race starts within 5 minutes or has already started
+        return minutesUntilSprintRace < 5
     }
     
     private fun createSprintPrediction(user: User, sprintRace: SprintRace, predictionDto: SprintPredictionDto): SprintPrediction {

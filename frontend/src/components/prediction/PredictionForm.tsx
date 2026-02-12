@@ -82,9 +82,9 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
     [prediction.thirdPlaceDriverId, 'thirdPlaceDriverId'],
   ];
   const fieldLabels: Record<keyof Prediction, string> = {
-    firstPlaceDriverId: t('predict.firstPlace'),
-    secondPlaceDriverId: t('predict.secondPlace'),
-    thirdPlaceDriverId: t('predict.thirdPlace'),
+    firstPlaceDriverId: t('predict.firstPlaceShort'),
+    secondPlaceDriverId: t('predict.secondPlaceShort'),
+    thirdPlaceDriverId: t('predict.thirdPlaceShort'),
     fastestLapDriverId: t('predict.fastestLap'),
     driverOfTheDayId: t('predict.driverOfDay'),
   };

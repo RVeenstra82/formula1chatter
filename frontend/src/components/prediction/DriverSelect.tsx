@@ -182,7 +182,7 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
               <span className={showReason ? 'text-slate-500' : ''}>{driver.firstName} {driver.lastName}</span>
               {showReason && (
                 <span
-                  className="ml-auto text-[10px] leading-none px-2 py-1 rounded-full border font-semibold bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                  className="ml-auto text-xs px-2 py-0.5 rounded-full border font-medium bg-slate-500/15 text-slate-400 border-slate-500/30"
                 >
                   {reason}
                 </span>

@@ -4,7 +4,12 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "sprint_predictions")
+@Table(
+    name = "sprint_predictions",
+    indexes = [
+        Index(name = "idx_sprint_predictions_user_race", columnList = "user_id, sprint_race_id", unique = true)
+    ]
+)
 data class SprintPrediction(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

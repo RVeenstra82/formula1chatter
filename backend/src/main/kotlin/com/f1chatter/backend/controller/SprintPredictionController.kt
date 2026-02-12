@@ -4,6 +4,8 @@ import com.f1chatter.backend.dto.SprintPredictionDto
 import com.f1chatter.backend.service.SprintPredictionService
 import com.f1chatter.backend.service.SprintPredictionResultDto
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -11,13 +13,23 @@ import org.springframework.web.bind.annotation.*
 class SprintPredictionController(
     private val sprintPredictionService: SprintPredictionService
 ) {
+    private fun getAuthenticatedUserId(): Long {
+        val principal = SecurityContextHolder.getContext().authentication?.principal
+        val username = when (principal) {
+            is UserDetails -> principal.username
+            is String -> principal
+            else -> throw IllegalStateException("Not authenticated")
+        }
+        return username.toLongOrNull() ?: throw IllegalStateException("Invalid user ID in token")
+    }
+
     @PostMapping("/{sprintRaceId}")
     fun saveSprintPrediction(
         @PathVariable sprintRaceId: String,
-        @RequestBody predictionDto: SprintPredictionDto,
-        @RequestParam userId: Long
+        @RequestBody predictionDto: SprintPredictionDto
     ): ResponseEntity<Any> {
         return try {
+            val userId = getAuthenticatedUserId()
             sprintPredictionService.saveSprintPrediction(userId, sprintRaceId, predictionDto)
             ResponseEntity.ok(predictionDto)
         } catch (e: IllegalStateException) {

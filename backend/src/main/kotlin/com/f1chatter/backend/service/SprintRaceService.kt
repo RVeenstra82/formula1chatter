@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.dto.SprintRaceDto
 import com.f1chatter.backend.model.SprintRace
 import com.f1chatter.backend.repository.SprintRaceRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -13,8 +14,7 @@ class SprintRaceService(
     private val sprintRaceRepository: SprintRaceRepository
 ) {
     fun getCurrentSeasonSprintRaces(): List<SprintRaceDto> {
-        val currentYear = LocalDate.now().year
-        val sprintRaces = sprintRaceRepository.findBySeason(currentYear)
+        val sprintRaces = sprintRaceRepository.findBySeason(F1SeasonUtils.getCurrentSeason())
         return sprintRaces.map { mapToDto(it) }
     }
     

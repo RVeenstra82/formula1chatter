@@ -43,7 +43,7 @@ class JwtAuthenticationFilter(
                 logger.debug { "TestUser authentication detected (dev profile)" }
 
                 val userDetails: UserDetails = User.builder()
-                    .username("Test User")
+                    .username("0") // TestUser userId
                     .password("")
                     .authorities("USER", "ADMIN")
                     .build()
@@ -74,7 +74,7 @@ class JwtAuthenticationFilter(
                         }
 
                         val userDetails: UserDetails = User.builder()
-                            .username(username)
+                            .username(userId.toString())
                             .password("")
                             .authorities(authorities as Collection<SimpleGrantedAuthority>)
                             .build()

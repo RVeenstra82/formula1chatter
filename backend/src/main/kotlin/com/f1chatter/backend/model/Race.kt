@@ -1,15 +1,17 @@
 package com.f1chatter.backend.model
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity
-@Table(name = "races")
+@Table(
+    name = "races",
+    indexes = [
+        Index(name = "idx_races_season", columnList = "season"),
+        Index(name = "idx_races_race_completed", columnList = "raceCompleted")
+    ]
+)
 data class Race(
     @Id
     val id: String, // season + round, e.g. "2023-1"

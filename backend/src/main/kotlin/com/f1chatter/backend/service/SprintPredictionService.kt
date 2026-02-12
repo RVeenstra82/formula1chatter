@@ -22,20 +22,9 @@ class SprintPredictionService(
 ) {
     @Transactional
     fun saveSprintPrediction(userId: Long, sprintRaceId: String, predictionDto: SprintPredictionDto): SprintPrediction {
-        // Handle TestUser case
-        val user = if (userId == 0L) {
-            // Create a virtual TestUser for predictions
-            User(
-                id = 0L,
-                facebookId = "test-user",
-                name = "Test User",
-                email = "testuser@f1chatter.com",
-                profilePictureUrl = null
-            )
-        } else {
+        val user = if (userId == 0L) User.TEST_USER else
             userRepository.findByIdOrNull(userId)
                 ?: throw NoSuchElementException("User not found")
-        }
         
         val sprintRace = sprintRaceRepository.findByIdOrNull(sprintRaceId)
             ?: throw NoSuchElementException("Sprint race not found")

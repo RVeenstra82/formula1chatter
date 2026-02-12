@@ -27,7 +27,9 @@ interface PredictionRepository : JpaRepository<Prediction, Long> {
     
     @Query("SELECT p FROM Prediction p WHERE p.race.season = :season")
     fun findBySeason(season: Int): List<Prediction>
-    
+
     @Query("SELECT p FROM Prediction p WHERE p.race = :race")
     fun findByRace(race: Race): List<Prediction>
+
+    fun findByUserId(userId: Long): List<Prediction>
 } 

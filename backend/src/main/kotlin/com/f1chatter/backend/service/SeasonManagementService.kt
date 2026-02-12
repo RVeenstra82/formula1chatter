@@ -3,11 +3,11 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class SeasonManagementService(
@@ -17,24 +17,7 @@ class SeasonManagementService(
 ) {
     private val logger = KotlinLogging.logger {}
     
-    /**
-     * Determines the current F1 season based on the current date.
-     * F1 seasons typically start in March, so if we're in January or February,
-     * we use the previous year's season data.
-     */
-    private fun getCurrentSeason(): Int {
-        val currentDate = LocalDate.now()
-        val currentYear = currentDate.year
-        val currentMonth = currentDate.monthValue
-        
-        // If we're in January or February, we're still in the previous year's season
-        // F1 seasons typically start in March
-        return if (currentMonth <= 2) {
-            currentYear - 1
-        } else {
-            currentYear
-        }
-    }
+    private fun getCurrentSeason(): Int = F1SeasonUtils.getCurrentSeason()
     
     /**
      * Check for new season and reset scores if needed.

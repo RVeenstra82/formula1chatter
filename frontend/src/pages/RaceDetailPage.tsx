@@ -12,11 +12,7 @@ const RaceDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  
-  if (!raceId) {
-    return <div>{t('common.raceIdRequired')}</div>;
-  }
-  
+
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
     queryFn: () => {
@@ -27,36 +23,41 @@ const RaceDetailPage: React.FC = () => {
           return Promise.resolve(mockRace);
         }
       }
-      return api.getRaceById(raceId);
+      return api.getRaceById(raceId!);
     },
-  });
-  
-  const { data: drivers, isLoading: isLoadingDrivers } = useQuery<Driver[]>({
-    queryKey: ['active-drivers', raceId],
-    queryFn: () => (raceId ? api.getActiveDriversForRace(raceId) : Promise.resolve([] as Driver[])),
     enabled: !!raceId,
   });
-  
+
+  const { data: drivers, isLoading: isLoadingDrivers } = useQuery<Driver[]>({
+    queryKey: ['active-drivers', raceId],
+    queryFn: () => api.getActiveDriversForRace(raceId!),
+    enabled: !!raceId,
+  });
+
   useEffect(() => {
     if (!race || race.completed) return;
-    
+
     const started = hasRaceStarted(race.date, race.time);
     if (started) return;
-    
+
     const updateTimeRemaining = () => {
       setTimeRemaining(calculateTimeRemaining(race.date, race.time, language));
     };
-    
+
     // Update immediately
     updateTimeRemaining();
-    
+
     // Set up interval to update every minute
     const interval = setInterval(updateTimeRemaining, 60000);
-    
+
     // Clean up interval
     return () => clearInterval(interval);
   }, [race, language]);
-  
+
+  if (!raceId) {
+    return <div>{t('common.raceIdRequired')}</div>;
+  }
+
   if (isLoadingRace || isLoadingDrivers) {
     return (
       <div className="animate-pulse">

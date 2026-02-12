@@ -40,6 +40,9 @@ spring:
       max-age: 86400
     timeout: 86400
 
+app:
+  frontend-url: https://formula1chatter.vercel.app
+
 server:
   port: ${PORT:8090}
 

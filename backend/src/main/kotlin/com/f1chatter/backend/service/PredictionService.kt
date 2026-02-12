@@ -10,10 +10,10 @@ import com.f1chatter.backend.model.User
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
@@ -28,20 +28,9 @@ class PredictionService(
 ) {
     @Transactional
     fun savePrediction(userId: Long, raceId: String, predictionDto: PredictionDto): Prediction {
-        // Handle TestUser case
-        val user = if (userId == 0L) {
-            // Create a virtual TestUser for predictions
-            User(
-                id = 0L,
-                facebookId = "test-user",
-                name = "Test User",
-                email = "testuser@f1chatter.com",
-                profilePictureUrl = null
-            )
-        } else {
+        val user = if (userId == 0L) User.TEST_USER else
             userRepository.findByIdOrNull(userId)
                 ?: throw NoSuchElementException("User not found")
-        }
         
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
@@ -97,20 +86,9 @@ class PredictionService(
     }
     
     fun getUserPredictionForRace(userId: Long, raceId: String): PredictionDto? {
-        // Handle TestUser case
-        val user = if (userId == 0L) {
-            // Create a virtual TestUser for predictions
-            User(
-                id = 0L,
-                facebookId = "test-user",
-                name = "Test User",
-                email = "testuser@f1chatter.com",
-                profilePictureUrl = null
-            )
-        } else {
+        val user = if (userId == 0L) User.TEST_USER else
             userRepository.findByIdOrNull(userId)
                 ?: throw NoSuchElementException("User not found")
-        }
         
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
@@ -213,11 +191,13 @@ class PredictionService(
         }
     }
     
-    fun getSeasonLeaderboard(season: Int = LocalDate.now().year): List<LeaderboardEntryDto> {
+    fun getSeasonLeaderboard(season: Int = F1SeasonUtils.getCurrentSeason()): List<LeaderboardEntryDto> {
         val leaderboard = predictionRepository.getSeasonLeaderboard(season)
-        
+        val userIds = leaderboard.map { it.userId }
+        val usersById = userRepository.findAllById(userIds).associateBy { it.id }
+
         return leaderboard.map { entry ->
-            val user = userRepository.findByIdOrNull(entry.userId) ?: throw NoSuchElementException("User not found")
+            val user = usersById[entry.userId] ?: throw NoSuchElementException("User not found")
             LeaderboardEntryDto(
                 userId = user.id!!,
                 userName = user.name,
@@ -227,18 +207,20 @@ class PredictionService(
         }
     }
     
-    fun getUserSeasonScore(userId: Long, season: Int = LocalDate.now().year): Int {
+    fun getUserSeasonScore(userId: Long, season: Int = F1SeasonUtils.getCurrentSeason()): Int {
         return predictionRepository.getTotalScoreByUserIdAndSeason(userId, season)
     }
     
     fun getSeasonLeaderboardBeforeRace(raceId: String, season: Int): List<LeaderboardEntryDto> {
         val race = raceRepository.findByIdOrNull(raceId) ?: throw NoSuchElementException("Race not found")
-        
+
         // Calculate leaderboard based on races before this race
         val leaderboard = predictionRepository.getSeasonLeaderboardBeforeRace(season, race.round)
-        
+        val userIds = leaderboard.map { it.userId }
+        val usersById = userRepository.findAllById(userIds).associateBy { it.id }
+
         return leaderboard.map { entry ->
-            val user = userRepository.findByIdOrNull(entry.userId) ?: throw NoSuchElementException("User not found")
+            val user = usersById[entry.userId] ?: throw NoSuchElementException("User not found")
             LeaderboardEntryDto(
                 userId = user.id!!,
                 userName = user.name,

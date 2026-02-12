@@ -16,7 +16,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    @org.springframework.beans.factory.annotation.Value("\${app.frontend-url}") private val frontendUrl: String
 ) {
     
     @Bean
@@ -43,7 +44,7 @@ class SecurityConfig(
             .logout { logout ->
                 logout
                     .logoutUrl("/api/logout")
-                    .logoutSuccessUrl("https://formula1chatter.vercel.app/")
+                    .logoutSuccessUrl("${frontendUrl}/")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .permitAll()

@@ -19,9 +19,10 @@ class ImageProxyController(
     private val allowedHosts = setOf(
         "www.formula1.com",
         "formula1.com",
+        "media.formula1.com",
         "content-api.formula1.com",
         "fom-website.azureedge.net",
-        "f1mrx.netlify.app" // add common cdn aliases used by F1 images
+        "f1mrx.netlify.app"
     )
 
     @GetMapping("/proxy")

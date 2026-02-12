@@ -25,7 +25,8 @@ class AuthController(
     private val userService: UserService,
     private val jwtService: JwtService,
     private val environment: Environment,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    @Value("\${app.frontend-url}") private val frontendUrl: String
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -133,7 +134,7 @@ class AuthController(
             )
             val userJson = objectMapper.writeValueAsString(userMap)
             val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())
-            val redirectUrl = "https://formula1chatter.vercel.app/?token=${jwtToken}&user=${encodedUserJson}"
+            val redirectUrl = "${frontendUrl}/?token=${jwtToken}&user=${encodedUserJson}"
 
             return ResponseEntity.status(302)
                 .header("Location", redirectUrl)

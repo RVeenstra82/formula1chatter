@@ -26,6 +26,9 @@ jolpica:
       requests-per-second: 3
       max-retries: 3
 
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
 openf1:
   api:
     rate-limit:

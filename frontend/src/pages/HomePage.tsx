@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const HomePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const { t } = useLanguage();
   
   const { data: nextRace, isLoading: isLoadingRace } = useQuery<Race>({
@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
         {!user && (
           <div className="mt-4">
             <button 
-              onClick={useAuth().login} 
+              onClick={login} 
               className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3"
             >
               {t('home.loginToStart')}

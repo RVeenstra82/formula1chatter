@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.dto.RaceDto
 import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.repository.RaceRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -31,7 +32,7 @@ class RaceServiceTest {
     @Test
     fun `getCurrentSeasonRaces returns mapped races for current year`() {
         // Arrange
-        val currentYear = LocalDate.now().year
+        val currentYear = F1SeasonUtils.getCurrentSeason()
         val races = listOf(
             createSampleRace("2023-1", currentYear, 1),
             createSampleRace("2023-2", currentYear, 2)

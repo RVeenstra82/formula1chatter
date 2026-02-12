@@ -1,22 +1,23 @@
-# Omgevingsvariabelen en gevoelige informatie
+# Environment variables and secrets
 .env
 env.properties
 set-env.sh
 backend/src/main/resources/application-local.yml
 
-# MCP configuratie met API keys (niet committen)
+# MCP configuration (contains API keys)
 .mcp.json
 mcp.json
 mcp-render.json
+mcp-template.json
 
 # Mac OS
 .DS_Store
 
-# Gradle bestanden
+# Gradle
 .gradle/
 build/
 
-# Maven bestanden
+# Maven
 target/
 
 # IntelliJ IDEA
@@ -24,7 +25,6 @@ target/
 *.iml
 *.iws
 *.ipr
-*.iws
 out/
 
 # Eclipse
@@ -47,21 +47,23 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Gegenereerde bestanden
+# Generated files
 bin/
 tmp/
 *.class
 
-# Test results en screenshots
+# Test results and screenshots
 test-results/
 playwright-report/
 *.png
 *.jpg
-*.jpeg 
-# Git configuratie bestanden (lokaal)
+*.jpeg
+
+# Local git helper scripts
 setup-git-accounts*.sh
 git-helper*.sh
 show-ssh-keys*.sh
-README_GIT_SETUP*.md
-GIT_SETUP*.md
 switch-git-config.sh
+
+# Temp directories
+temp-backend/

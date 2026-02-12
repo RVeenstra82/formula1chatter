@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import type { Race } from '../../api/client';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour, hasRaceStarted } from '../../utils/timeUtils';
 
 interface RaceCardProps {
-  race: any;
+  race: Race;
   isNext?: boolean;
 }
 

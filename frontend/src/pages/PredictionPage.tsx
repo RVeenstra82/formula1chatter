@@ -12,10 +12,41 @@ import { calculateTimeRemaining, isLessThanOneHour, isLessThanFiveMinutes, hasRa
 const PredictionPage: React.FC = () => {
   const { raceId } = useParams<{ raceId: string }>();
   const navigate = useNavigate();
-  const { user, isLoading: isLoadingAuth } = useAuth();
+  const { user, login, isLoading: isLoadingAuth } = useAuth();
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  
+
+  const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
+    queryKey: ['race', raceId],
+    queryFn: () => api.getRaceById(raceId!),
+    enabled: !!raceId,
+  });
+
+  // Fetch active drivers for this race
+  const { data: drivers = [] } = useQuery({
+    queryKey: ['active-drivers', raceId],
+    queryFn: () => api.getActiveDriversForRace(raceId!),
+    enabled: !!raceId,
+  });
+
+  // Update countdown timer every second
+  useEffect(() => {
+    if (!race) return;
+
+    const updateTimer = () => {
+      const remaining = calculateTimeRemaining(race.date, race.time, language);
+      setTimeRemaining(remaining);
+    };
+
+    // Update immediately and then every second
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [race, language]);
+
+  const isLoading = isLoadingRace || isLoadingAuth;
+
   if (!raceId) {
     return (
       <div className="text-center py-12">
@@ -27,36 +58,6 @@ const PredictionPage: React.FC = () => {
       </div>
     );
   }
-
-  const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
-    queryKey: ['race', raceId],
-    queryFn: () => api.getRaceById(raceId),
-  });
-
-  // Fetch active drivers for this race
-  const { data: drivers = [] } = useQuery({
-    queryKey: ['active-drivers', raceId],
-    queryFn: () => api.getActiveDriversForRace(raceId),
-    enabled: !!raceId,
-  });
-
-  // Update countdown timer every second
-  useEffect(() => {
-    if (!race) return;
-    
-    const updateTimer = () => {
-      const remaining = calculateTimeRemaining(race.date, race.time, language);
-      setTimeRemaining(remaining);
-    };
-    
-    // Update immediately and then every second
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    
-    return () => clearInterval(interval);
-  }, [race, language]);
-  
-  const isLoading = isLoadingRace || isLoadingAuth;
   
   if (isLoading) {
     return (
@@ -121,7 +122,7 @@ const PredictionPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-4">{t('predict.loginRequired')}</h1>
         <p className="mb-8">{t('predict.needLogin')}</p>
         <button 
-          onClick={useAuth().login} 
+          onClick={login} 
           className="btn btn-primary"
         >
           {t('predict.loginFacebook')}

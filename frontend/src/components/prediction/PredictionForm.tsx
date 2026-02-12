@@ -47,10 +47,10 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   // Mutation to save prediction
   const { mutate: savePrediction, isPending: isSaving, error: saveError } = useMutation({
     mutationFn: () => {
-      if (!user || user.id === undefined || user.id === null) {
+      if (!user) {
         throw new Error('User not authenticated');
       }
-      return api.savePrediction(user.id, race.id, prediction);
+      return api.savePrediction(race.id, prediction);
     },
     onSuccess: () => {
       if (onSuccess) onSuccess();

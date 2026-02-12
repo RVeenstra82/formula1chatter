@@ -55,7 +55,7 @@ class StartupLogConfig {
             
             logger.info("📋 Redirect URI template: $redirectUri")
             logger.info("📋 Expected redirect URI: https://formula1chatter.onrender.com/api/login/oauth2/code/facebook")
-            logger.info("📋 Success redirect URL: https://formula1chatter.vercel.app/#/")
+            logger.info("📋 Success redirect URL: configured via app.frontend-url property")
             
             // Test Facebook app accessibility
             if (clientId.isNotBlank() && clientId != "dummy-client-id") {

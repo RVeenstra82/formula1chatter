@@ -75,8 +75,7 @@ class UserService(
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
         // Remove all predictions for this user
-        val allPredictions = predictionRepository.findAll()
-        val userPredictions = allPredictions.filter { it.user.id == userId }
+        val userPredictions = predictionRepository.findByUserId(userId)
         if (userPredictions.isNotEmpty()) {
             predictionRepository.deleteAll(userPredictions)
         }

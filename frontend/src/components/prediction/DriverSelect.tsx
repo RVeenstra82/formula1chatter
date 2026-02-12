@@ -2,7 +2,6 @@ import React from 'react';
 import Select from 'react-select';
 import type { GroupBase, SingleValue } from 'react-select';
 import type { Driver } from '../../api/client';
-import { teamLogos } from '../../assets/teamLogos';
 const proxy = (src?: string | null) => (src ? `/api/images/proxy?src=${encodeURIComponent(src)}` : undefined);
 
 interface DriverSelectProps {
@@ -13,7 +12,6 @@ interface DriverSelectProps {
   id: string;
   disabled?: boolean;
   disabledReasons?: Record<string, string>; // driverId -> reason text
-  showTeamLogo?: boolean;
 }
 
 interface DriverOption {
@@ -30,7 +28,6 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
   id,
   disabled = false,
   disabledReasons = {},
-  showTeamLogo = true,
 }) => {
   // Group drivers by constructor
   const groupedOptions: GroupBase<DriverOption>[] = Object.entries(
@@ -73,7 +70,6 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
         placeholder="Select a driver"
         formatOptionLabel={({ driver }, { context }) => {
           const reason = disabledReasons[driver.id];
-          const logoSrc = showTeamLogo && driver.constructorName ? teamLogos[driver.constructorName] : undefined;
           // Only show the disabled reason in the dropdown menu, not in the selected value
           const showReason = context === 'menu' && !!reason;
 
@@ -117,14 +113,6 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
                 >
                   {reason}
                 </span>
-              )}
-              {logoSrc && (
-                <img
-                  src={logoSrc}
-                  alt={driver.constructorName || 'Team'}
-                  className="w-5 h-5 ml-2 opacity-80"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
               )}
             </div>
           );

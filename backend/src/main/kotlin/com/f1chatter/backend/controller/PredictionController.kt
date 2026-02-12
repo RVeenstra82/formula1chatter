@@ -4,9 +4,10 @@ import com.f1chatter.backend.dto.LeaderboardEntryDto
 import com.f1chatter.backend.dto.PredictionDto
 import com.f1chatter.backend.dto.PredictionResultDto
 import com.f1chatter.backend.service.PredictionService
+import com.f1chatter.backend.util.F1SeasonUtils
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,13 +15,23 @@ import org.springframework.web.bind.annotation.*
 class PredictionController(
     private val predictionService: PredictionService
 ) {
+    private fun getAuthenticatedUserId(): Long {
+        val principal = SecurityContextHolder.getContext().authentication?.principal
+        val username = when (principal) {
+            is UserDetails -> principal.username
+            is String -> principal
+            else -> throw IllegalStateException("Not authenticated")
+        }
+        return username.toLongOrNull() ?: throw IllegalStateException("Invalid user ID in token")
+    }
+
     @PostMapping("/{raceId}")
     fun savePrediction(
         @PathVariable raceId: String,
-        @RequestBody predictionDto: PredictionDto,
-        @RequestParam userId: Long
+        @RequestBody predictionDto: PredictionDto
     ): ResponseEntity<Any> {
         return try {
+            val userId = getAuthenticatedUserId()
             predictionService.savePrediction(userId, raceId, predictionDto)
             ResponseEntity.ok(predictionDto)
         } catch (e: IllegalStateException) {
@@ -49,7 +60,7 @@ class PredictionController(
     
     @GetMapping("/leaderboard")
     fun getSeasonLeaderboard(@RequestParam(required = false) season: Int?): ResponseEntity<List<LeaderboardEntryDto>> {
-        val currentSeason = season ?: java.time.LocalDate.now().year
+        val currentSeason = season ?: F1SeasonUtils.getCurrentSeason()
         val leaderboard = predictionService.getSeasonLeaderboard(currentSeason)
         return ResponseEntity.ok(leaderboard)
     }
@@ -59,7 +70,7 @@ class PredictionController(
         @PathVariable userId: Long,
         @RequestParam(required = false) season: Int?
     ): ResponseEntity<Int> {
-        val currentSeason = season ?: java.time.LocalDate.now().year
+        val currentSeason = season ?: F1SeasonUtils.getCurrentSeason()
         val score = predictionService.getUserSeasonScore(userId, currentSeason)
         return ResponseEntity.ok(score)
     }

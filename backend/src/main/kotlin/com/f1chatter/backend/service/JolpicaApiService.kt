@@ -17,6 +17,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import com.f1chatter.backend.util.F1SeasonUtils
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -41,24 +42,7 @@ class JolpicaApiService(
     private val requestDelayMs = (1000 / requestsPerSecond).toLong() // Calculate delay based on requests per second
     private var lastRequestTime = 0L
     
-    /**
-     * Determines the current F1 season based on the current date.
-     * F1 seasons typically start in March, so if we're in January or February,
-     * we use the previous year's season data.
-     */
-    private fun getCurrentSeason(): Int {
-        val currentDate = LocalDate.now()
-        val currentYear = currentDate.year
-        val currentMonth = currentDate.monthValue
-        
-        // If we're in January or February, we're still in the previous year's season
-        // F1 seasons typically start in March
-        return if (currentMonth <= 2) {
-            currentYear - 1
-        } else {
-            currentYear
-        }
-    }
+    private fun getCurrentSeason(): Int = F1SeasonUtils.getCurrentSeason()
     
     // Cache to store API responses
     private val apiCache = ConcurrentHashMap<String, Map<*, *>>()
@@ -201,32 +185,26 @@ class JolpicaApiService(
         logger.info { "Successfully imported ${races.size} races for season $currentSeason" }
     }
     
-    fun fetchDriversForSeason(season: Int? = null) {
+    fun fetchDriversForSeason(season: Int? = null, forceRefresh: Boolean = false) {
         // Use provided season or determine current season
         val dataYear = season ?: getCurrentSeason()
-        
-        // Check if we already have drivers stored
-        val existingDrivers = driverRepository.findAll().toList()
-        val existingConstructors = constructorRepository.findAll().toList()
-        
-        // If we have drivers and constructors and they have relationships, we can skip fetching
-        if (existingDrivers.isNotEmpty() && existingConstructors.isNotEmpty() && 
-            existingDrivers.any { it.constructor != null }) {
-            logger.info { "Using ${existingDrivers.size} existing drivers and ${existingConstructors.size} constructors from database" }
-            return
+
+        if (!forceRefresh) {
+            // Check if we already have drivers stored
+            val existingDrivers = driverRepository.findAll().toList()
+            val existingConstructors = constructorRepository.findAll().toList()
+
+            // If we have drivers and constructors and they have relationships, we can skip fetching
+            if (existingDrivers.isNotEmpty() && existingConstructors.isNotEmpty() &&
+                existingDrivers.any { it.constructor != null }) {
+                logger.info { "Using ${existingDrivers.size} existing drivers and ${existingConstructors.size} constructors from database" }
+                return
+            }
         }
-        
-        // If we have no drivers or need to update, fetch them
-        if (existingDrivers.isEmpty()) {
-            fetchDrivers(dataYear)
-        }
-        
-        // If we have no constructors or need to update, fetch them
-        if (existingConstructors.isEmpty()) {
-            fetchConstructorsForSeason(dataYear)
-        }
-        
-        // Always assign drivers to constructors
+
+        logger.info { "Fetching drivers and constructors for season $dataYear (forceRefresh=$forceRefresh)" }
+        fetchDrivers(dataYear)
+        fetchConstructorsForSeason(dataYear)
         assignDriversToConstructors(dataYear)
     }
     
@@ -302,40 +280,57 @@ class JolpicaApiService(
     }
     
     private fun assignDriversToConstructors(season: Int) {
-        // Check if drivers already have constructors assigned
-        val drivers = driverRepository.findAll().toList()
-        if (drivers.all { it.constructor != null }) {
-            logger.info { "All drivers already have constructors assigned, skipping constructor assignment" }
-            return
-        }
-        
+        // First try driver standings (available once the season has started)
         val url = "$baseUrl/$season/driverStandings.json"
         logger.info { "Fetching driver standings to assign constructors from $url" }
-        
-        val response = makeApiRequest(url, Map::class.java) ?: return
-        val data = response["MRData"] as? Map<*, *>
+
+        val response = makeApiRequest(url, Map::class.java)
+        val data = response?.get("MRData") as? Map<*, *>
         val standingsTable = data?.get("StandingsTable") as? Map<*, *>
         val standingsLists = standingsTable?.get("StandingsLists") as? List<Map<*, *>> ?: emptyList()
-        
+
         if (standingsLists.isNotEmpty()) {
             val driverStandings = standingsLists[0]["DriverStandings"] as? List<Map<*, *>> ?: emptyList()
-            
             driverStandings.forEach { standingMap ->
                 val driverId = (standingMap["Driver"] as Map<*, *>)["driverId"].toString()
                 val constructorsList = standingMap["Constructors"] as? List<Map<*, *>> ?: emptyList()
-                
                 if (constructorsList.isNotEmpty()) {
                     val constructorId = constructorsList[0]["constructorId"].toString()
-                    
-                    val driver = driverRepository.findByIdOrNull(driverId)
-                    val constructor = constructorRepository.findByIdOrNull(constructorId)
-                    
-                    if (driver != null && constructor != null) {
-                        driver.constructor = constructor
-                        driverRepository.save(driver)
-                    }
+                    linkDriverToConstructor(driverId, constructorId)
                 }
             }
+            logger.info { "Assigned constructors via driver standings" }
+            return
+        }
+
+        // Fallback: query each constructor's drivers (works before season starts)
+        logger.info { "No standings available for season $season, fetching drivers per constructor" }
+        val constructors = constructorRepository.findAll()
+        constructors.forEach { constructor ->
+            try {
+                val driversUrl = "$baseUrl/$season/constructors/${constructor.id}/drivers.json"
+                val driversResponse = makeApiRequest(driversUrl, Map::class.java) ?: return@forEach
+                val driversData = driversResponse["MRData"] as? Map<*, *>
+                val driverTable = driversData?.get("DriverTable") as? Map<*, *>
+                val drivers = driverTable?.get("Drivers") as? List<Map<*, *>> ?: emptyList()
+
+                drivers.forEach { driverMap ->
+                    val driverId = driverMap["driverId"].toString()
+                    linkDriverToConstructor(driverId, constructor.id)
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to fetch drivers for constructor ${constructor.name}" }
+            }
+        }
+        logger.info { "Assigned constructors via per-constructor driver lists" }
+    }
+
+    private fun linkDriverToConstructor(driverId: String, constructorId: String) {
+        val driver = driverRepository.findByIdOrNull(driverId)
+        val constructor = constructorRepository.findByIdOrNull(constructorId)
+        if (driver != null && constructor != null) {
+            driver.constructor = constructor
+            driverRepository.save(driver)
         }
     }
     

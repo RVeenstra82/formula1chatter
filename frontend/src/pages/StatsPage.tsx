@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import {
-  mockStatsOverview,
-  mockDriverStats,
-  mockPredictionAccuracy,
-  mockCircuitStats,
-  mockUserStats,
-  mockSeasonProgress,
-  mockConstructorStats
-} from '../services/mockStatsService';
+import { api } from '../api/client';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   AreaChart, Area
 } from 'recharts';
-
-
 
 const StatsPage: React.FC = () => {
   const { tab } = useParams<{ tab: string }>();
@@ -25,69 +16,84 @@ const StatsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { t } = useLanguage();
   const { user } = useAuth();
-  
+
   // Share functionality
   const handleShare = async () => {
     const url = `${window.location.origin}/stats/${activeTab}`;
     try {
       await navigator.clipboard.writeText(url);
-      // You could add a toast notification here
-      console.log(t('stats.copiedToClipboard'));
-    } catch (err) {
-      console.error('Failed to copy link:', err);
+    } catch {
+      // Failed to copy link
     }
   };
-  
+
   // URL synchronization
   useEffect(() => {
     if (tab && tab !== activeTab) {
-      // Validate tab parameter
       const validTabs = ['overview', 'drivers', 'constructors', 'accuracy', 'circuits', 'users', 'progress'];
       if (validTabs.includes(tab)) {
         setActiveTab(tab);
       } else {
-        // Invalid tab, redirect to overview
         navigate('/stats/overview', { replace: true });
       }
     }
-  }, [tab, navigate]);
+  }, [tab, activeTab, navigate]);
 
-  // Update URL when activeTab changes (but not on initial load)
   useEffect(() => {
     if (activeTab && activeTab !== 'overview' && !tab) {
       navigate(`/stats/${activeTab}`, { replace: true });
     }
   }, [activeTab, tab, navigate]);
 
-  // If user is not logged in and tries to access users tab, redirect to overview
-  React.useEffect(() => {
+  useEffect(() => {
     if (!user && activeTab === 'users') {
       setActiveTab('overview');
       navigate('/stats/overview', { replace: true });
     }
   }, [user, activeTab, navigate]);
 
-  // In development, use mock data directly
-  const overview = import.meta.env.DEV ? mockStatsOverview : undefined;
-  const driverStats = import.meta.env.DEV ? mockDriverStats : undefined;
-  const predictionAccuracy = import.meta.env.DEV ? mockPredictionAccuracy : undefined;
-  const circuitStats = import.meta.env.DEV ? mockCircuitStats : undefined;
-  const userStats = import.meta.env.DEV ? (user ? mockUserStats : undefined) : undefined;
-  const seasonProgress = import.meta.env.DEV ? mockSeasonProgress : undefined;
-  const constructorStats = import.meta.env.DEV ? mockConstructorStats : undefined;
+  // Data fetching — only fetch when tab is active
+  const { data: overview, isLoading: overviewLoading } = useQuery({
+    queryKey: ['stats', 'overview'],
+    queryFn: api.getStatsOverview,
+    enabled: activeTab === 'overview',
+  });
 
-  const isLoading = false; // In development, no loading states needed
+  const { data: driverStats, isLoading: driverLoading } = useQuery({
+    queryKey: ['stats', 'driver-performance'],
+    queryFn: api.getDriverPerformanceStats,
+    enabled: activeTab === 'drivers',
+  });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                  <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">{t('common.loading')}</p>
-          </div>
-      </div>
-    );
-  }
+  const { data: constructorStats, isLoading: constructorLoading } = useQuery({
+    queryKey: ['stats', 'constructor-performance'],
+    queryFn: api.getConstructorPerformanceStats,
+    enabled: activeTab === 'constructors',
+  });
+
+  const { data: predictionAccuracy, isLoading: accuracyLoading } = useQuery({
+    queryKey: ['stats', 'prediction-accuracy'],
+    queryFn: api.getPredictionAccuracyStats,
+    enabled: activeTab === 'accuracy',
+  });
+
+  const { data: circuitStats, isLoading: circuitLoading } = useQuery({
+    queryKey: ['stats', 'circuit-difficulty'],
+    queryFn: api.getCircuitDifficultyStats,
+    enabled: activeTab === 'circuits',
+  });
+
+  const { data: userStats, isLoading: userLoading } = useQuery({
+    queryKey: ['stats', 'user-comparison'],
+    queryFn: api.getUserComparisonStats,
+    enabled: activeTab === 'users' && !!user,
+  });
+
+  const { data: seasonProgress, isLoading: progressLoading } = useQuery({
+    queryKey: ['stats', 'season-progress'],
+    queryFn: api.getSeasonProgressStats,
+    enabled: activeTab === 'progress',
+  });
 
   const tabs = [
     { id: 'overview', name: t('stats.overview') },
@@ -99,6 +105,15 @@ const StatsPage: React.FC = () => {
     { id: 'progress', name: t('stats.seasonProgress') },
   ];
 
+  const renderLoading = (message: string) => (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+        <p className="mt-2 text-gray-600">{message}</p>
+      </div>
+    </div>
+  );
+
   const renderOverview = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -109,7 +124,6 @@ const StatsPage: React.FC = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">{t('stats.totalUsers')}</p>
-              
               <p className="text-2xl font-bold text-gray-900">{overview?.totalUsers || 0}</p>
             </div>
           </div>
@@ -147,7 +161,7 @@ const StatsPage: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">{t('stats.averageScore')}</p>
               <p className="text-2xl font-bold text-gray-900">
-                {overview?.averageScore ? overview.averageScore.toFixed(1) : '0.0'}
+                {overview?.averageScore ? Number(overview.averageScore).toFixed(1) : '0.0'}
               </p>
             </div>
           </div>
@@ -169,7 +183,7 @@ const StatsPage: React.FC = () => {
         </div>
       )}
 
-      {(!overview || overview.totalPredictions === 0) && (
+      {(!overview || overview.totalPredictions === 0) && !overviewLoading && (
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
           <div className="text-6xl mb-4">📊</div>
           <h3 className="text-lg font-semibold mb-2">{t('stats.noDataAvailable')}</h3>
@@ -181,17 +195,17 @@ const StatsPage: React.FC = () => {
 
   const renderDriverPerformance = () => (
     <div className="space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">{t('stats.driverSuccessRates')}</h3>
-                  <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={driverStats?.driverStats?.slice(0, 10) || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="driverCode" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`${value}%`, t('stats.successRate')]} />
-              <Bar dataKey="successRate" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-semibold mb-4">{t('stats.driverSuccessRates')}</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={driverStats?.driverStats?.slice(0, 10) || []}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="driverCode" />
+            <YAxis />
+            <Tooltip formatter={(value) => [`${value}%`, t('stats.successRate')]} />
+            <Bar dataKey="successRate" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -225,13 +239,16 @@ const StatsPage: React.FC = () => {
   );
 
   const renderPredictionAccuracy = () => {
-    const accuracyData = predictionAccuracy?.accuracyByType ? 
-      Object.entries(predictionAccuracy.accuracyByType).map(([type, data]) => ({
-        type: t(`stats.${type}`),
-        accuracy: (data as any).accuracy,
-        correct: (data as any).correctPredictions,
-        total: (data as any).totalPredictions
-      })) : [];
+    const accuracyData = predictionAccuracy?.accuracyByType ?
+      Object.entries(predictionAccuracy.accuracyByType).map(([type, data]) => {
+        const typed = data as { accuracy: number; correctPredictions: number; totalPredictions: number };
+        return {
+          type: t(`stats.${type}`),
+          accuracy: typed.accuracy,
+          correct: typed.correctPredictions,
+          total: typed.totalPredictions
+        };
+      }) : [];
 
     return (
       <div className="space-y-6">
@@ -242,8 +259,8 @@ const StatsPage: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="type" />
               <YAxis />
-                          <Tooltip formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-            <Bar dataKey="accuracy" fill="#8884d8" />
+              <Tooltip formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
+              <Bar dataKey="accuracy" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -266,7 +283,7 @@ const StatsPage: React.FC = () => {
   const renderCircuitDifficulty = () => (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4">{t('stats.circuitDifficultyLowerAccuracy')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('stats.circuitDifficultyLowerAccuracy')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={circuitStats?.circuitStats || []}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -279,7 +296,7 @@ const StatsPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">{t('stats.circuitAccuracy')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={circuitStats?.circuitStats?.slice(0, 8) || []}>
@@ -308,7 +325,7 @@ const StatsPage: React.FC = () => {
     </div>
   );
 
-    const renderUserComparison = () => {
+  const renderUserComparison = () => {
     if (!user) {
       return (
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
@@ -323,52 +340,52 @@ const StatsPage: React.FC = () => {
       <div className="space-y-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">{t('stats.userTotalScores')}</h3>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={userStats?.userStats || []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="userName" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="totalScore" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">{t('stats.userAccuracy')}</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={userStats?.userStats || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="userName" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-              <Bar dataKey="accuracy" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4">{t('stats.averageScorePerUser')}</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={400}>
             <BarChart data={userStats?.userStats || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="userName" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="averageScore" fill="#ffc658" />
+              <Bar dataKey="totalScore" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">{t('stats.userAccuracy')}</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={userStats?.userStats || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="userName" />
+                <YAxis />
+                <Tooltip formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
+                <Bar dataKey="accuracy" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">{t('stats.averageScorePerUser')}</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={userStats?.userStats || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="userName" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="averageScore" fill="#ffc658" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
   };
 
   const renderSeasonProgress = () => (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4">{t('stats.seasonProgressAccuracy')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('stats.seasonProgressAccuracy')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={seasonProgress?.raceProgress || []}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -382,7 +399,7 @@ const StatsPage: React.FC = () => {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4">{t('stats.averageScoreProgression')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('stats.averageScoreProgression')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={seasonProgress?.raceProgress || []}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -399,7 +416,7 @@ const StatsPage: React.FC = () => {
   const renderConstructorPerformance = () => (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4">{t('stats.constructorSuccessRates')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('stats.constructorSuccessRates')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={constructorStats?.constructorStats || []}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -444,68 +461,19 @@ const StatsPage: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">{t('stats.loadingOverview')}</p>
-            </div>
-          </div>
-        ) : renderOverview();
+        return overviewLoading ? renderLoading(t('stats.loadingOverview')) : renderOverview();
       case 'drivers':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">{t('stats.loadingDriverStatistics')}</p>
-            </div>
-          </div>
-        ) : renderDriverPerformance();
+        return driverLoading ? renderLoading(t('stats.loadingDriverStatistics')) : renderDriverPerformance();
       case 'accuracy':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading accuracy data...</p>
-            </div>
-          </div>
-        ) : renderPredictionAccuracy();
+        return accuracyLoading ? renderLoading(t('common.loading')) : renderPredictionAccuracy();
       case 'circuits':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading circuit data...</p>
-            </div>
-          </div>
-        ) : renderCircuitDifficulty();
+        return circuitLoading ? renderLoading(t('common.loading')) : renderCircuitDifficulty();
       case 'users':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading user data...</p>
-            </div>
-          </div>
-        ) : renderUserComparison();
+        return userLoading ? renderLoading(t('common.loading')) : renderUserComparison();
       case 'progress':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading season progress...</p>
-            </div>
-          </div>
-        ) : renderSeasonProgress();
+        return progressLoading ? renderLoading(t('common.loading')) : renderSeasonProgress();
       case 'constructors':
-        return false ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading constructor data...</p>
-            </div>
-          </div>
-        ) : renderConstructorPerformance();
+        return constructorLoading ? renderLoading(t('common.loading')) : renderConstructorPerformance();
       default:
         return renderOverview();
     }
@@ -537,20 +505,20 @@ const StatsPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md mb-8">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
-              {tabs.map((tab) => (
+              {tabs.map((tabItem) => (
                 <button
-                  key={tab.id}
+                  key={tabItem.id}
                   onClick={() => {
-                    setActiveTab(tab.id);
-                    navigate(`/stats/${tab.id}`);
+                    setActiveTab(tabItem.id);
+                    navigate(`/stats/${tabItem.id}`);
                   }}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
+                    activeTab === tabItem.id
                       ? 'border-red-500 text-red-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  {tab.name}
+                  {tabItem.name}
                 </button>
               ))}
             </nav>

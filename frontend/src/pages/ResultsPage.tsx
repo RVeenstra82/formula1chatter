@@ -12,10 +12,6 @@ const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  if (!raceId) {
-    return <div>{t('common.raceIdRequired')}</div>;
-  }
-  
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
     queryFn: () => {
@@ -26,21 +22,26 @@ const ResultsPage: React.FC = () => {
           return Promise.resolve(mockRace);
         }
       }
-      return api.getRaceById(raceId);
+      return api.getRaceById(raceId!);
     },
+    enabled: !!raceId,
   });
-  
+
   const { data: results = [], isLoading: isLoadingResults } = useQuery<PredictionResult[]>({
     queryKey: ['results', raceId],
     queryFn: () => {
       if (import.meta.env.DEV) {
         // Use mock data in development
-        return Promise.resolve(mockRaceResults[raceId] || []);
+        return Promise.resolve(mockRaceResults[raceId!] || []);
       }
-      return api.getRaceResults(raceId);
+      return api.getRaceResults(raceId!);
     },
-    enabled: !!race?.completed,
+    enabled: !!raceId && !!race?.completed,
   });
+
+  if (!raceId) {
+    return <div>{t('common.raceIdRequired')}</div>;
+  }
   
   const isLoading = isLoadingRace || isLoadingResults;
   

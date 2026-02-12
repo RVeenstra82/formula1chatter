@@ -11,7 +11,7 @@ type ViewMode = 'season' | 'race';
 
 const LeaderboardPage: React.FC = () => {
   const { t } = useLanguage();
-  const { user, isLoading: isLoadingAuth } = useAuth();
+  const { user, login, isLoading: isLoadingAuth } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('season');
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
 
@@ -82,7 +82,7 @@ const LeaderboardPage: React.FC = () => {
           <h1 className="text-2xl font-bold mb-4">{t('leaderboard.loginRequired')}</h1>
           <p className="text-gray-600 mb-6">{t('leaderboard.loginToView')}</p>
           <button 
-            onClick={useAuth().login} 
+            onClick={login} 
             className="btn btn-primary"
           >
             {t('common.login')}

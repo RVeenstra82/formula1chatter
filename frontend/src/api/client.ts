@@ -148,6 +148,43 @@ export interface SprintPrediction {
   thirdPlaceDriverId: string;
 }
 
+// Stats types
+export interface StatsOverview {
+  totalUsers: number;
+  completedRaces: number;
+  totalPredictions: number;
+  averageScore: number;
+  mostPredictedDriver?: { driverCode: string; driverName: string };
+}
+
+export interface DriverPerformanceStats {
+  driverStats: Array<{ driverCode: string; successRate: number; podiumFinishes: number; totalPredictions: number }>;
+}
+
+export interface ConstructorPerformanceStats {
+  constructorStats: Array<{ constructorName: string; successRate: number; correctPredictions: number; totalPredictions: number }>;
+}
+
+export interface PredictionAccuracyStats {
+  accuracyByType: Record<string, { accuracy: number; correctPredictions: number; totalPredictions: number }>;
+}
+
+export interface CircuitDifficultyStats {
+  circuitStats: Array<{ circuitName: string; difficulty: number; accuracy: number; totalPredictions: number }>;
+}
+
+export interface UserComparisonStats {
+  userStats: Array<{ userName: string; totalScore: number; accuracy: number; averageScore: number }>;
+}
+
+export interface SeasonProgressStats {
+  raceProgress: Array<{ raceName: string; accuracy: number; averageScore: number }>;
+}
+
+export interface AdminActionResult {
+  [key: string]: unknown;
+}
+
 // API Functions
 export const api = {
   // Auth
@@ -224,13 +261,13 @@ export const api = {
   },
 
   // Predictions
-  savePrediction: async (userId: number, raceId: string, prediction: Prediction): Promise<void> => {
-    await apiClient.post(`/predictions/${raceId}?userId=${userId}`, prediction);
+  savePrediction: async (raceId: string, prediction: Prediction): Promise<void> => {
+    await apiClient.post(`/predictions/${raceId}`, prediction);
   },
 
   // Sprint Predictions
-  saveSprintPrediction: async (userId: number, sprintRaceId: string, prediction: SprintPrediction): Promise<void> => {
-    await apiClient.post(`/sprint-predictions/${sprintRaceId}?userId=${userId}`, prediction);
+  saveSprintPrediction: async (sprintRaceId: string, prediction: SprintPrediction): Promise<void> => {
+    await apiClient.post(`/sprint-predictions/${sprintRaceId}`, prediction);
   },
 
   getUserSprintPredictionForRace: async (userId: number, sprintRaceId: string): Promise<SprintPrediction | null> => {
@@ -242,7 +279,7 @@ export const api = {
     }
   },
 
-  getSprintRaceResults: async (sprintRaceId: string): Promise<any[]> => {
+  getSprintRaceResults: async (sprintRaceId: string): Promise<PredictionResult[]> => {
     const response = await apiClient.get(`/sprint-predictions/sprint-race/${sprintRaceId}/results`);
     return response.data;
   },
@@ -289,73 +326,73 @@ export const api = {
   },
 
   // Stats
-  getStatsOverview: async (): Promise<any> => {
+  getStatsOverview: async (): Promise<StatsOverview> => {
     const response = await apiClient.get('/stats/overview');
     return response.data;
   },
 
-  getDriverPerformanceStats: async (): Promise<any> => {
+  getDriverPerformanceStats: async (): Promise<DriverPerformanceStats> => {
     const response = await apiClient.get('/stats/driver-performance');
     return response.data;
   },
 
-  getPredictionAccuracyStats: async (): Promise<any> => {
+  getPredictionAccuracyStats: async (): Promise<PredictionAccuracyStats> => {
     const response = await apiClient.get('/stats/prediction-accuracy');
     return response.data;
   },
 
-  getCircuitDifficultyStats: async (): Promise<any> => {
+  getCircuitDifficultyStats: async (): Promise<CircuitDifficultyStats> => {
     const response = await apiClient.get('/stats/circuit-difficulty');
     return response.data;
   },
 
-  getUserComparisonStats: async (): Promise<any> => {
+  getUserComparisonStats: async (): Promise<UserComparisonStats> => {
     const response = await apiClient.get('/stats/user-comparison');
     return response.data;
   },
 
-  getSeasonProgressStats: async (): Promise<any> => {
+  getSeasonProgressStats: async (): Promise<SeasonProgressStats> => {
     const response = await apiClient.get('/stats/season-progress');
     return response.data;
   },
 
-  getConstructorPerformanceStats: async (): Promise<any> => {
+  getConstructorPerformanceStats: async (): Promise<ConstructorPerformanceStats> => {
     const response = await apiClient.get('/stats/constructor-performance');
     return response.data;
   },
 
   // Admin
-  updateDriverPhotos: async (): Promise<any> => {
+  updateDriverPhotos: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/update-driver-photos');
     return response.data;
   },
 
-  processCompletedRaces: async (): Promise<any> => {
+  processCompletedRaces: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/process-completed-races');
     return response.data;
   },
 
-  syncRaceData: async (): Promise<any> => {
+  syncRaceData: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/sync-race-data');
     return response.data;
   },
 
-  forceSyncRaceData: async (): Promise<any> => {
+  forceSyncRaceData: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/force-sync-race-data');
     return response.data;
   },
 
-  forceSyncWeekendSchedules: async (): Promise<any> => {
+  forceSyncWeekendSchedules: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/force-sync-weekend-schedules');
     return response.data;
   },
 
-  syncDriverData: async (): Promise<any> => {
+  syncDriverData: async (): Promise<AdminActionResult> => {
     const response = await apiClient.post('/admin/sync-driver-data');
     return response.data;
   },
 
-  getSystemStatus: async (): Promise<any> => {
+  getSystemStatus: async (): Promise<AdminActionResult> => {
     const response = await apiClient.get('/admin/system-status');
     return response.data;
   },

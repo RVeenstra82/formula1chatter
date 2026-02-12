@@ -23,8 +23,9 @@ const ProfilePage: React.FC = () => {
     try {
       await apiClient.delete('/users/me');
       await logout();
-    } catch (e: any) {
-      setError(e?.response?.data?.error || 'Verwijderen mislukt');
+    } catch (e: unknown) {
+      const axiosError = e as { response?: { data?: { error?: string } } };
+      setError(axiosError?.response?.data?.error || 'Verwijderen mislukt');
     } finally {
       setDeleting(false);
     }

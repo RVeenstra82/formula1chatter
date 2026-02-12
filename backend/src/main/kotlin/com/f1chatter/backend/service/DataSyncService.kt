@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -25,24 +26,7 @@ class DataSyncService(
     @Value("\${openf1.api.startup.update-profile-pictures:false}")
     private lateinit var updateProfilePicturesOnStartup: String
     
-    /**
-     * Determines the current F1 season based on the current date.
-     * F1 seasons typically start in March, so if we're in January or February,
-     * we use the previous year's season data.
-     */
-    fun getCurrentSeason(): Int {
-        val currentDate = LocalDate.now()
-        val currentYear = currentDate.year
-        val currentMonth = currentDate.monthValue
-        
-        // If we're in January or February, we're still in the previous year's season
-        // F1 seasons typically start in March
-        return if (currentMonth <= 2) {
-            currentYear - 1
-        } else {
-            currentYear
-        }
-    }
+    fun getCurrentSeason(): Int = F1SeasonUtils.getCurrentSeason()
     
     // Reduced frequency to once per week to minimize API calls
     @Scheduled(cron = "0 0 0 * * SUN") // At midnight on Sunday
@@ -59,19 +43,11 @@ class DataSyncService(
         }
     }
     
-    // Reduced frequency to once per week to minimize API calls
+    // Re-sync drivers weekly to pick up mid-season changes
     @Scheduled(cron = "0 0 1 * * SUN") // At 1 AM on Sunday
     fun syncDriverData() {
-        // Check if we have drivers and constructors
-        val driversExist = driverRepository.count() > 0
-        val constructorsExist = constructorRepository.count() > 0
-        
-        if (!driversExist || !constructorsExist) {
-            logger.info { "Syncing driver and constructor data" }
-            jolpicaApiService.fetchDriversForSeason()
-        } else {
-            logger.info { "Drivers and constructors already exist, skipping driver sync" }
-        }
+        logger.info { "Weekly driver sync for season ${getCurrentSeason()}" }
+        jolpicaApiService.fetchDriversForSeason(getCurrentSeason(), forceRefresh = true)
     }
     
     // Check for new season data daily
@@ -159,32 +135,32 @@ class DataSyncService(
     fun initializeData() {
         logger.info { "Initializing F1 data if needed" }
         
-        // Check if we have any race data
-        val hasRaces = raceRepository.count() > 0
-        if (!hasRaces) {
-            logger.info { "No races found in database, syncing race data" }
+        // Check if we have race data for the current season
+        val currentSeason = getCurrentSeason()
+        val hadCurrentSeasonRaces = raceRepository.findBySeason(currentSeason).isNotEmpty()
+        if (!hadCurrentSeasonRaces) {
+            logger.info { "No races found for season $currentSeason, syncing race data" }
             syncCurrentSeasonData()
         } else {
-            logger.info { "Races already exist in database, skipping race sync" }
+            logger.info { "Races for season $currentSeason already exist, skipping race sync" }
         }
-        
-        // Check if we have driver data
+
+        // Re-sync drivers for the current season if we just synced new races,
+        // or if driver/constructor data is missing entirely
         val hasDrivers = driverRepository.count() > 0
         val hasConstructors = constructorRepository.count() > 0
-        
-        if (!hasDrivers || !hasConstructors) {
-            logger.info { "Missing driver or constructor data, syncing driver data" }
-            
-            // Wait 5 seconds before syncing drivers to avoid rate limiting
+        val needsDriverRefresh = !hadCurrentSeasonRaces || !hasDrivers || !hasConstructors
+
+        if (needsDriverRefresh) {
+            logger.info { "Syncing drivers and constructors for season $currentSeason" }
             try {
-                Thread.sleep(5000)
+                Thread.sleep(5000) // Wait to avoid rate limiting
             } catch (e: InterruptedException) {
                 Thread.currentThread().interrupt()
             }
-            
-            syncDriverData()
+            jolpicaApiService.fetchDriversForSeason(currentSeason, forceRefresh = true)
         } else {
-            logger.info { "Drivers and constructors already exist in database, skipping driver sync" }
+            logger.info { "Drivers and constructors already exist for current season, skipping driver sync" }
         }
         
         // Only update driver profile pictures during startup if explicitly enabled

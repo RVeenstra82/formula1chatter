@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../api/client';
-// import { useLanguage } from '../contexts/LanguageContext';
+import type { AdminActionResult } from '../api/client';
 
 interface AdminAction {
   name: string;
-  apiFunction: () => Promise<any>;
+  apiFunction: () => Promise<AdminActionResult>;
   description: string;
+}
+
+interface ActionResult {
+  success: boolean;
+  data?: AdminActionResult;
+  error?: string;
+}
+
+interface SystemStatus {
+  totalRaces: number;
+  completedRaces: number;
+  pendingRaces: number;
+  lastSync: string;
 }
 
 const AdminPage: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
-  const [results, setResults] = useState<Record<string, any>>({});
-  const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [results, setResults] = useState<Record<string, ActionResult | null>>({});
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
 
   // Check if user is admin (you can customize this logic)
   const isAdmin = user?.isAdmin === true;
@@ -65,15 +78,16 @@ const AdminPage: React.FC = () => {
       
       setResults(prev => ({ ...prev, [action.name]: { success: true, data } }));
       if (action.name === 'Get System Status') {
-        setSystemStatus(data);
+        setSystemStatus(data as unknown as SystemStatus);
       }
-    } catch (error: any) {
-      setResults(prev => ({ 
-        ...prev, 
-        [action.name]: { 
-          success: false, 
-          error: error.response?.data?.error || error.message || 'Unknown error' 
-        } 
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: string } }; message?: string };
+      setResults(prev => ({
+        ...prev,
+        [action.name]: {
+          success: false,
+          error: axiosError.response?.data?.error || axiosError.message || 'Unknown error'
+        }
       }));
     } finally {
       setLoading(null);
@@ -158,22 +172,26 @@ const AdminPage: React.FC = () => {
               </button>
 
               {/* Results */}
-              {results[action.name] && (
-                <div className={`mt-4 p-3 rounded-md ${
-                  results[action.name].success 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-red-50 border border-red-200'
-                }`}>
-                  <p className={`text-sm font-medium ${
-                    results[action.name].success ? 'text-green-800' : 'text-red-800'
+              {(() => {
+                const result = results[action.name];
+                if (!result) return null;
+                return (
+                  <div className={`mt-4 p-3 rounded-md ${
+                    result.success
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
                   }`}>
-                    {results[action.name].success ? 'Success' : 'Error'}
-                  </p>
-                  <pre className="text-xs mt-1 overflow-x-auto">
-                    {JSON.stringify(results[action.name].data || results[action.name].error, null, 2)}
-                  </pre>
-                </div>
-              )}
+                    <p className={`text-sm font-medium ${
+                      result.success ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                      {result.success ? 'Success' : 'Error'}
+                    </p>
+                    <pre className="text-xs mt-1 overflow-x-auto">
+                      {JSON.stringify(result.data || result.error, null, 2)}
+                    </pre>
+                  </div>
+                );
+              })()}
             </div>
           ))}
         </div>

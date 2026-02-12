@@ -37,7 +37,7 @@ class JwtAuthenticationFilter(
         val authHeader = request.getHeader("Authorization")
         val token = jwtService.extractTokenFromHeader(authHeader)
 
-        if (token != null && SecurityContextHolder.getContext().authentication == null) {
+        if (token != null) {
             // Handle TestUser authentication — dev profile only
             if (token == "test-token" && isDevProfile) {
                 logger.debug { "TestUser authentication detected (dev profile)" }

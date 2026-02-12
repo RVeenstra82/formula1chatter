@@ -17,11 +17,16 @@ class PredictionController(
     private val predictionService: PredictionService
 ) {
     private fun getAuthenticatedUserId(): Long {
-        val principal = SecurityContextHolder.getContext().authentication?.principal
+        val authentication = SecurityContextHolder.getContext().authentication
+            ?: throw IllegalStateException("Not authenticated")
+        val principal = authentication.principal
         val username = when (principal) {
-            is UserDetails -> principal.username
-            is String -> principal
-            else -> throw IllegalStateException("Not authenticated")
+            is UserDetails -> {
+                if (principal.username == "anonymousUser") throw IllegalStateException("Not authenticated")
+                principal.username
+            }
+            is String -> if (principal == "anonymousUser") throw IllegalStateException("Not authenticated") else principal
+            else -> throw IllegalStateException("Not authenticated. Please use a JWT token for API requests.")
         }
         return username.toLongOrNull() ?: throw IllegalStateException("Invalid user ID in token")
     }

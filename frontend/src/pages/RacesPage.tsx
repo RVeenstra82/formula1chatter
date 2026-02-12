@@ -22,25 +22,25 @@ const RacesPage: React.FC = () => {
   if (isLoadingAll || isLoadingNext) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-8">{t('races.title')}</h1>
+        <h1 className="text-3xl font-bold text-white mb-8">{t('races.title')}</h1>
         <div className="animate-pulse space-y-6">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="card h-48">
-              <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+              <div className="h-6 bg-f1-surface-elevated rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-f1-surface-elevated rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-f1-surface-elevated rounded w-1/3"></div>
             </div>
           ))}
         </div>
       </div>
     );
   }
-  
+
   if (!allRaces) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-3xl font-bold mb-4">{t('races.noRacesFound')}</h1>
-        <p>{t('races.errorLoading')}</p>
+        <h1 className="text-3xl font-bold text-white mb-4">{t('races.noRacesFound')}</h1>
+        <p className="text-slate-300">{t('races.errorLoading')}</p>
       </div>
     );
   }
@@ -53,8 +53,8 @@ const RacesPage: React.FC = () => {
   
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">{t('races.calendar')}</h1>
-      
+      <h1 className="text-3xl font-bold text-white mb-8">{t('races.calendar')}</h1>
+
       <div className="mb-8 flex gap-4">
         <button
           className={`btn ${showUpcoming ? 'btn-primary' : 'btn-secondary'}`}
@@ -69,10 +69,10 @@ const RacesPage: React.FC = () => {
           {t('races.pastRaces')}
         </button>
       </div>
-      
+
       {racesToShow.length === 0 ? (
         <div className="card p-6 text-center">
-          <p className="text-xl">
+          <p className="text-xl text-slate-300">
             {showUpcoming ? t('races.noUpcomingScheduled') : t('races.noPastRaces')}
           </p>
         </div>

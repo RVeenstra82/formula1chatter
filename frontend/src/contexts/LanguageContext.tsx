@@ -20,7 +20,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.leaderboard': 'Leaderboard',
     'nav.login': 'Login',
     'nav.logout': 'Logout',
-    
+    'nav.stats': 'Statistics',
+
     // Home page
     'home.title': 'Chatter Championship',
     'home.subtitle': 'Predict race results and compete with friends!',
@@ -90,8 +91,11 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.raceComplete': 'This race has been completed. You can no longer make predictions.',
     'predict.raceStarted': 'This race has already started. You can no longer make predictions.',
     'predict.firstPlace': 'First Place (5 points)',
+    'predict.firstPlaceShort': '1st Place',
     'predict.secondPlace': 'Second Place (3 points)',
+    'predict.secondPlaceShort': '2nd Place',
     'predict.thirdPlace': 'Third Place (1 point)',
+    'predict.thirdPlaceShort': '3rd Place',
     'predict.fastestLap': 'Fastest Lap (1 point)',
     'predict.driverOfDay': 'Driver of the Day (1 point)',
     'predict.submit': 'Submit Prediction',
@@ -274,10 +278,11 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.leaderboard': 'Ranglijst',
     'nav.login': 'Inloggen',
     'nav.logout': 'Uitloggen',
-    
+    'nav.stats': 'Statistieken',
+
     // Home page
     'home.title': 'Chatter Kampioenschap',
-    'home.subtitle': 'Voorspel race resultaten en wedijver met vrienden!',
+    'home.subtitle': 'Voorspel race-uitslagen en neem het op tegen je vrienden!',
     'home.loginToStart': 'Log in met Facebook om te beginnen met voorspellen',
     'home.howItWorks': 'Hoe het werkt',
     'home.noUpcomingRaces': 'Geen aankomende races gevonden.',
@@ -344,8 +349,11 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.raceComplete': 'Deze race is voltooid. Je kunt geen voorspellingen meer doen.',
     'predict.raceStarted': 'Deze race is al begonnen. Je kunt geen voorspellingen meer doen.',
     'predict.firstPlace': 'Eerste Plaats (5 punten)',
+    'predict.firstPlaceShort': '1e Plaats',
     'predict.secondPlace': 'Tweede Plaats (3 punten)',
+    'predict.secondPlaceShort': '2e Plaats',
     'predict.thirdPlace': 'Derde Plaats (1 punt)',
+    'predict.thirdPlaceShort': '3e Plaats',
     'predict.fastestLap': 'Snelste Ronde (1 punt)',
     'predict.driverOfDay': 'Coureur van de Dag (1 punt)',
     'predict.submit': 'Voorspelling Indienen',

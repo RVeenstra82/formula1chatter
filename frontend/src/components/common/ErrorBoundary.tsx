@@ -28,17 +28,17 @@ class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-f1-bg flex items-center justify-center">
           <div className="text-center max-w-md mx-auto p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl font-bold text-white mb-4">
               Er is iets misgegaan
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-slate-400 mb-6">
               Er is een onverwachte fout opgetreden. Probeer de pagina opnieuw te laden.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="btn btn-primary"
             >
               Pagina herladen
             </button>

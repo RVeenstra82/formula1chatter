@@ -82,9 +82,9 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
     [prediction.thirdPlaceDriverId, 'thirdPlaceDriverId'],
   ];
   const fieldLabels: Record<keyof Prediction, string> = {
-    firstPlaceDriverId: t('predict.firstPlace'),
-    secondPlaceDriverId: t('predict.secondPlace'),
-    thirdPlaceDriverId: t('predict.thirdPlace'),
+    firstPlaceDriverId: t('predict.firstPlaceShort'),
+    secondPlaceDriverId: t('predict.secondPlaceShort'),
+    thirdPlaceDriverId: t('predict.thirdPlaceShort'),
     fastestLapDriverId: t('predict.fastestLap'),
     driverOfTheDayId: t('predict.driverOfDay'),
   };
@@ -99,37 +99,37 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
   const isWithinFiveMinutes = isLessThanFiveMinutes(race.date, race.time);
   const isNotAuthenticated = !user || user.id === undefined || user.id === null;
   const isDisabled = isLoading || isSaving || race.completed || isPast || isWithinFiveMinutes || isNotAuthenticated;
-  
+
   if (isLoading) {
-    return <div className="card p-6">{t('common.loading')}</div>;
+    return <div className="card p-6 text-slate-300">{t('common.loading')}</div>;
   }
-  
+
   return (
     <form onSubmit={handleSubmit} className="card">
-      <h2 className="text-2xl font-bold mb-6">{t('predict.yourPrediction')}</h2>
-      
+      <h2 className="text-2xl font-bold text-white mb-6">{t('predict.yourPrediction')}</h2>
+
       {race.completed ? (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-6">
+        <div className="bg-f1-surface-elevated text-slate-300 p-4 rounded-lg border border-f1-border mb-6">
           {t('predict.raceComplete')}
         </div>
       ) : isPast ? (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-6">
+        <div className="bg-f1-surface-elevated text-slate-300 p-4 rounded-lg border border-f1-border mb-6">
           {t('predict.raceStarted')}
         </div>
       ) : isWithinFiveMinutes ? (
-        <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
-          ⚠️ {t('predict.noMorePredictions')}
+        <div className="bg-red-500/10 text-f1-red p-4 rounded-lg border border-red-500/30 mb-6">
+          {t('predict.noMorePredictions')}
         </div>
       ) : isNotAuthenticated ? (
-        <div className="bg-blue-100 text-blue-800 p-4 rounded-md mb-6">
+        <div className="bg-f1-surface-elevated text-slate-300 p-4 rounded-lg border border-f1-border mb-6">
           Please log in to make predictions
         </div>
       ) : null}
-      
+
       {saveError && (
-        <div className="bg-red-100 text-red-800 p-4 rounded-md mb-6">
-          ⚠️ {saveError.message?.includes('not authenticated') 
-            ? 'Please log in to make predictions' 
+        <div className="bg-red-500/10 text-f1-red p-4 rounded-lg border border-red-500/30 mb-6">
+          {saveError.message?.includes('not authenticated')
+            ? 'Please log in to make predictions'
             : t('predict.noMorePredictions')}
         </div>
       )}

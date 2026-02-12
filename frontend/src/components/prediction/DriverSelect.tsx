@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import type { GroupBase, SingleValue } from 'react-select';
+import type { GroupBase, SingleValue, StylesConfig } from 'react-select';
 import type { Driver } from '../../api/client';
 const proxy = (src?: string | null) => (src ? `/api/images/proxy?src=${encodeURIComponent(src)}` : undefined);
 
@@ -11,7 +11,7 @@ interface DriverSelectProps {
   label: string;
   id: string;
   disabled?: boolean;
-  disabledReasons?: Record<string, string>; // driverId -> reason text
+  disabledReasons?: Record<string, string>;
 }
 
 interface DriverOption {
@@ -19,6 +19,87 @@ interface DriverOption {
   label: string;
   driver: Driver;
 }
+
+const darkStyles: StylesConfig<DriverOption, false, GroupBase<DriverOption>> = {
+  control: (base, state) => ({
+    ...base,
+    backgroundColor: 'var(--f1-surface-elevated)',
+    borderColor: state.isFocused ? 'var(--f1-red)' : 'var(--f1-border)',
+    boxShadow: state.isFocused ? '0 0 0 2px rgba(225, 6, 0, 0.2)' : 'none',
+    color: 'var(--text-primary)',
+    minHeight: '44px',
+    '&:hover': {
+      borderColor: 'var(--f1-red)',
+    },
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: 'var(--f1-surface-elevated)',
+    border: '1px solid var(--f1-border)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    zIndex: 50,
+  }),
+  menuList: (base) => ({
+    ...base,
+    padding: 0,
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? 'var(--f1-border)' : 'transparent',
+    color: state.isDisabled ? 'var(--text-muted)' : 'var(--text-primary)',
+    cursor: state.isDisabled ? 'not-allowed' : 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    '&:active': {
+      backgroundColor: 'var(--f1-border)',
+    },
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: 'var(--text-primary)',
+  }),
+  input: (base) => ({
+    ...base,
+    color: 'var(--text-primary)',
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: 'var(--text-muted)',
+  }),
+  groupHeading: (base) => ({
+    ...base,
+    color: 'var(--text-secondary)',
+    backgroundColor: 'var(--f1-surface)',
+    textTransform: 'uppercase',
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    padding: '6px 12px',
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: 'var(--f1-border)',
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: 'var(--text-muted)',
+    '&:hover': {
+      color: 'var(--text-primary)',
+    },
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    color: 'var(--text-muted)',
+    '&:hover': {
+      color: 'var(--f1-red)',
+    },
+  }),
+  noOptionsMessage: (base) => ({
+    ...base,
+    color: 'var(--text-muted)',
+  }),
+};
 
 const DriverSelect: React.FC<DriverSelectProps> = ({
   drivers,
@@ -29,7 +110,6 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
   disabled = false,
   disabledReasons = {},
 }) => {
-  // Group drivers by constructor
   const groupedOptions: GroupBase<DriverOption>[] = Object.entries(
     drivers.reduce((acc, driver) => {
       const team = driver.constructorName || 'Independent';
@@ -52,7 +132,7 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
 
   return (
     <div className="mb-4">
-      <label htmlFor={id} className="block text-gray-700 font-medium mb-2">
+      <label htmlFor={id} className="block text-white font-medium mb-2 uppercase tracking-f1 text-sm">
         {label}
       </label>
       <Select
@@ -68,9 +148,9 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
         isOptionDisabled={(option) => !!disabledReasons[option.value]}
         isSearchable
         placeholder="Select a driver"
+        styles={darkStyles}
         formatOptionLabel={({ driver }, { context }) => {
           const reason = disabledReasons[driver.id];
-          // Only show the disabled reason in the dropdown menu, not in the selected value
           const showReason = context === 'menu' && !!reason;
 
           const avatar = driver.profilePictureUrl ? (
@@ -82,13 +162,12 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-gray-600">
+            <div className="w-8 h-8 rounded-full bg-f1-surface flex items-center justify-center text-sm font-medium text-slate-400">
               {driver.firstName.charAt(0)}{driver.lastName.charAt(0)}
             </div>
           );
 
           if (context === 'value') {
-            // Selected value rendering (compact, no reason)
             return (
               <div className="flex items-center gap-2">
                 {avatar}
@@ -97,33 +176,19 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
             );
           }
 
-          // Dropdown option rendering (include reason and optional team logo)
           return (
             <div className="flex items-center gap-2 w-full">
               {avatar}
-              <span className={showReason ? 'text-gray-500' : ''}>{driver.firstName} {driver.lastName}</span>
+              <span className={showReason ? 'text-slate-500' : ''}>{driver.firstName} {driver.lastName}</span>
               {showReason && (
                 <span
-                  className="ml-auto text-[10px] leading-none px-2 py-1 rounded-full border font-semibold"
-                  style={{
-                    backgroundColor: '#fef3c7', // amber-100
-                    color: '#92400e',          // amber-700
-                    borderColor: '#fcd34d',    // amber-300
-                  }}
+                  className="ml-auto text-xs px-2 py-0.5 rounded-full border font-medium bg-slate-500/15 text-slate-400 border-slate-500/30"
                 >
                   {reason}
                 </span>
               )}
             </div>
           );
-        }}
-        styles={{
-          option: (base) => ({
-            ...base,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-          }),
         }}
       />
     </div>

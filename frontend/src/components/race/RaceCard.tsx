@@ -12,103 +12,86 @@ interface RaceCardProps {
 const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
-  
-  // Format date based on locale
+
   const formattedDate = formatDateLocalized(race.date, 'PP', language);
-  
-  // Format time based on locale
-  const formattedTime = race.time 
+
+  const formattedTime = race.time
     ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
     : 'TBA';
-    
+
   const hasStarted = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !hasStarted;
-  
-  // Update time remaining every minute
+
   useEffect(() => {
     if (!canPredict) return;
-    
+
     const updateTimeRemaining = () => {
       setTimeRemaining(calculateTimeRemaining(race.date, race.time, language));
     };
-    
-    // Update immediately
+
     updateTimeRemaining();
-    
-    // Set up interval to update every minute
     const interval = setInterval(updateTimeRemaining, 60000);
-    
-    // Clean up interval
     return () => clearInterval(interval);
   }, [race.date, race.time, language, canPredict]);
-  
+
   return (
-    <div className={`card transition-all duration-300 ${isNext ? 'border-2 border-f1-red' : ''}`}>
+    <div className={`${isNext ? 'card-featured' : 'card'} transition-all duration-300 hover:border-slate-500`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
         <div className="flex-1">
-          <h3 className="text-lg sm:text-xl font-bold">{race.raceName}</h3>
-          <p className="text-gray-700 text-sm sm:text-base">{race.circuitName}</p>
-          <p className="text-gray-600 text-xs sm:text-sm">{race.locality}, {race.country}</p>
-          
+          <h3 className="text-lg sm:text-xl font-bold text-white">{race.raceName}</h3>
+          <p className="text-slate-400 text-sm sm:text-base">{race.circuitName}</p>
+          <p className="text-slate-400 text-xs sm:text-sm">{race.locality}, {race.country}</p>
+
           <div className="mt-3">
-            <p className="text-gray-800 text-sm sm:text-base">
-              <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
+            <p className="text-slate-300 text-sm sm:text-base">
+              <span className="font-semibold text-white">{t('races.date')}:</span> {formattedDate}
             </p>
-            <p className="text-gray-800 text-sm sm:text-base">
-              <span className="font-semibold">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-gray-500">({t('races.localTime')})</span>
+            <p className="text-slate-300 text-sm sm:text-base">
+              <span className="font-semibold text-white">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-slate-500">({t('races.localTime')})</span>
             </p>
-            
+
             {canPredict && timeRemaining && (
-              <div className={`mt-2 p-2 rounded text-xs sm:text-sm ${
+              <div className={`mt-2 p-2 rounded border text-xs sm:text-sm ${
                 isLessThanOneHour(race.date, race.time)
-                  ? 'bg-red-50 text-red-800'
-                  : 'bg-blue-50 text-gray-800'
+                  ? 'bg-red-950/50 border-red-500/50 text-red-400'
+                  : 'bg-blue-950/50 border-blue-500/50 text-blue-400'
               }`}>
-                <p className={`font-semibold ${
-                  isLessThanOneHour(race.date, race.time)
-                    ? 'text-red-700'
-                    : 'text-blue-700'
-                }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
-                <p className={`text-xs mt-1 ${
-                  isLessThanOneHour(race.date, race.time)
-                    ? 'text-red-600'
-                    : 'text-blue-600'
-                }`}>{t('races.saveBeforeStart')}</p>
+                <p className="font-semibold">{t('races.timeRemaining')}: {timeRemaining}</p>
+                <p className="text-xs mt-1 opacity-80">{t('races.saveBeforeStart')}</p>
               </div>
             )}
           </div>
         </div>
-        
+
         <div className="text-right mt-3 sm:mt-0">
-          <div className="text-xs sm:text-sm font-semibold">
+          <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-f1">
             {t('races.round')} {race.round}
           </div>
-          
-          {/* Sprint Weekend Badge */}
+
           {race.isSprintWeekend && (
             <div className="mt-2">
-              <span className="inline-block px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
-                🏁 Sprint Weekend
+              <span className="badge-green">
+                Sprint Weekend
               </span>
             </div>
           )}
-          
+
           {race.completed ? (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+            <span className="badge-green mt-2">
               {t('races.completed')}
             </span>
           ) : hasStarted ? (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+            <span className="badge-yellow mt-2">
               {t('races.inProgress')}
             </span>
           ) : (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+            <span className="badge-blue mt-2">
               {t('races.upcoming')}
             </span>
           )}
         </div>
       </div>
-      
+
       <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         {race.completed ? (
           <Link to={`/races/${race.id}/results`} className="btn btn-primary text-center">
@@ -123,7 +106,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
             {t('races.makePredict')}
           </Link>
         )}
-        
+
         <Link to={`/races/${race.id}`} className="btn btn-secondary text-center">
           {t('races.details')}
         </Link>
@@ -132,4 +115,4 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   );
 };
 
-export default RaceCard; 
+export default RaceCard;

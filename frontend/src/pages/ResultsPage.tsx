@@ -48,30 +48,30 @@ const ResultsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-        <div className="h-6 bg-gray-300 rounded w-1/3 mb-8"></div>
+        <div className="h-8 bg-f1-surface-elevated rounded w-1/2 mb-4"></div>
+        <div className="h-6 bg-f1-surface-elevated rounded w-1/3 mb-8"></div>
         <div className="card h-96"></div>
       </div>
     );
   }
-  
+
   if (!race) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-3xl font-bold mb-4">{t('common.notFound')}</h1>
-        <p className="mb-8">{t('races.notFound')}</p>
+        <h1 className="text-3xl font-bold text-white mb-4">{t('common.notFound')}</h1>
+        <p className="text-slate-300 mb-8">{t('races.notFound')}</p>
         <Link to="/races" className="btn btn-primary">
           {t('races.viewAllRaces')}
         </Link>
       </div>
     );
   }
-  
+
   if (!race.completed) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-3xl font-bold mb-4">{t('results.notAvailable')}</h1>
-        <p className="mb-8">{t('results.notCompleted')}</p>
+        <h1 className="text-3xl font-bold text-white mb-4">{t('results.notAvailable')}</h1>
+        <p className="text-slate-300 mb-8">{t('results.notCompleted')}</p>
         <div className="flex gap-4 justify-center">
           <Link to={`/races/${race.id}`} className="btn btn-primary">
             {t('races.details')}
@@ -93,21 +93,21 @@ const ResultsPage: React.FC = () => {
         >
           {t('common.back')}
         </button>
-        
-        <Link 
+
+        <Link
           to={`/races/${race.id}`}
           className="btn btn-secondary"
         >
           {t('races.details')}
         </Link>
       </div>
-      
-      <h1 className="text-3xl font-bold mb-4">{t('results.title')}</h1>
-      <h2 className="text-xl text-gray-700 mb-8">{race.raceName} - {t('races.round')} {race.round}</h2>
-      
+
+      <h1 className="text-3xl font-bold text-white mb-4">{t('results.title')}</h1>
+      <h2 className="text-xl text-slate-300 mb-8">{race.raceName} - {t('races.round')} {race.round}</h2>
+
       {results.length === 0 ? (
         <div className="card p-8 text-center">
-          <p className="text-xl mb-4">{t('results.noPredictionsMade')}</p>
+          <p className="text-xl text-slate-300 mb-4">{t('results.noPredictionsMade')}</p>
           <Link to="/races" className="btn btn-primary">
             {t('races.viewAllRaces')}
           </Link>
@@ -115,51 +115,51 @@ const ResultsPage: React.FC = () => {
       ) : (
         <>
           <ResultsPodium results={results} />
-          
+
           <div className="card">
-            <h3 className="text-xl font-bold mb-4">{t('results.allResults')}</h3>
-            
+            <h3 className="text-xl font-bold text-white mb-4">{t('results.allResults')}</h3>
+
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-f1-bg">
                   <tr>
-                    <th className="px-4 py-2 text-left">{t('results.rank')}</th>
-                    <th className="px-4 py-2 text-left">{t('results.user')}</th>
-                    <th className="px-4 py-2 text-right">{t('results.score')}</th>
+                    <th className="px-4 py-2 text-left text-slate-300">{t('results.rank')}</th>
+                    <th className="px-4 py-2 text-left text-slate-300">{t('results.user')}</th>
+                    <th className="px-4 py-2 text-right text-slate-300">{t('results.score')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((result, index) => (
-                    <tr 
-                      key={result.userId} 
-                      className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                    <tr
+                      key={result.userId}
+                      className={index % 2 === 0 ? 'bg-f1-surface' : 'bg-f1-bg'}
                     >
-                      <td className="px-4 py-3 border-t">
+                      <td className="px-4 py-3 border-t border-f1-border">
                         <div className="flex items-center">
-                          <span className="font-bold mr-2">{index + 1}</span>
+                          <span className="font-bold text-white mr-2">{index + 1}</span>
                           {index < 3 && (
                             <span className={`
                               inline-block w-6 h-6 rounded-full text-white text-xs flex items-center justify-center
-                              ${index === 0 ? 'bg-f1-red' : index === 1 ? 'bg-gray-500' : 'bg-amber-700'}
+                              ${index === 0 ? 'bg-f1-red' : index === 1 ? 'bg-podium-silver' : 'bg-podium-bronze'}
                             `}>
                               {index + 1}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 border-t">
+                      <td className="px-4 py-3 border-t border-f1-border">
                         <div className="flex items-center">
                           {result.profilePictureUrl && (
-                            <img 
-                              src={result.profilePictureUrl} 
-                              alt={result.userName} 
+                            <img
+                              src={result.profilePictureUrl}
+                              alt={result.userName}
                               className="w-8 h-8 rounded-full mr-3 profile-pic"
                             />
                           )}
-                          <span>{result.userName}</span>
+                          <span className="text-slate-300">{result.userName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 border-t text-right font-bold">{result.score} {t('results.pts')}</td>
+                      <td className="px-4 py-3 border-t border-f1-border text-right font-bold text-white">{result.score} {t('results.pts')}</td>
                     </tr>
                   ))}
                 </tbody>

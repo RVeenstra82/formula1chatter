@@ -111,15 +111,14 @@ class UserServiceTest {
             profilePictureUrl = profilePictureUrl
         )
         every { userRepository.findByFacebookId(facebookId) } returns existingUser
-        
+        every { userRepository.save(any()) } returns existingUser
+
         // Act
         val result = userService.processOAuthPostLogin(auth)
-        
+
         // Assert
         verify { userRepository.findByFacebookId(facebookId) }
-        
-        // Save should not be called for existing user
-        verify(exactly = 0) { userRepository.save(any()) }
+        verify { userRepository.save(any()) }
         
         assertEquals(1L, result.id)
         assertEquals(name, result.name)

@@ -6,6 +6,7 @@ import com.f1chatter.backend.service.JolpicaApiService
 import com.f1chatter.backend.service.PredictionService
 import com.f1chatter.backend.repository.RaceRepository
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -14,6 +15,7 @@ import mu.KotlinLogging
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasAuthority('ADMIN')")
 class AdminController(
     private val openF1ApiService: OpenF1ApiService,
     private val dataSyncService: DataSyncService,

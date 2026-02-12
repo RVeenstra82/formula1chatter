@@ -12,8 +12,11 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+jwt:
+  secret: dev-only-secret-key-that-is-at-least-32-characters-long-for-hmac-sha256
+
 logging:
   level:
     com.f1chatter: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE 
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

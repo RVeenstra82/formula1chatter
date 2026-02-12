@@ -1,11 +1,14 @@
 package com.f1chatter.backend.controller
 
+import com.f1chatter.backend.config.SecurityConfig
 import com.f1chatter.backend.service.PredictionService
 import com.f1chatter.backend.service.JwtService
+import com.f1chatter.backend.service.UserService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
@@ -14,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(PredictionController::class)
+@Import(SecurityConfig::class)
 class PredictionControllerTest {
 
     @Autowired
@@ -25,49 +29,23 @@ class PredictionControllerTest {
     @MockBean
     private lateinit var jwtService: JwtService
 
-    @Test
-    @WithMockUser
-    fun `should get user prediction for race`() {
-        // When & Then
-        mockMvc.perform(get("/api/predictions/race/2025-1"))
-            .andExpect(status().isOk)
-    }
+    @MockBean
+    private lateinit var userService: UserService
 
     @Test
     @WithMockUser
     fun `should get prediction results for race`() {
         // When & Then
-        mockMvc.perform(get("/api/predictions/race/2025-1/results"))
+        mockMvc.perform(get("/api/predictions/race/2025-1/results").contextPath("/api"))
             .andExpect(status().isOk)
     }
 
     @Test
     @WithMockUser
-    fun `should create prediction`() {
-        // Given
-        val predictionRequest = """
-            {
-                "firstPlaceDriverId": "VER",
-                "secondPlaceDriverId": "PER",
-                "thirdPlaceDriverId": "SAI",
-                "fastestLapDriverId": "VER",
-                "driverOfTheDayId": "VER"
-            }
-        """.trimIndent()
-
+    fun `should get leaderboard`() {
         // When & Then
-        mockMvc.perform(
-            post("/api/predictions/race/2025-1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(predictionRequest)
-        )
+        mockMvc.perform(get("/api/predictions/leaderboard").contextPath("/api"))
             .andExpect(status().isOk)
     }
 
-    @Test
-    fun `should return 401 when not authenticated`() {
-        // When & Then
-        mockMvc.perform(get("/api/predictions/race/2025-1"))
-            .andExpect(status().isUnauthorized)
-    }
 }

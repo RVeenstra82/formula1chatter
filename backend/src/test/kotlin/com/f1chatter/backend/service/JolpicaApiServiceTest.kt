@@ -6,6 +6,7 @@ import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
+import com.f1chatter.backend.repository.SprintRaceRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.CapturingSlot
 import io.mockk.every
@@ -26,6 +27,7 @@ class JolpicaApiServiceTest {
     private lateinit var restTemplate: RestTemplate
     private lateinit var objectMapper: ObjectMapper
     private lateinit var raceRepository: RaceRepository
+    private lateinit var sprintRaceRepository: SprintRaceRepository
     private lateinit var driverRepository: DriverRepository
     private lateinit var constructorRepository: ConstructorRepository
     private lateinit var service: JolpicaApiService
@@ -35,12 +37,14 @@ class JolpicaApiServiceTest {
         restTemplate = mockk()
         objectMapper = ObjectMapper()
         raceRepository = mockk(relaxed = true)
+        sprintRaceRepository = mockk(relaxed = true)
         driverRepository = mockk(relaxed = true)
         constructorRepository = mockk(relaxed = true)
         service = JolpicaApiService(
             restTemplate,
             objectMapper,
             raceRepository,
+            sprintRaceRepository,
             driverRepository,
             constructorRepository,
             baseUrl = "https://api.ergast.com/api/f1",

@@ -14,10 +14,13 @@ spring:
       enabled: true
       path: /h2-console
 
+jwt:
+  secret: dev-only-secret-key-that-is-at-least-32-characters-long-for-hmac-sha256
+
 logging:
   level:
     com.f1chatter: DEBUG
-    org.springframework.security: DEBUG 
+    org.springframework.security: DEBUG
 
 openf1:
   api:

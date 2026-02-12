@@ -2,6 +2,7 @@ package com.f1chatter.backend.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -13,6 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter
 ) {
@@ -26,7 +28,7 @@ class SecurityConfig(
                 auth
                     .requestMatchers("/api/auth/user").authenticated()
                     .requestMatchers("/api/predictions/user/**").authenticated()
-                    .requestMatchers("/api/admin/**").authenticated()
+                    .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                     .requestMatchers("/api/**").permitAll()
                     .requestMatchers("/**").permitAll()
             }

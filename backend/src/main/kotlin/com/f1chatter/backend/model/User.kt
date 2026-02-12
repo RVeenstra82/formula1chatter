@@ -13,7 +13,10 @@ data class User(
     val name: String,
     val email: String,
     val profilePictureUrl: String?,
-    
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    var isAdmin: Boolean = false,
+
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     val predictions: MutableList<Prediction> = mutableListOf()
 ) 

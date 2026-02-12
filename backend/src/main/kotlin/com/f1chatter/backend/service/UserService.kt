@@ -16,12 +16,16 @@ class UserService(
     private val predictionRepository: PredictionRepository
 ) {
     private val logger = KotlinLogging.logger {}
+
+    private fun isKnownAdmin(user: User): Boolean =
+        user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
+
     fun processOAuthPostLogin(auth: OAuth2AuthenticationToken): UserDto {
         val attributes = auth.principal.attributes
         val facebookId = attributes["id"].toString()
-        
+
         val existingUser = userRepository.findByFacebookId(facebookId)
-        
+
         val user = if (existingUser != null) {
             existingUser
         } else {
@@ -29,42 +33,41 @@ class UserService(
             val email = (attributes["email"] as? String)?.takeIf { it.isNotBlank() }
                 ?: "${facebookId}@f1chatter.local" // Fallback email when provider doesn't share it
             val profilePictureUrl = "https://graph.facebook.com/$facebookId/picture?type=large"
-            
-            val newUser = User(
+
+            User(
                 facebookId = facebookId,
                 name = name,
                 email = email,
                 profilePictureUrl = profilePictureUrl
             )
-            
-            userRepository.save(newUser)
         }
-        
-        val isAdmin = user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
-        logger.info { "User ${user.name} (${user.email}) - isAdmin: $isAdmin" }
-        
+
+        user.isAdmin = isKnownAdmin(user)
+        val savedUser = userRepository.save(user)
+
+        logger.info { "User ${savedUser.name} (${savedUser.email}) - isAdmin: ${savedUser.isAdmin}" }
+
         return UserDto(
-            id = user.id!!,
-            name = user.name,
-            email = user.email,
-            profilePictureUrl = user.profilePictureUrl,
-            isAdmin = isAdmin
+            id = savedUser.id!!,
+            name = savedUser.name,
+            email = savedUser.email,
+            profilePictureUrl = savedUser.profilePictureUrl,
+            isAdmin = savedUser.isAdmin
         )
     }
-    
+
     fun getUserById(id: Long): UserDto {
         val user = userRepository.findByIdOrNull(id)
             ?: throw NoSuchElementException("User not found with id: $id")
-        
-        val isAdmin = user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
-        logger.info { "User ${user.name} (${user.email}) - isAdmin: $isAdmin" }
-        
+
+        logger.info { "User ${user.name} (${user.email}) - isAdmin: ${user.isAdmin}" }
+
         return UserDto(
             id = user.id!!,
             name = user.name,
             email = user.email,
             profilePictureUrl = user.profilePictureUrl,
-            isAdmin = isAdmin
+            isAdmin = user.isAdmin
         )
     }
 

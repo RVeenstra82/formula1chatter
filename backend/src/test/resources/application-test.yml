@@ -23,7 +23,6 @@ logging:
     org.springframework.web: DEBUG
 
 # Test-specific settings
-app:
-  jwt:
-    secret: test-secret-key-for-integration-tests-only-not-for-production-use
-    expiration: 86400000 # 24 hours in milliseconds
+jwt:
+  secret: test-secret-key-for-integration-tests-only-not-for-production-use
+  expiration: 86400

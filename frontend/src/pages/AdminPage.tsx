@@ -16,7 +16,7 @@ const AdminPage: React.FC = () => {
   const [systemStatus, setSystemStatus] = useState<any>(null);
 
   // Check if user is admin (you can customize this logic)
-  const isAdmin = user?.email === 'wub66@hotmail.com' || user?.isAdmin === true; // Include test user
+  const isAdmin = user?.isAdmin === true;
 
   const adminActions: AdminAction[] = [
     {
@@ -136,11 +136,6 @@ const AdminPage: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900">{action.name}</h3>
                   <p className="text-sm text-gray-600 mt-1">{action.description}</p>
                 </div>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  action.method === 'GET' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-                }`}>
-                  {action.method}
-                </span>
               </div>
               
               <button

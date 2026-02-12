@@ -13,7 +13,7 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService(
-    @Value("\${jwt.secret:default-secret-key-that-is-at-least-32-characters-long-for-security}")
+    @Value("\${jwt.secret}")
     private val secretKey: String,
     @Value("\${jwt.expiration:86400}") // 24 hours in seconds
     private val expirationSeconds: Long
@@ -27,14 +27,15 @@ class JwtService(
     /**
      * Generate a JWT token for a user
      */
-    fun generateToken(userId: Long, username: String, email: String): String {
+    fun generateToken(userId: Long, username: String, email: String, isAdmin: Boolean = false): String {
         val now = Instant.now()
         val expiration = now.plus(expirationSeconds, ChronoUnit.SECONDS)
-        
+
         val token = Jwts.builder()
             .subject(userId.toString())
             .claim("username", username)
             .claim("email", email)
+            .claim("isAdmin", isAdmin)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiration))
             .signWith(key)
@@ -83,6 +84,19 @@ class JwtService(
         }
     }
     
+    /**
+     * Extract isAdmin from JWT token
+     */
+    fun extractIsAdmin(token: String): Boolean {
+        return try {
+            val claims = extractAllClaims(token)
+            claims["isAdmin"] as? Boolean ?: false
+        } catch (e: Exception) {
+            logger.warn { "Failed to extract isAdmin from token: ${e.message}" }
+            false
+        }
+    }
+
     /**
      * Validate JWT token
      */

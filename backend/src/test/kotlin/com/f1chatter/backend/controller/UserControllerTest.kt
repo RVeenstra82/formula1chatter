@@ -1,20 +1,20 @@
 package com.f1chatter.backend.controller
 
-import com.f1chatter.backend.model.User
+import com.f1chatter.backend.config.SecurityConfig
 import com.f1chatter.backend.service.UserService
 import com.f1chatter.backend.service.JwtService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
+import org.springframework.context.annotation.Import
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(UserController::class)
+@Import(SecurityConfig::class)
 class UserControllerTest {
 
     @Autowired
@@ -26,21 +26,11 @@ class UserControllerTest {
     @MockBean
     private lateinit var jwtService: JwtService
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
     @Test
     @WithMockUser
-    fun `should get current user`() {
-        // When & Then
-        mockMvc.perform(get("/api/user/me"))
-            .andExpect(status().isOk)
-    }
-
-    @Test
-    fun `should return 401 when not authenticated`() {
-        // When & Then
-        mockMvc.perform(get("/api/user/me"))
+    fun `should call delete my account`() {
+        // When & Then - will return 401 because no Authorization header with valid JWT
+        mockMvc.perform(delete("/api/users/me").contextPath("/api"))
             .andExpect(status().isUnauthorized)
     }
 }

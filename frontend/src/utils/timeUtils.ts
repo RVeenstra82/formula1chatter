@@ -37,7 +37,7 @@ export const formatTimeLocalized = (
 /**
  * Format a time string to show only hours and minutes (remove seconds)
  */
-export const formatTimeWithoutSeconds = (timeString: string | null): string => {
+export const formatTimeWithoutSeconds = (timeString: string | null | undefined): string => {
   if (!timeString) return '';
   
   // Split by colon and take only hours and minutes

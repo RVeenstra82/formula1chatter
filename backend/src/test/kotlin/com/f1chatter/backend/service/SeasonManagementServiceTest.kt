@@ -25,7 +25,8 @@ class SeasonManagementServiceTest {
         val userRepo = mockk<UserRepository>()
         val service = SeasonManagementService(predictionRepo, raceRepo, userRepo)
 
-        val season = LocalDate.now().year
+        val now = LocalDate.now()
+        val season = if (now.monthValue <= 2) now.year - 1 else now.year
         every { predictionRepo.findBySeason(season) } returns emptyList()
         every { raceRepo.findBySeason(season) } returns listOf(sampleRace("$season-1", season))
         every { userRepo.findAll() } returns emptyList()

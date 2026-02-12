@@ -109,26 +109,27 @@ export const isLessThanOneHour = (
 };
 
 /**
- * Check if the race starts in less than five minutes
+ * Check if the race starts in less than five minutes (or has already started).
+ * Matches backend `isPredictionsClosed` logic: minutesUntilRace < 5
  * Note: Backend stores race times as UTC times without timezone info
  */
 export const isLessThanFiveMinutes = (
-  dateString: string, 
+  dateString: string,
   timeString: string | null
 ): boolean => {
   const date = parseISO(dateString + 'T00:00:00Z');
-  
+
   if (timeString) {
     const [hours, minutes] = timeString.split(':').map(Number);
     date.setUTCHours(hours, minutes, 0, 0);
   } else {
     date.setUTCHours(12, 0, 0, 0);
   }
-  
+
   const now = new Date();
   const diffInMinutes = (date.getTime() - now.getTime()) / (1000 * 60);
-  
-  return diffInMinutes <= 5 && diffInMinutes > 0;
+
+  return diffInMinutes < 5;
 }; 
 
 /**

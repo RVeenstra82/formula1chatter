@@ -7,6 +7,14 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import DriverSelect from './DriverSelect';
 import { isLessThanFiveMinutes, hasRaceStarted } from '../../utils/timeUtils';
 
+function getErrorMessage(error: Error, t: (key: string) => string): string {
+  const axiosError = error as { response?: { data?: { error?: string } } };
+  const backendMessage = axiosError.response?.data?.error;
+  if (backendMessage) return backendMessage;
+  if (error.message?.includes('not authenticated')) return t('predict.loginRequired');
+  return t('predict.saveError');
+}
+
 interface PredictionFormProps {
   race: Race;
   onSuccess?: () => void;
@@ -128,9 +136,7 @@ const PredictionForm: React.FC<PredictionFormProps> = ({ race, onSuccess }) => {
 
       {saveError && (
         <div className="bg-red-500/10 text-f1-red p-4 rounded-lg border border-red-500/30 mb-6">
-          {saveError.message?.includes('not authenticated')
-            ? 'Please log in to make predictions'
-            : t('predict.noMorePredictions')}
+          {getErrorMessage(saveError, t)}
         </div>
       )}
       

@@ -35,9 +35,12 @@ class PredictionService(
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
         
-        // Check if race starts within 5 minutes
-        if (isRaceStartingWithinFiveMinutes(race)) {
-            throw IllegalStateException("Predictions are no longer accepted. Race starts within 5 minutes.")
+        // Check if predictions are still allowed
+        if (race.raceCompleted) {
+            throw IllegalStateException("Predictions are no longer accepted. Race has been completed.")
+        }
+        if (isPredictionsClosed(race)) {
+            throw IllegalStateException("Predictions are no longer accepted. Race starts within 5 minutes or has already started.")
         }
         
         val existingPrediction = predictionRepository.findByUserAndRace(user, race)
@@ -50,13 +53,15 @@ class PredictionService(
         }
     }
     
-    private fun isRaceStartingWithinFiveMinutes(race: Race): Boolean {
+    private fun isPredictionsClosed(race: Race): Boolean {
         val now = LocalDateTime.now(ZoneOffset.UTC)
         // Treat race time as UTC time to match frontend behavior
         val raceDateTime = LocalDateTime.of(race.date, race.time)
+        // toMinutes() truncates toward zero, so the effective cutoff is at the 5:00 mark
         val minutesUntilRace = java.time.Duration.between(now, raceDateTime).toMinutes()
-        
-        return minutesUntilRace <= 5 && minutesUntilRace > 0
+
+        // Block predictions if race starts within 5 minutes or has already started
+        return minutesUntilRace < 5
     }
     
     private fun createPrediction(user: User, race: Race, predictionDto: PredictionDto): Prediction {

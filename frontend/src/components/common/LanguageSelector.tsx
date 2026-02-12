@@ -10,12 +10,12 @@ const LanguageSelector: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-2">
-      <span className="text-sm font-medium">{t('common.language')}:</span>
+      <span className="text-sm font-medium text-slate-400">{t('common.language')}:</span>
       <div className="flex space-x-1">
         <button
           onClick={() => handleLanguageChange('en')}
           className={`px-2 py-1 text-sm rounded ${
-            language === 'en' ? 'bg-f1-red text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            language === 'en' ? 'bg-f1-red text-white' : 'bg-f1-surface-elevated text-slate-400 border border-f1-border hover:border-f1-red'
           }`}
         >
           EN
@@ -23,7 +23,7 @@ const LanguageSelector: React.FC = () => {
         <button
           onClick={() => handleLanguageChange('nl')}
           className={`px-2 py-1 text-sm rounded ${
-            language === 'nl' ? 'bg-f1-red text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            language === 'nl' ? 'bg-f1-red text-white' : 'bg-f1-surface-elevated text-slate-400 border border-f1-border hover:border-f1-red'
           }`}
         >
           NL
@@ -33,4 +33,4 @@ const LanguageSelector: React.FC = () => {
   );
 };
 
-export default LanguageSelector; 
+export default LanguageSelector;

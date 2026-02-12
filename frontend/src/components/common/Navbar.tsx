@@ -12,75 +12,64 @@ const Navbar: React.FC = () => {
     setLanguage(language === 'en' ? 'nl' : 'en');
   };
 
+  const navLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-f1-red hover:bg-f1-red/10 transition-all font-medium text-white uppercase tracking-f1 text-sm";
+  const adminLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-purple-500 hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1 text-sm";
+
   return (
-    <nav className="bg-f1-dark text-white shadow-md">
+    <nav className="carbon-bg text-white border-b border-f1-border speed-line">
       <div className="container mx-auto px-4 py-3">
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-between items-center">
           <Link to="/" className="text-xl font-bold flex items-center">
-            <span className="text-f1-red mr-2">F1</span>
+            <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_rgba(225,6,0,0.5)]">F1</span>
             <span>Chatter Championship</span>
           </Link>
-            
+
             <div className="flex items-center">
               <div className="flex space-x-2 mr-6">
-                <Link 
-                  to="/races" 
-                  className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
-                >
+                <Link to="/races" className={navLinkClass}>
                   {t('nav.races')}
                 </Link>
-                <Link 
-                  to="/leaderboard" 
-                  className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
-                >
+                <Link to="/leaderboard" className={navLinkClass}>
                   {t('nav.leaderboard')}
                 </Link>
-                <Link 
-                  to="/stats" 
-                  className="px-4 py-2 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
-                >
+                <Link to="/stats" className={navLinkClass}>
                   Statistieken
                 </Link>
-                
+
                 {user?.isAdmin ? (
-                  <Link 
-                    to="/admin" 
-                    className="px-4 py-2 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"
-                  >
+                  <Link to="/admin" className={adminLinkClass}>
                     Admin
                   </Link>
                 ) : null}
               </div>
           </div>
 
-             <div className="border-l border-gray-600 pl-6">
+             <div className="border-l border-f1-border pl-6">
                <button
                  onClick={toggleLanguage}
-                 className="text-white hover:text-f1-red transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                 className="text-slate-400 hover:text-f1-red transition-colors px-3 py-2 rounded-md text-sm font-medium uppercase tracking-f1"
                >
                  {language.toUpperCase()}
                </button>
              </div>
-             
-             
-             
+
              {isLoading ? (
-               <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse ml-6"></div>
+               <div className="w-8 h-8 rounded-full bg-f1-surface-elevated animate-pulse ml-6"></div>
              ) : user ? (
                <div className="flex items-center ml-6">
                  <Link to="/profile" className="flex items-center hover:text-f1-red transition-colors">
                    {user.profilePictureUrl && (
-                     <img 
-                       src={user.profilePictureUrl} 
-                       alt={user.name} 
-                       className="w-8 h-8 rounded-full mr-2 profile-pic"
+                     <img
+                       src={user.profilePictureUrl}
+                       alt={user.name}
+                       className="w-8 h-8 rounded-full mr-2 border-2 border-f1-border hover:border-f1-red transition-colors"
                      />
                    )}
-                   <span>{user.name}</span>
+                   <span className="font-body">{user.name}</span>
                  </Link>
-                 <button 
-                   onClick={() => logout()} 
+                 <button
+                   onClick={() => logout()}
                    className="ml-4 text-sm btn btn-primary"
                  >
                    {t('nav.logout')}
@@ -88,8 +77,8 @@ const Navbar: React.FC = () => {
                </div>
              ) : (
                <div className="flex items-center space-x-2 ml-6">
-                 <button 
-                   onClick={login} 
+                 <button
+                   onClick={login}
                    className="btn btn-primary flex items-center"
                  >
                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -114,21 +103,21 @@ const Navbar: React.FC = () => {
         <div className="md:hidden">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-lg font-bold flex items-center">
-              <span className="text-f1-red mr-2">F1</span>
+              <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_rgba(225,6,0,0.5)]">F1</span>
               <span>Chatter</span>
             </Link>
-            
+
             <div className="flex items-center space-x-3">
               <button
                 onClick={toggleLanguage}
-                className="text-white hover:text-f1-red transition-colors px-2 py-1 rounded text-sm"
+                className="text-slate-400 hover:text-f1-red transition-colors px-2 py-1 rounded text-sm uppercase tracking-f1"
               >
                 {language.toUpperCase()}
               </button>
-              
+
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-md hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-md hover:bg-f1-surface-elevated transition-colors"
                 aria-label="Toggle menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,75 +133,75 @@ const Navbar: React.FC = () => {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="mt-4 pb-4 border-t border-gray-600">
+            <div className="mt-4 pb-4 border-t border-f1-border">
               <div className="flex flex-col space-y-3 mt-4">
-                <Link 
-                  to="/races" 
-                  className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                <Link
+                  to="/races"
+                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.races')}
                 </Link>
-                <Link 
-                  to="/leaderboard" 
-                  className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                <Link
+                  to="/leaderboard"
+                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.leaderboard')}
                 </Link>
-                <Link 
-                  to="/stats" 
-                  className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                <Link
+                  to="/stats"
+                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Statistieken
                 </Link>
-                
+
                 {user?.isAdmin ? (
-                  <Link 
-                    to="/admin" 
-                    className="px-4 py-3 rounded-md bg-purple-500/10 hover:bg-purple-200 transition-colors font-medium text-white hover:text-purple-800"
+                  <Link
+                    to="/admin"
+                    className="px-4 py-3 rounded-md hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Admin
                   </Link>
                 ) : null}
-                
+
                 {isLoading ? (
-                  <div className="w-8 h-8 rounded-full bg-gray-600 animate-pulse"></div>
+                  <div className="w-8 h-8 rounded-full bg-f1-surface-elevated animate-pulse"></div>
                 ) : user ? (
                   <div className="flex flex-col space-y-3">
-                    <Link 
-                      to="/profile" 
+                    <Link
+                      to="/profile"
                       className="flex items-center px-4 py-3 hover:text-f1-red transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {user.profilePictureUrl && (
-                        <img 
-                          src={user.profilePictureUrl} 
-                          alt={user.name} 
-                          className="w-8 h-8 rounded-full mr-3 profile-pic"
+                        <img
+                          src={user.profilePictureUrl}
+                          alt={user.name}
+                          className="w-8 h-8 rounded-full mr-3 border-2 border-f1-border"
                         />
                       )}
-                      <span>{user.name}</span>
+                      <span className="font-body">{user.name}</span>
                     </Link>
-                    <button 
+                    <button
                       onClick={async () => {
                         await logout();
                         setIsMenuOpen(false);
-                      }} 
-                      className="px-4 py-3 rounded-md bg-f1-red/10 hover:bg-red-200 transition-colors font-medium text-white hover:text-f1-dark"
+                      }}
+                      className="px-4 py-3 rounded-md hover:bg-f1-red/10 transition-all font-medium text-white uppercase tracking-f1"
                     >
                       {t('nav.logout')}
                     </button>
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-3">
-                    <button 
+                    <button
                       onClick={() => {
                         login();
                         setIsMenuOpen(false);
-                      }} 
+                      }}
                       className="btn btn-primary flex items-center justify-center"
                     >
                       <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -241,4 +230,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

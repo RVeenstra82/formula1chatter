@@ -18,7 +18,6 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.home': 'Home',
     'nav.races': 'Races',
     'nav.leaderboard': 'Leaderboard',
-    'nav.login': 'Login',
     'nav.logout': 'Logout',
     'nav.stats': 'Statistics',
 
@@ -137,7 +136,12 @@ const translations: Record<Language, Record<string, string>> = {
     'prediction.raceStarted': 'This race has already started.',
     'prediction.timeRemaining': 'Time remaining to predict',
     'prediction.selectAll': 'Please select all predictions before saving.',
-    
+    'prediction.yourPrediction': 'Your Prediction',
+    'prediction.noPredictionYet': 'No Prediction Yet',
+    'prediction.noPredictionCta': 'You haven\'t made a prediction for this race yet. Don\'t miss out!',
+    'prediction.noPredictionMade': 'You did not make a prediction for this race.',
+    'prediction.editPrediction': 'Edit Prediction',
+
     // Results
     'results.title': 'Prediction Results',
     'results.notAvailable': 'Results Not Available',
@@ -191,6 +195,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Statistics
     'stats.title': 'F1 Chatter Statistics',
+    'stats.titleSuffix': 'Chatter Statistics',
     'stats.subtitle': 'Explore detailed analytics and insights about predictions and performance',
     'stats.overview': 'Overview',
     'stats.driverPerformance': 'Driver Performance',
@@ -305,7 +310,6 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.home': 'Home',
     'nav.races': 'Races',
     'nav.leaderboard': 'Ranglijst',
-    'nav.login': 'Inloggen',
     'nav.logout': 'Uitloggen',
     'nav.stats': 'Statistieken',
 
@@ -424,7 +428,12 @@ const translations: Record<Language, Record<string, string>> = {
     'prediction.raceStarted': 'Deze race is al begonnen.',
     'prediction.timeRemaining': 'Tijd over om te voorspellen',
     'prediction.selectAll': 'Selecteer alle voorspellingen voordat je opslaat.',
-    
+    'prediction.yourPrediction': 'Jouw Voorspelling',
+    'prediction.noPredictionYet': 'Nog Geen Voorspelling',
+    'prediction.noPredictionCta': 'Je hebt nog geen voorspelling gedaan voor deze race. Mis het niet!',
+    'prediction.noPredictionMade': 'Je hebt geen voorspelling gedaan voor deze race.',
+    'prediction.editPrediction': 'Voorspelling Bewerken',
+
     // Results
     'results.title': 'Voorspellingsresultaten',
     'results.notAvailable': 'Resultaten Niet Beschikbaar',
@@ -467,6 +476,7 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
     'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
     'leaderboard.change': 'Verandering',
+    'leaderboard.selectRace': 'Selecteer race',
     
     // Leaderboard page
     'leaderboard.subtitle': 'Volg je prestaties tegen andere gebruikers',
@@ -479,6 +489,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Statistics
     'stats.title': 'F1 Chatter Statistieken',
+    'stats.titleSuffix': 'Chatter Statistieken',
     'stats.subtitle': 'Bekijk gedetailleerde analyses en inzichten over voorspellingen en prestaties',
     'stats.overview': 'Overzicht',
     'stats.driverPerformance': 'Coureur Prestaties',
@@ -578,10 +589,10 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Footer
     'footer.privacyPolicy': 'Privacybeleid',
-    'footer.dataDeletion': 'Gegevens Verwijderen',
+    'footer.dataDeletion': 'Gegevens verwijderen',
 
     // Home (logged-in CTA)
-    'home.viewRaces': 'Bekijk Aankomende Races',
+    'home.viewRaces': 'Bekijk aankomende races',
 
   },
 };

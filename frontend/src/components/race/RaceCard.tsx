@@ -24,9 +24,9 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
 
   // Only show countdown for races within 14 days
   const isWithin14Days = (() => {
-    const raceDate = new Date(`${race.date}T${race.time || '00:00:00'}Z`);
+    const raceStartDate = new Date(`${race.date}T${race.time || '00:00:00'}Z`);
     const now = new Date();
-    const diffMs = raceDate.getTime() - now.getTime();
+    const diffMs = raceStartDate.getTime() - now.getTime();
     return diffMs > 0 && diffMs < 14 * 24 * 60 * 60 * 1000;
   })();
   const showCountdown = canPredict && isWithin14Days;
@@ -80,7 +80,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
           {race.isSprintWeekend && (
             <div className="mt-2">
               <span className="badge-green">
-                Sprint Weekend
+                {t('races.sprintWeekend')}
               </span>
             </div>
           )}

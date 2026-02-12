@@ -21,6 +21,16 @@ const Navbar: React.FC = () => {
         ? 'border-f1-red bg-f1-red/10 text-f1-red'
         : 'border-transparent hover:border-f1-red hover:bg-f1-red/10 text-white'
     }`;
+
+  const mobileNavLinkClass = (path: string) =>
+    `px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
+      isActive(path)
+        ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red'
+        : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
+    }`;
+
+  const ariaCurrent = (path: string) => isActive(path) ? 'page' as const : undefined;
+
   const adminLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-purple-500 hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1 text-sm";
 
   return (
@@ -35,13 +45,13 @@ const Navbar: React.FC = () => {
 
             <div className="flex items-center">
               <div className="flex space-x-2 mr-6">
-                <Link to="/races" className={navLinkClass('/races')}>
+                <Link to="/races" className={navLinkClass('/races')} aria-current={ariaCurrent('/races')}>
                   {t('nav.races')}
                 </Link>
-                <Link to="/leaderboard" className={navLinkClass('/leaderboard')}>
+                <Link to="/leaderboard" className={navLinkClass('/leaderboard')} aria-current={ariaCurrent('/leaderboard')}>
                   {t('nav.leaderboard')}
                 </Link>
-                <Link to="/stats" className={navLinkClass('/stats')}>
+                <Link to="/stats" className={navLinkClass('/stats')} aria-current={ariaCurrent('/stats')}>
                   {t('nav.stats')}
                 </Link>
 
@@ -137,27 +147,24 @@ const Navbar: React.FC = () => {
               <div className="flex flex-col space-y-3 mt-4">
                 <Link
                   to="/races"
-                  className={`px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
-                    isActive('/races') ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red' : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
-                  }`}
+                  className={mobileNavLinkClass('/races')}
+                  aria-current={ariaCurrent('/races')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.races')}
                 </Link>
                 <Link
                   to="/leaderboard"
-                  className={`px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
-                    isActive('/leaderboard') ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red' : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
-                  }`}
+                  className={mobileNavLinkClass('/leaderboard')}
+                  aria-current={ariaCurrent('/leaderboard')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.leaderboard')}
                 </Link>
                 <Link
                   to="/stats"
-                  className={`px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
-                    isActive('/stats') ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red' : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
-                  }`}
+                  className={mobileNavLinkClass('/stats')}
+                  aria-current={ariaCurrent('/stats')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.stats')}

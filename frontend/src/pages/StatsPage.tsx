@@ -500,7 +500,7 @@ const StatsPage: React.FC = () => {
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-f1">
-              <span className="text-f1-red">F1</span> {t('stats.title').replace('F1 ', '')}
+              <span className="text-f1-red">F1</span> {t('stats.titleSuffix')}
             </h1>
             <p className="text-slate-400">{t('stats.subtitle')}</p>
           </div>

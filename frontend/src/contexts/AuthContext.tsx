@@ -10,7 +10,6 @@ interface AuthContextType {
   error: Error | null;
   login: () => void;
   logout: () => void;
-
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

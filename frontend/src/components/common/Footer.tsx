@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Footer: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-f1-dark text-white py-6 mt-auto border-t border-f1-border">
       <div className="container mx-auto px-4">
@@ -11,10 +14,10 @@ const Footer: React.FC = () => {
           </div>
           <div className="flex space-x-4">
             <Link to="/privacy-policy" className="text-slate-400 hover:text-f1-red transition-colors">
-              Privacy Policy
+              {t('footer.privacyPolicy')}
             </Link>
             <Link to="/data-deletion" className="text-slate-400 hover:text-f1-red transition-colors">
-              Data Deletion
+              {t('footer.dataDeletion')}
             </Link>
             <a
               href="https://github.com/RVeenstra82/formula1chatter"
@@ -31,4 +34,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

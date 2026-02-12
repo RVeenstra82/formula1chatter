@@ -22,8 +22,17 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   const hasStarted = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !hasStarted;
 
+  // Only show countdown for races within 14 days
+  const isWithin14Days = (() => {
+    const raceDate = new Date(`${race.date}T${race.time || '00:00:00'}Z`);
+    const now = new Date();
+    const diffMs = raceDate.getTime() - now.getTime();
+    return diffMs > 0 && diffMs < 14 * 24 * 60 * 60 * 1000;
+  })();
+  const showCountdown = canPredict && isWithin14Days;
+
   useEffect(() => {
-    if (!canPredict) return;
+    if (!showCountdown) return;
 
     const updateTimeRemaining = () => {
       setTimeRemaining(calculateTimeRemaining(race.date, race.time, language));
@@ -32,7 +41,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
     updateTimeRemaining();
     const interval = setInterval(updateTimeRemaining, 60000);
     return () => clearInterval(interval);
-  }, [race.date, race.time, language, canPredict]);
+  }, [race.date, race.time, language, showCountdown]);
 
   return (
     <div className={`${isNext ? 'card-featured' : 'card'} transition-all duration-300 hover:border-slate-500`}>
@@ -50,7 +59,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
               <span className="font-semibold text-white">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-slate-500">({t('races.localTime')})</span>
             </p>
 
-            {canPredict && timeRemaining && (
+            {showCountdown && timeRemaining && (
               <div className={`mt-2 p-2 rounded border text-xs sm:text-sm ${
                 isLessThanOneHour(race.date, race.time)
                   ? 'bg-red-950/50 border-red-500/50 text-red-400'

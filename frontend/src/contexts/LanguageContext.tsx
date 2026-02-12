@@ -56,7 +56,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.errorLoading': 'There was an error loading the race calendar.',
     'races.noUpcomingScheduled': 'No upcoming races scheduled.',
     'races.noPastRaces': 'No past races found.',
-    'races.localTime': 'English time',
+    'races.localTime': 'Local time',
     'races.timeRemaining': 'Time remaining to predict',
     'races.saveBeforeStart': 'Don\'t forget to save your prediction before the race starts!',
     'races.sprintWeekend': 'Sprint Weekend',
@@ -268,7 +268,36 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link copied to clipboard!',
-    
+
+    // Leaderboard (missing)
+    'leaderboard.loginRequired': 'Login Required',
+
+    // Stats (missing)
+    'stats.loginRequired': 'Log in to view user statistics.',
+
+    // Profile
+    'profile.notLoggedIn': 'You are not logged in.',
+    'profile.account': 'Account',
+    'profile.deleteDescription': 'You can delete your account including all your predictions and scores.',
+    'profile.deleteFailed': 'Deletion failed',
+    'profile.deleteAccount': 'Delete my account',
+    'profile.deleteConfirmation': 'Type your full name exactly as shown below to confirm, then click "Confirm deletion". This action cannot be undone.',
+    'profile.nameToType': 'Name to type',
+    'profile.enterYourName': 'Enter your name',
+    'profile.typeExactName': 'Type your exact name',
+    'profile.copyPasteDisabled': 'Copy-paste is disabled for this field.',
+    'profile.confirmDelete': 'Confirm deletion',
+    'profile.deleting': 'Deleting...',
+
+    // Nav
+    'nav.loginWithFacebook': 'Login with Facebook',
+
+    // Footer
+    'footer.privacyPolicy': 'Privacy Policy',
+    'footer.dataDeletion': 'Data Deletion',
+
+    // Home (logged-in CTA)
+    'home.viewRaces': 'View Upcoming Races',
 
   },
   nl: {
@@ -314,7 +343,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.errorLoading': 'Er was een fout bij het laden van de racekalender.',
     'races.noUpcomingScheduled': 'Geen aankomende races gepland.',
     'races.noPastRaces': 'Geen afgelopen races gevonden.',
-    'races.localTime': 'Nederlandse tijd',
+    'races.localTime': 'Lokale tijd',
     'races.timeRemaining': 'Tijd over om te voorspellen',
     'races.saveBeforeStart': 'Vergeet niet je voorspelling op te slaan voordat de race begint!',
     'races.sprintWeekend': 'Sprint Weekend',
@@ -529,7 +558,30 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'Nee',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link gekopieerd naar klembord!',
-    
+
+    // Profile
+    'profile.notLoggedIn': 'Je bent niet ingelogd.',
+    'profile.account': 'Account',
+    'profile.deleteDescription': 'Je kunt je account verwijderen inclusief al je voorspellingen en scores.',
+    'profile.deleteFailed': 'Verwijderen mislukt',
+    'profile.deleteAccount': 'Verwijder mijn account',
+    'profile.deleteConfirmation': 'Typ ter bevestiging je volledige naam exact zoals hieronder weergegeven en klik daarna op "Bevestig verwijderen". Deze actie kan niet ongedaan worden gemaakt.',
+    'profile.nameToType': 'Te typen naam',
+    'profile.enterYourName': 'Voer je naam in',
+    'profile.typeExactName': 'Typ exact je naam',
+    'profile.copyPasteDisabled': 'Kopieer-plakken is uitgeschakeld voor dit veld.',
+    'profile.confirmDelete': 'Bevestig verwijderen',
+    'profile.deleting': 'Verwijderen...',
+
+    // Nav
+    'nav.loginWithFacebook': 'Inloggen met Facebook',
+
+    // Footer
+    'footer.privacyPolicy': 'Privacybeleid',
+    'footer.dataDeletion': 'Gegevens Verwijderen',
+
+    // Home (logged-in CTA)
+    'home.viewRaces': 'Bekijk Aankomende Races',
 
   },
 };

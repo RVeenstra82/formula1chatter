@@ -187,7 +187,7 @@ const LeaderboardPage: React.FC = () => {
     if (restOfLeaderboard.length === 0) {
       return (
         <div className="card p-8 text-center">
-          <p className="text-slate-500 text-lg">
+          <p className="text-slate-400 text-lg">
             {viewMode === 'season'
               ? t('leaderboard.noResults')
               : t('leaderboard.noRaceResults')

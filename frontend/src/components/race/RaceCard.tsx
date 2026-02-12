@@ -35,12 +35,12 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   }, [race.date, race.time, language, canPredict]);
 
   return (
-    <div className={`${isNext ? 'card-featured' : 'card'} transition-all duration-300 hover:border-f1-border`}>
+    <div className={`${isNext ? 'card-featured' : 'card'} transition-all duration-300 hover:border-slate-500`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
         <div className="flex-1">
           <h3 className="text-lg sm:text-xl font-bold text-white">{race.raceName}</h3>
           <p className="text-slate-400 text-sm sm:text-base">{race.circuitName}</p>
-          <p className="text-slate-500 text-xs sm:text-sm">{race.locality}, {race.country}</p>
+          <p className="text-slate-400 text-xs sm:text-sm">{race.locality}, {race.country}</p>
 
           <div className="mt-3">
             <p className="text-slate-300 text-sm sm:text-base">
@@ -70,22 +70,22 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
 
           {race.isSprintWeekend && (
             <div className="mt-2">
-              <span className="inline-block px-2 sm:px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-semibold">
-                🏁 Sprint Weekend
+              <span className="badge-green">
+                Sprint Weekend
               </span>
             </div>
           )}
 
           {race.completed ? (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-semibold">
+            <span className="badge-green mt-2">
               {t('races.completed')}
             </span>
           ) : hasStarted ? (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-full text-xs font-semibold">
+            <span className="badge-yellow mt-2">
               {t('races.inProgress')}
             </span>
           ) : (
-            <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-semibold">
+            <span className="badge-blue mt-2">
               {t('races.upcoming')}
             </span>
           )}

@@ -141,15 +141,15 @@ const RaceDetailPage: React.FC = () => {
             {t('races.season')} {race.season}
           </span>
           {race.completed ? (
-            <span className="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-semibold">
+            <span className="badge-green">
               {t('races.completed')}
             </span>
           ) : started ? (
-            <span className="inline-block px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-semibold">
+            <span className="badge-yellow">
               {t('races.inProgress')}
             </span>
           ) : (
-            <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-semibold">
+            <span className="badge-blue">
               {t('races.upcoming')}
             </span>
           )}
@@ -171,20 +171,20 @@ const RaceDetailPage: React.FC = () => {
           </p>
 
           {canPredict && timeRemaining && (
-            <div className={`mt-4 p-4 rounded ${
+            <div className={`mt-4 p-4 rounded-lg border ${
               isLessThanOneHour(race.date, race.time)
-                ? 'bg-red-950/50'
-                : 'bg-blue-950/50'
+                ? 'bg-red-950/50 border-red-500/50'
+                : 'bg-f1-surface-elevated border-f1-border'
             }`}>
               <p className={`font-semibold ${
                 isLessThanOneHour(race.date, race.time)
                   ? 'text-red-400'
-                  : 'text-blue-400'
+                  : 'text-white'
               }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
               <p className={`text-sm mt-1 ${
                 isLessThanOneHour(race.date, race.time)
                   ? 'text-red-400'
-                  : 'text-blue-400'
+                  : 'text-slate-400'
               }`}>{t('races.saveBeforeStart')}</p>
               <Link
                 to={`/races/${race.id}/predict`}

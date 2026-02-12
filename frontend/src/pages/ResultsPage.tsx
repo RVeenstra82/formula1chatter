@@ -140,7 +140,7 @@ const ResultsPage: React.FC = () => {
                           {index < 3 && (
                             <span className={`
                               inline-block w-6 h-6 rounded-full text-white text-xs flex items-center justify-center
-                              ${index === 0 ? 'bg-f1-red' : index === 1 ? 'bg-gray-500' : 'bg-amber-700'}
+                              ${index === 0 ? 'bg-f1-red' : index === 1 ? 'bg-podium-silver' : 'bg-podium-bronze'}
                             `}>
                               {index + 1}
                             </span>

@@ -71,7 +71,7 @@ const DataDeletion: React.FC = () => {
               <div>
                 <button
                   type="submit"
-                  className="bg-red-600 text-white py-2 px-6 rounded hover:bg-red-700 transition-colors"
+                  className="btn btn-primary"
                 >
                   Submit Deletion Request
                 </button>

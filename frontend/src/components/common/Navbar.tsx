@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-between items-center">
           <Link to="/" className="text-xl font-bold flex items-center">
-            <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_rgba(225,6,0,0.5)]">F1</span>
+            <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_var(--f1-red-glow)]">F1</span>
             <span>Chatter Championship</span>
           </Link>
 
@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
                   {t('nav.leaderboard')}
                 </Link>
                 <Link to="/stats" className={navLinkClass}>
-                  Statistieken
+                  {t('nav.stats')}
                 </Link>
 
                 {user?.isAdmin ? (
@@ -103,7 +103,7 @@ const Navbar: React.FC = () => {
         <div className="md:hidden">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-lg font-bold flex items-center">
-              <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_rgba(225,6,0,0.5)]">F1</span>
+              <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_var(--f1-red-glow)]">F1</span>
               <span>Chatter</span>
             </Link>
 
@@ -154,7 +154,7 @@ const Navbar: React.FC = () => {
                   className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Statistieken
+                  {t('nav.stats')}
                 </Link>
 
                 {user?.isAdmin ? (

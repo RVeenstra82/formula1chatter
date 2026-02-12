@@ -20,7 +20,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.leaderboard': 'Leaderboard',
     'nav.login': 'Login',
     'nav.logout': 'Logout',
-    
+    'nav.stats': 'Statistics',
+
     // Home page
     'home.title': 'Chatter Championship',
     'home.subtitle': 'Predict race results and compete with friends!',
@@ -274,7 +275,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.leaderboard': 'Ranglijst',
     'nav.login': 'Inloggen',
     'nav.logout': 'Uitloggen',
-    
+    'nav.stats': 'Statistieken',
+
     // Home page
     'home.title': 'Chatter Kampioenschap',
     'home.subtitle': 'Voorspel race resultaten en wedijver met vrienden!',

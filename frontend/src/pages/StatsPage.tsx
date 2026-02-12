@@ -10,8 +10,18 @@ import {
   AreaChart, Area
 } from 'recharts';
 
+const chartTheme = {
+  grid: '#2d2d44',
+  axis: '#64748b',
+  axisLight: '#94a3b8',
+  red: '#e10600',
+  green: '#22c55e',
+  gold: '#fbbf24',
+  orange: '#f97316',
+};
+
 const tooltipStyle = {
-  contentStyle: { backgroundColor: '#1e1e2e', border: '1px solid #2d2d44', borderRadius: '8px', color: '#ffffff' },
+  contentStyle: { backgroundColor: '#1e1e2e', border: `1px solid ${chartTheme.grid}`, borderRadius: '8px', color: '#ffffff' },
   labelStyle: { color: '#ffffff' },
 };
 
@@ -204,11 +214,11 @@ const StatsPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.driverSuccessRates')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={driverStats?.driverStats?.slice(0, 10) || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-            <XAxis dataKey="driverCode" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <XAxis dataKey="driverCode" stroke={chartTheme.axis} />
+            <YAxis stroke={chartTheme.axis} />
             <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.successRate')]} />
-            <Bar dataKey="successRate" fill="#e10600" />
+            <Bar dataKey="successRate" fill={chartTheme.red} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -218,11 +228,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.podiumFinishes')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={driverStats?.driverStats?.slice(0, 8) || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="driverCode" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="driverCode" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="podiumFinishes" fill="#22c55e" />
+              <Bar dataKey="podiumFinishes" fill={chartTheme.green} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -231,11 +241,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.totalPredictionsPerDriver')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={driverStats?.driverStats?.slice(0, 8) || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="driverCode" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="driverCode" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="totalPredictions" fill="#fbbf24" />
+              <Bar dataKey="totalPredictions" fill={chartTheme.gold} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -261,11 +271,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.predictionAccuracyByType')}</h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={accuracyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="type" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="type" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-              <Bar dataKey="accuracy" fill="#e10600" />
+              <Bar dataKey="accuracy" fill={chartTheme.red} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -274,10 +284,10 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.accuracyRadarChart')}</h3>
           <ResponsiveContainer width="100%" height={400}>
             <RadarChart data={accuracyData}>
-              <PolarGrid stroke="#2d2d44" />
-              <PolarAngleAxis dataKey="type" stroke="#94a3b8" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#64748b" />
-              <Radar name={t('stats.accuracy')} dataKey="accuracy" stroke="#e10600" fill="#e10600" fillOpacity={0.3} />
+              <PolarGrid stroke={chartTheme.grid} />
+              <PolarAngleAxis dataKey="type" stroke={chartTheme.axisLight} />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} stroke={chartTheme.axis} />
+              <Radar name={t('stats.accuracy')} dataKey="accuracy" stroke={chartTheme.red} fill={chartTheme.red} fillOpacity={0.3} />
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -291,11 +301,11 @@ const StatsPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.circuitDifficultyLowerAccuracy')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={circuitStats?.circuitStats || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-            <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke={chartTheme.axis} />
+            <YAxis stroke={chartTheme.axis} />
             <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.difficulty')]} />
-            <Bar dataKey="difficulty" fill="#f97316" />
+            <Bar dataKey="difficulty" fill={chartTheme.orange} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -305,11 +315,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.circuitAccuracy')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={circuitStats?.circuitStats?.slice(0, 8) || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-              <Bar dataKey="accuracy" fill="#22c55e" />
+              <Bar dataKey="accuracy" fill={chartTheme.green} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -318,11 +328,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.predictionsPerCircuit')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={circuitStats?.circuitStats?.slice(0, 8) || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="circuitName" angle={-45} textAnchor="end" height={100} stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="totalPredictions" fill="#fbbf24" />
+              <Bar dataKey="totalPredictions" fill={chartTheme.gold} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -347,11 +357,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.userTotalScores')}</h3>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={userStats?.userStats || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="userName" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="userName" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="totalScore" fill="#e10600" />
+              <Bar dataKey="totalScore" fill={chartTheme.red} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -361,11 +371,11 @@ const StatsPage: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.userAccuracy')}</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={userStats?.userStats || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-                <XAxis dataKey="userName" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+                <XAxis dataKey="userName" stroke={chartTheme.axis} />
+                <YAxis stroke={chartTheme.axis} />
                 <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-                <Bar dataKey="accuracy" fill="#22c55e" />
+                <Bar dataKey="accuracy" fill={chartTheme.green} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -374,11 +384,11 @@ const StatsPage: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.averageScorePerUser')}</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={userStats?.userStats || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-                <XAxis dataKey="userName" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+                <XAxis dataKey="userName" stroke={chartTheme.axis} />
+                <YAxis stroke={chartTheme.axis} />
                 <Tooltip {...tooltipStyle} />
-                <Bar dataKey="averageScore" fill="#fbbf24" />
+                <Bar dataKey="averageScore" fill={chartTheme.gold} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -393,12 +403,12 @@ const StatsPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.seasonProgressAccuracy')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={seasonProgress?.raceProgress || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-            <XAxis dataKey="raceName" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <XAxis dataKey="raceName" stroke={chartTheme.axis} />
+            <YAxis stroke={chartTheme.axis} />
             <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.accuracy')]} />
-            <Legend wrapperStyle={{ color: '#94a3b8' }} />
-            <Line type="monotone" dataKey="accuracy" stroke="#e10600" strokeWidth={2} />
+            <Legend wrapperStyle={{ color: chartTheme.axisLight }} />
+            <Line type="monotone" dataKey="accuracy" stroke={chartTheme.red} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -407,11 +417,11 @@ const StatsPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.averageScoreProgression')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={seasonProgress?.raceProgress || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-            <XAxis dataKey="raceName" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <XAxis dataKey="raceName" stroke={chartTheme.axis} />
+            <YAxis stroke={chartTheme.axis} />
             <Tooltip {...tooltipStyle} />
-            <Area type="monotone" dataKey="averageScore" stroke="#e10600" fill="#e10600" fillOpacity={0.2} />
+            <Area type="monotone" dataKey="averageScore" stroke={chartTheme.red} fill={chartTheme.red} fillOpacity={0.2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -424,11 +434,11 @@ const StatsPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.constructorSuccessRates')}</h3>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={constructorStats?.constructorStats || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-            <XAxis dataKey="constructorName" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+            <XAxis dataKey="constructorName" stroke={chartTheme.axis} />
+            <YAxis stroke={chartTheme.axis} />
             <Tooltip {...tooltipStyle} formatter={(value) => [`${value}%`, t('stats.successRate')]} />
-            <Bar dataKey="successRate" fill="#e10600" />
+            <Bar dataKey="successRate" fill={chartTheme.red} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -438,11 +448,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.correctPredictionsByConstructor')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={constructorStats?.constructorStats || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="constructorName" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="constructorName" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="correctPredictions" fill="#22c55e" />
+              <Bar dataKey="correctPredictions" fill={chartTheme.green} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -451,11 +461,11 @@ const StatsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.totalPredictionsByConstructor')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={constructorStats?.constructorStats || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2d2d44" />
-              <XAxis dataKey="constructorName" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
+              <XAxis dataKey="constructorName" stroke={chartTheme.axis} />
+              <YAxis stroke={chartTheme.axis} />
               <Tooltip {...tooltipStyle} />
-              <Bar dataKey="totalPredictions" fill="#fbbf24" />
+              <Bar dataKey="totalPredictions" fill={chartTheme.gold} />
             </BarChart>
           </ResponsiveContainer>
         </div>

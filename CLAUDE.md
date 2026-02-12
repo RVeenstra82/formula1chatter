@@ -101,6 +101,14 @@ Scheduled with `@Scheduled` cron expressions. Syncs races weekly, drivers weekly
 ### External API Rate Limiting
 Jolpica API: 3 req/sec with retries. OpenF1 API: 500ms delay between drivers, stops after 2 consecutive errors. Responses are cached in `ApiCache` table.
 
+## Git Workflow
+
+- **Never commit directly to `main`.** Always create a feature branch first.
+- Branch naming: `feature/<short-description>`, `fix/<short-description>`, or `chore/<short-description>`
+- Use `/branch` skill to create and switch to a new branch.
+- When work is done, commit on the feature branch and create a PR to `main`.
+- Load `.env` before starting dev: `export $(cat .env | xargs) && npm run dev`
+
 ## Key Conventions
 
 - Backend server runs on port **8090** with context path `/api` (so endpoints are like `localhost:8090/api/races`)

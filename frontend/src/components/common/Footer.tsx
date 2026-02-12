@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <span className="text-f1-red font-bold">F1</span> Chatter Championship &copy; {new Date().getFullYear()}
+            <span className="text-f1-red font-bold">F1</span> {t('footer.copyright')} &copy; {new Date().getFullYear()}
           </div>
           <div className="flex space-x-4">
             <Link to="/privacy-policy" className="text-slate-400 hover:text-f1-red transition-colors">

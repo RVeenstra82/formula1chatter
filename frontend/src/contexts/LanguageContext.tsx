@@ -301,6 +301,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     'footer.privacyPolicy': 'Privacy Policy',
     'footer.dataDeletion': 'Data Deletion',
+    'footer.copyright': 'Chatter Championship',
 
     // Home (logged-in CTA)
     'home.viewRaces': 'View Upcoming Races',
@@ -592,6 +593,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     'footer.privacyPolicy': 'Privacybeleid',
     'footer.dataDeletion': 'Gegevens verwijderen',
+    'footer.copyright': 'Chatter Kampioenschap',
 
     // Home (logged-in CTA)
     'home.viewRaces': 'Bekijk aankomende races',

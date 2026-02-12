@@ -18,14 +18,14 @@ const Navbar: React.FC = () => {
   const navLinkClass = (path: string) =>
     `px-4 py-2 rounded-md border transition-all font-medium uppercase tracking-f1 text-sm ${
       isActive(path)
-        ? 'border-f1-red bg-f1-red/10 text-f1-red'
+        ? 'border-f1-red bg-f1-red/20 text-f1-red shadow-[inset_0_0_12px_rgba(225,6,0,0.15)]'
         : 'border-transparent hover:border-f1-red hover:bg-f1-red/10 text-white'
     }`;
 
   const mobileNavLinkClass = (path: string) =>
     `px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
       isActive(path)
-        ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red'
+        ? 'bg-f1-red/20 border-l-2 border-l-f1-red text-f1-red'
         : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
     }`;
 

@@ -183,7 +183,7 @@ const StatsPage: React.FC = () => {
         </div>
       </div>
 
-      {overview?.mostPredictedDriver && (
+      {overview?.mostPredictedDriver && overview.totalPredictions > 0 && (
         <div className="card">
           <h3 className="text-lg font-semibold mb-4 text-white">{t('stats.mostPredictedDriver')}</h3>
           <div className="flex items-center space-x-4">
@@ -519,7 +519,7 @@ const StatsPage: React.FC = () => {
         {/* Tab Navigation */}
         <div className="bg-f1-surface rounded-lg border border-f1-border mb-8 checkered-bg">
           <div className="border-b border-f1-border">
-            <nav className="-mb-px flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
+            <nav className="-mb-px flex space-x-4 md:space-x-8 px-4 md:px-6 overflow-x-auto scrollbar-hide" aria-label="Tabs">
               {tabs.map((tabItem) => (
                 <button
                   key={tabItem.id}

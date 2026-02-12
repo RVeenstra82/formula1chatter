@@ -2,14 +2,14 @@
 name: ux-review
 description: Open the app in a browser and review it for UI/UX improvements. Use when you want a visual audit of the application.
 argument-hint: "[page or area to focus on, e.g. 'predictions', 'leaderboard', or leave empty for full review]"
-allowed-tools: mcp__playwright__*, Bash(curl *), Bash(lsof *)
+allowed-tools: mcp__chrome-devtools__*, Bash(curl *), Bash(lsof *)
 ---
 
-Open the running application in a headless browser, navigate through every page, take screenshots, and produce a structured UI/UX review with concrete improvement suggestions.
+Open the running application in Chrome, navigate through every page, run performance traces, check for console errors and network issues, and produce a structured UI/UX review with concrete improvement suggestions.
 
 ## Prerequisites
 - The application must be running locally (`npm run dev` or equivalent)
-- The Playwright MCP server must be available
+- The Chrome DevTools MCP server must be connected (a Chrome browser must be open)
 
 ## Arguments
 - `$ARGUMENTS` — (optional) A specific page or area to focus on. Leave empty for a full-app review.
@@ -21,9 +21,10 @@ Open the running application in a headless browser, navigate through every page,
    - If not on 5173, try 5174
    - If not running, inform the user and stop
 
-2. **Navigate to the app:**
-   - Use `browser_navigate` to open the app URL
-   - Take a snapshot with `browser_snapshot` to understand the page structure
+2. **Set up the browser:**
+   - Use `list_pages` to see open pages, then `select_page` or `new_page` to open the app URL
+   - Use `resize_page` to set desktop viewport (1280x800)
+   - Take an initial `take_snapshot` to understand the page structure
 
 3. **Review pages systematically:**
    If no specific area is given, visit ALL of these pages in order:
@@ -32,7 +33,7 @@ Open the running application in a headless browser, navigate through every page,
    - **Prediction form** — form usability, driver selection, feedback
    - **Leaderboard** — table layout, ranking clarity
    - **User profile / auth states** — logged-in vs logged-out experience
-   - **Mobile viewport** (resize to 375x812) — responsive design check
+   - **Mobile viewport** — responsive design check (see step 6)
 
    If a specific area is given, focus on that area but still check mobile.
 
@@ -46,22 +47,49 @@ Open the running application in a headless browser, navigate through every page,
    - **Error states** — Are errors clearly communicated? Recovery path obvious?
    - **Responsiveness** — Does it work at mobile, tablet, and desktop widths?
    - **Navigation** — Is it clear how to move between pages? Active state visible?
-   - **Accessibility** — Tab order logical? Contrast sufficient? Labels present?
+   - **Accessibility** — Tab order logical? Contrast sufficient? Labels present? (use `take_snapshot` with `verbose: true` for full a11y tree)
    - **Performance feel** — Any visible jank, layout shifts, or slow loads?
    - **i18n** — Any hardcoded text that should be translated?
 
-5. **Take screenshots:**
+5. **Performance analysis (on key pages):**
+   Run a performance trace on the most important page (usually home or race schedule):
+   - Navigate to the target page with `navigate_page`
+   - Start a trace with `performance_start_trace` (set `reload: true`, `autoStop: true`)
+   - Review the trace results for Core Web Vitals (LCP, CLS, INP)
+   - Use `performance_analyze_insight` to drill into any highlighted issues (e.g., LCPBreakdown, DocumentLatency, RenderBlocking, LayoutShifts)
+   - Report CWV scores and any performance insights found
+
+6. **Console & network checks:**
+   After visiting each page:
+   - Use `list_console_messages` (filter `types: ["error", "warn"]`) to catch JavaScript errors and warnings
+   - Use `list_network_requests` to check for failed requests (4xx/5xx), slow responses, or oversized payloads
+   - Report any issues found with request details
+
+7. **Mobile & dark mode emulation:**
+   - Use `emulate` to set a mobile viewport: `viewport: { width: 375, height: 812, deviceScaleFactor: 3, hasTouch: true, isMobile: true }`
+   - Re-check the most important pages at mobile size
+   - Use `emulate` with `colorScheme: "dark"` to verify dark mode consistency (if applicable)
+   - Use `emulate` with `colorScheme: "auto"` to reset when done
+   - Reset viewport to null when done: `emulate` with `viewport: null`
+
+8. **Take screenshots:**
    - Save all screenshots to the `screenshots/` directory in the project root
-   - Use descriptive filenames like `screenshots/ux-review-{page}-{viewport}.png`
+   - Use `take_screenshot` with `filePath` set to descriptive names like `screenshots/ux-review-{page}-desktop.png`
    - Take a screenshot of each page at desktop width (1280x800)
    - Take a screenshot of key pages at mobile width (375x812)
    - Reference screenshots in the report
 
-6. **Produce the review report:**
+9. **Produce the review report:**
    Structure findings by severity:
 
    ### Critical (blocks usability)
    - Issues that prevent users from completing core tasks
+
+   ### Performance
+   - Core Web Vitals scores (LCP, CLS, INP) with pass/fail indication
+   - Performance insights from the trace
+   - Slow or failed network requests
+   - Console errors
 
    ### Improvements (should fix)
    - Issues that degrade the experience but don't block functionality
@@ -80,6 +108,8 @@ Open the running application in a headless browser, navigate through every page,
 
 ## Output
 - Present the full review report to the user
+- Include a **Performance Summary** section with CWV scores
+- List any console errors or failed network requests
 - List all screenshots taken with their paths
 - Provide a prioritized summary of top 5 improvements
 
@@ -89,3 +119,5 @@ Open the running application in a headless browser, navigate through every page,
 - Consider both first-time visitors and returning users
 - Test with both authenticated and unauthenticated states when possible
 - If the app has Dutch/English toggle, check both languages
+- Use `emulate` with `networkConditions: "Slow 3G"` if you want to test perceived performance on slow connections
+- Use `take_snapshot` with `verbose: true` for detailed accessibility information

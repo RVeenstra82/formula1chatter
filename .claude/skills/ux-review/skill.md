@@ -51,6 +51,8 @@ Open the running application in a headless browser, navigate through every page,
    - **i18n** — Any hardcoded text that should be translated?
 
 5. **Take screenshots:**
+   - Save all screenshots to the `screenshots/` directory in the project root
+   - Use descriptive filenames like `screenshots/ux-review-{page}-{viewport}.png`
    - Take a screenshot of each page at desktop width (1280x800)
    - Take a screenshot of key pages at mobile width (375x812)
    - Reference screenshots in the report

@@ -5,6 +5,7 @@ set-env.sh
 backend/src/main/resources/application-local.yml
 
 # MCP configuratie met API keys (niet committen)
+.mcp.json
 mcp.json
 mcp-render.json
 

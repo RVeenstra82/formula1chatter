@@ -55,9 +55,7 @@ tmp/
 # Test results and screenshots
 test-results/
 playwright-report/
-*.png
-*.jpg
-*.jpeg
+screenshots/
 
 # Local git helper scripts
 setup-git-accounts*.sh

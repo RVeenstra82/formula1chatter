@@ -1,134 +1,108 @@
 # Formula 1 Chatter
 
-A Formula 1 prediction and discussion platform where users can make predictions about race outcomes and compete with others.
+[![Kotlin](https://img.shields.io/badge/Kotlin-Spring_Boot_3-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![React](https://img.shields.io/badge/React_19-TypeScript-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Deploy](https://img.shields.io/badge/Vercel-Frontend-000?logo=vercel)](https://formula1chatter.vercel.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+An F1 prediction game where you predict race podiums, fastest laps, and driver of the day — then compete against friends on a season-long leaderboard.
+
+> **[formula1chatter.vercel.app](https://formula1chatter.vercel.app)**
 
 ## Features
 
-- **Race Predictions**: Make predictions for upcoming F1 races
-- **Leaderboard**: Compete with other users and see rankings
-- **Real-time Data**: Automatic synchronization with F1 data sources
-- **User Authentication**: Secure login with Facebook OAuth
-- **Mobile Responsive**: Works great on all devices
+- **Podium predictions** — Pick P1, P2, and P3 for every Grand Prix and sprint race
+- **Fastest lap & Driver of the Day** — Earn bonus points with extra predictions
+- **Scoring system** — 5 pts for P1, 3 pts for P2, 1 pt for P3, and 1 pt each for fastest lap and DOTD
+- **Season leaderboard** — Track your ranking against other players throughout the season
+- **Sprint race support** — Separate predictions for sprint weekends
+- **Automatic race data** — Schedules, results, and driver info synced from Jolpica and OpenF1 APIs
+- **Multilingual** — Full English and Dutch language support
+- **Responsive design** — F1-inspired dark theme, optimized for desktop and mobile
+- **Facebook login** — One-click authentication via OAuth2
 
 ## Tech Stack
 
-### Backend
-- **Kotlin** with **Spring Boot** and idiomatic nullables
-- **PostgreSQL** database
-- **JPA/Hibernate** for data persistence
-- **Spring Security** for authentication
-- **Scheduled tasks** for data synchronization
-- **Spring Data Kotlin extensions** for better null-safety
+| Layer | Technologies |
+|-------|-------------|
+| **Backend** | Kotlin, Spring Boot 3, Spring Security (OAuth2 + JWT), JPA/Hibernate |
+| **Frontend** | React 19, TypeScript, Tailwind CSS, MUI, React Query, Vite |
+| **Database** | PostgreSQL (H2 in-memory for local dev) |
+| **APIs** | [Jolpica](https://github.com/jolpica/jolpica-f1) (race data), [OpenF1](https://openf1.org/) (driver photos) |
+| **Hosting** | Render (backend), Vercel (frontend) |
 
-### Frontend
-- **React** with **TypeScript**
-- **Tailwind CSS** for styling
-- **Vite** for build tooling
-- **React Router** for navigation
-
-## API Rate Limiting Configuration
-
-The application uses external APIs (OpenF1 and Jolpica) for F1 data. To prevent rate limiting issues, the following configuration options are available:
-
-### OpenF1 API Configuration
-
-Add these settings to your `application.yml` or environment variables:
-
-```yaml
-openf1:
-  api:
-    rate-limit:
-      delay-between-drivers-ms: 500    # Delay between processing different drivers
-      delay-between-calls-ms: 200      # Delay between API calls for the same driver
-      max-errors-before-stop: 5        # Stop after this many errors
-    startup:
-      update-profile-pictures: false   # Disable profile picture updates during startup
-```
-
-### Environment Variables
-
-- `UPDATE_PROFILE_PICTURES_ON_STARTUP`: Set to `true` to enable profile picture updates during application startup (default: `false`)
-
-### Why These Changes?
-
-The original implementation was making too many API calls to the OpenF1 API during startup, causing 504 Gateway Timeout errors. The improvements include:
-
-1. **Configurable delays** between API calls to respect rate limits
-2. **Optional startup updates** to prevent startup delays
-3. **Better error handling** to stop when too many errors occur
-4. **Increased timeouts** in RestTemplate configuration
-5. **Scheduled updates** that run weekly instead of during startup
-
-## Background jobs and scheduling
-
-The backend contains several scheduled jobs (Spring `@Scheduled`) that keep data fresh and compute results. All times below are in server time.
-
-- Races sync: Every Sunday at 00:00
-  - Cron: `0 0 0 * * SUN`
-  - Method: `DataSyncService.syncCurrentSeasonData()`
-  - Behavior: Downloads current season races if not present
-
-- Drivers & constructors sync: Every Sunday at 01:00
-  - Cron: `0 0 1 * * SUN`
-  - Method: `DataSyncService.syncDriverData()`
-  - Behavior: Fetches drivers/constructors if missing
-
-- Driver profile pictures update: Every Sunday at 02:00
-  - Cron: `0 0 2 * * SUN`
-  - Method: `DataSyncService.updateDriverProfilePictures()` → `OpenF1ApiService.updateDriverProfilePictures()`
-  - Behavior: Refreshes driver headshots from OpenF1
-  - Startup option: Set `UPDATE_PROFILE_PICTURES_ON_STARTUP=true` to also run once during app startup (default false). See `openf1.api.startup.update-profile-pictures` in `application.yml`.
-
-- New season check: Daily at 06:00
-  - Cron: `0 0 6 * * *`
-  - Method: `DataSyncService.checkForNewSeason()`
-  - Behavior: If the new season has no races in DB yet, triggers a races sync
-
-- Completed races processing: Every hour on Sundays
-  - Cron: `0 0 * * * SUN`
-  - Method: `DataSyncService.checkForCompletedRaces()`
-  - Behavior: Looks for recently finished races, updates results from Jolpica, then recalculates prediction scores
-
-### Manual admin trigger
-
-For immediate refresh of driver photos you can call the admin endpoint (base path `/api`):
-
-```bash
-curl -X POST "https://<your-backend-domain>/api/admin/update-driver-photos"
-```
-
-This is useful right after a deployment to Render to ensure headshots are up to date without waiting for the weekly job.
-
-## Development Setup
+## Quick Start
 
 ### Prerequisites
+
 - Java 17+
 - Node.js 18+
-- PostgreSQL 13+
+- Docker (optional, for PostgreSQL)
 
-### Backend Setup
-1. Navigate to the backend directory: `cd backend`
-2. Create a PostgreSQL database
-3. Update `application-dev.yml` with your database credentials
-4. Run: `./gradlew bootRun`
+### Run locally
 
-### Frontend Setup
-1. Navigate to the frontend directory: `cd frontend`
-2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
+```bash
+# Clone the repository
+git clone https://github.com/rickveenstra/formula1chatter.git
+cd formula1chatter
+
+# Start everything (backend on :8090, frontend on :5173)
+npm run dev
+```
+
+This starts the backend with an **H2 in-memory database** — no PostgreSQL needed.
+
+To use PostgreSQL instead:
+
+```bash
+# Start PostgreSQL via Docker
+docker compose up -d
+
+# Run with postgres profile
+cd backend && ./gradlew bootRun --args='--spring.profiles.active=postgres'
+```
+
+## Project Structure
+
+```
+formula1chatter/
+├── backend/          # Kotlin + Spring Boot API
+│   └── src/main/kotlin/com/f1chatter/backend/
+│       ├── controller/   # REST endpoints
+│       ├── service/      # Business logic & scoring
+│       ├── model/        # JPA entities
+│       ├── dto/          # Data transfer objects
+│       └── config/       # Security, JWT, CORS
+├── frontend/         # React + TypeScript SPA
+│   └── src/
+│       ├── api/          # API client & types
+│       ├── pages/        # Route-level components
+│       ├── components/   # Reusable UI components
+│       └── contexts/     # Auth & language providers
+└── docker-compose.yml
+```
 
 ## Deployment
 
-The application is configured for deployment on Render (backend) and Vercel (frontend) with automatic database provisioning and environment variable management. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions.
+The app runs on **Render** (backend) and **Vercel** (frontend). See [DEPLOYMENT.md](DEPLOYMENT.md) for setup instructions including Facebook OAuth configuration.
+
+## Development
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed development documentation including:
+
+- Build & test commands
+- API rate limiting configuration
+- Background job schedules
+- Admin endpoints
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`feature/my-feature`)
+3. Commit your changes
+4. Open a pull request
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).

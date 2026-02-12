@@ -10,7 +10,6 @@ interface AuthContextType {
   error: Error | null;
   login: () => void;
   logout: () => void;
-  testLogin?: () => void; // Optioneel, alleen in dev
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -108,28 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = '/';
   };
 
-  // Test login functie alleen in development mode
-  const testLogin = () => {
-    const testUser = {
-      id: 0,
-      name: 'Test User',
-      email: 'testuser@f1chatter.com',
-      profilePictureUrl: null,
-      isAdmin: true, // Give test user admin rights
-    };
-    setUser(testUser);
-    // Store test user in localStorage for persistence
-    localStorage.setItem('user', JSON.stringify(testUser));
-    localStorage.setItem('authToken', 'test-token');
-  };
-
   const value: AuthContextType = {
     user,
     isLoading,
     error,
     login,
     logout,
-    ...(import.meta.env.DEV ? { testLogin } : {}),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

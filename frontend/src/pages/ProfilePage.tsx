@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { apiClient } from '../api/client';
 
 const ProfilePage: React.FC = () => {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -12,7 +14,7 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-400">Je bent niet ingelogd.</div>
+        <div className="text-slate-400">{t('profile.notLoggedIn')}</div>
       </div>
     );
   }
@@ -25,7 +27,7 @@ const ProfilePage: React.FC = () => {
       await logout();
     } catch (e: unknown) {
       const axiosError = e as { response?: { data?: { error?: string } } };
-      setError(axiosError?.response?.data?.error || 'Verwijderen mislukt');
+      setError(axiosError?.response?.data?.error || t('profile.deleteFailed'));
     } finally {
       setDeleting(false);
     }
@@ -47,8 +49,8 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold text-white mb-2">Account</h2>
-          <p className="text-sm text-slate-400 mb-4">Je kunt je account verwijderen inclusief al je voorspellingen en scores.</p>
+          <h2 className="text-lg font-semibold text-white mb-2">{t('profile.account')}</h2>
+          <p className="text-sm text-slate-400 mb-4">{t('profile.deleteDescription')}</p>
 
           {error && (
             <div className="mb-4 p-3 rounded-md bg-red-950/50 border border-red-500/30 text-red-400 text-sm">{error}</div>
@@ -59,29 +61,29 @@ const ProfilePage: React.FC = () => {
               onClick={() => setIsConfirming(true)}
               className="px-4 py-2 rounded-md font-semibold bg-red-600 text-white hover:bg-red-700"
             >
-              Verwijder mijn account
+              {t('profile.deleteAccount')}
             </button>
           ) : (
             <div className="mt-4 p-4 border border-red-500/30 rounded-md bg-red-950/50">
               <p className="text-sm text-red-400 mb-2 font-medium">
-                Typ ter bevestiging je volledige naam exact zoals hieronder weergegeven en klik daarna op "Bevestig verwijderen". Deze actie kan niet ongedaan worden gemaakt.
+                {t('profile.deleteConfirmation')}
               </p>
 
               <div className="mb-3">
-                <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">Te typen naam</p>
+                <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">{t('profile.nameToType')}</p>
                 <div className="px-3 py-2 rounded-md bg-f1-surface border border-f1-border text-white inline-block select-none">
                   {user.name}
                 </div>
               </div>
 
-              <label className="block text-sm text-slate-300 mb-1" htmlFor="confirmName">Voer je naam in</label>
+              <label className="block text-sm text-slate-300 mb-1" htmlFor="confirmName">{t('profile.enterYourName')}</label>
               <input
                 id="confirmName"
                 type="text"
                 value={confirmName}
                 onChange={(e) => setConfirmName(e.target.value)}
                 className="input w-full mb-3"
-                placeholder="Typ exact je naam"
+                placeholder={t('profile.typeExactName')}
                 autoComplete="off"
                 spellCheck={false}
                 onPaste={(e) => e.preventDefault()}
@@ -95,7 +97,7 @@ const ProfilePage: React.FC = () => {
                 autoFocus
               />
 
-              <p className="text-xs text-slate-500 mb-3">Kopieer-plakken is uitgeschakeld voor dit veld.</p>
+              <p className="text-xs text-slate-500 mb-3">{t('profile.copyPasteDisabled')}</p>
 
               <div className="flex items-center gap-3">
                 <button
@@ -107,7 +109,7 @@ const ProfilePage: React.FC = () => {
                       : 'bg-red-600 text-white hover:bg-red-700'
                   }`}
                 >
-                  {deleting ? 'Verwijderen...' : 'Bevestig verwijderen'}
+                  {deleting ? t('profile.deleting') : t('profile.confirmDelete')}
                 </button>
                 <button
                   type="button"
@@ -118,7 +120,7 @@ const ProfilePage: React.FC = () => {
                   }}
                   className="px-4 py-2 rounded-md font-semibold bg-f1-surface border border-f1-border text-slate-300 hover:bg-f1-surface-elevated"
                 >
-                  Annuleren
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -130,5 +132,3 @@ const ProfilePage: React.FC = () => {
 };
 
 export default ProfilePage;
-
-

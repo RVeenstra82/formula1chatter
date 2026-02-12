@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
-import type { Race, Driver } from '../api/client';
+import type { Race, Driver, Prediction } from '../api/client';
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour, hasRaceStarted } from '../utils/timeUtils';
 import { mockRaces } from '../mocks/mockLeaderboardData';
@@ -10,8 +11,27 @@ import { mockRaces } from '../mocks/mockLeaderboardData';
 const RaceDetailPage: React.FC = () => {
   const { raceId } = useParams<{ raceId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [showSuccessBanner, setShowSuccessBanner] = useState(
+    !!(location.state as { predictionSaved?: boolean } | null)?.predictionSaved
+  );
+
+  // Clear router state so refresh doesn't re-show banner
+  useEffect(() => {
+    if ((location.state as { predictionSaved?: boolean } | null)?.predictionSaved) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Auto-dismiss banner after 5 seconds
+  useEffect(() => {
+    if (!showSuccessBanner) return;
+    const timer = setTimeout(() => setShowSuccessBanner(false), 5000);
+    return () => clearTimeout(timer);
+  }, [showSuccessBanner]);
 
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
@@ -32,6 +52,12 @@ const RaceDetailPage: React.FC = () => {
     queryKey: ['active-drivers', raceId],
     queryFn: () => api.getActiveDriversForRace(raceId!),
     enabled: !!raceId,
+  });
+
+  const { data: userPrediction } = useQuery<Prediction | null>({
+    queryKey: ['user-prediction', user?.id, raceId],
+    queryFn: () => api.getUserPredictionForRace(user!.id, raceId!),
+    enabled: !!user && !!raceId,
   });
 
   useEffect(() => {
@@ -101,7 +127,41 @@ const RaceDetailPage: React.FC = () => {
   
   const started = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !started;
-  
+
+  const renderPredictionRow = (
+    position: string,
+    predDriverId: string,
+    actualDriverId: string | null,
+    badgeClass: string,
+  ) => {
+    const driver = getDriverById(predDriverId);
+    const isCorrect = race.completed && actualDriverId === predDriverId;
+    const isWrong = race.completed && actualDriverId !== predDriverId;
+
+    return (
+      <div key={position} className={`flex items-center gap-3 p-2.5 rounded ${isCorrect ? 'bg-green-950/40' : isWrong ? 'bg-red-950/30' : 'bg-black/30'}`}>
+        <span className={`w-7 h-7 rounded-full ${badgeClass} text-xs font-bold flex items-center justify-center shrink-0`}>
+          {position}
+        </span>
+        <div className="flex-1 min-w-0">
+          {driver ? (
+            <>
+              <div className="text-white text-sm font-semibold truncate">{driver.firstName} {driver.lastName}</div>
+              <div className="text-slate-500 text-xs">{driver.constructorName}</div>
+            </>
+          ) : (
+            <div className="text-slate-500 text-sm">—</div>
+          )}
+        </div>
+        {race.completed && (
+          <span className={`text-lg ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+            {isCorrect ? '✓' : '✗'}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="mb-8 flex justify-between items-center z-10 relative">
@@ -113,11 +173,11 @@ const RaceDetailPage: React.FC = () => {
         </button>
         
         {canPredict && (
-          <Link 
+          <Link
             to={`/races/${race.id}/predict`}
             className="btn btn-primary relative z-20"
           >
-            {t('races.makePredict')}
+            {userPrediction ? t('prediction.editPrediction') : t('races.makePredict')}
           </Link>
         )}
         
@@ -130,7 +190,21 @@ const RaceDetailPage: React.FC = () => {
           </Link>
         )}
       </div>
-      
+
+      {/* Success Banner */}
+      {showSuccessBanner && (
+        <div className="mb-6 p-4 bg-green-950/50 border border-green-500/50 rounded-lg flex items-center justify-between">
+          <p className="text-green-400 font-semibold">{t('prediction.predictionSaved')}</p>
+          <button
+            onClick={() => setShowSuccessBanner(false)}
+            className="text-green-400 hover:text-green-300 ml-4 text-xl leading-none"
+            aria-label={t('common.close')}
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
       <div className="card mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">{race.raceName}</h1>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -155,43 +229,83 @@ const RaceDetailPage: React.FC = () => {
           )}
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-white mb-2">{t('race.circuitInfo')}</h2>
-          <p className="text-slate-300">{race.circuitName}</p>
-          <p className="text-slate-400">{race.locality}, {race.country}</p>
-        </div>
-        
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-white mb-2">{t('race.raceSchedule')}</h2>
-          <p className="text-slate-300">
-            <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
-          </p>
-          <p className="text-slate-300">
-            <span className="font-semibold">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-slate-500">({t('races.localTime')})</span>
-          </p>
+        <div className={`grid grid-cols-1 ${user ? 'lg:grid-cols-[1fr_320px]' : ''} gap-6 mb-6`}>
+          {/* Left column: race info */}
+          <div>
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-white mb-2">{t('race.circuitInfo')}</h2>
+              <p className="text-slate-300">{race.circuitName}</p>
+              <p className="text-slate-400">{race.locality}, {race.country}</p>
+            </div>
 
-          {canPredict && timeRemaining && (
-            <div className={`mt-4 p-4 rounded-lg border ${
-              isLessThanOneHour(race.date, race.time)
-                ? 'bg-red-950/50 border-red-500/50'
-                : 'bg-f1-surface-elevated border-f1-border'
-            }`}>
-              <p className={`font-semibold ${
-                isLessThanOneHour(race.date, race.time)
-                  ? 'text-red-400'
-                  : 'text-white'
-              }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
-              <p className={`text-sm mt-1 ${
-                isLessThanOneHour(race.date, race.time)
-                  ? 'text-red-400'
-                  : 'text-slate-400'
-              }`}>{t('races.saveBeforeStart')}</p>
-              <Link
-                to={`/races/${race.id}/predict`}
-                className="btn btn-primary btn-sm mt-3"
-              >
-                {t('races.makePredict')}
-              </Link>
+            <div>
+              <h2 className="text-xl font-bold text-white mb-2">{t('race.raceSchedule')}</h2>
+              <p className="text-slate-300">
+                <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
+              </p>
+              <p className="text-slate-300">
+                <span className="font-semibold">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-slate-500">({t('races.localTime')})</span>
+              </p>
+
+              {canPredict && timeRemaining && (
+                <div className={`mt-4 p-4 rounded-lg border ${
+                  isLessThanOneHour(race.date, race.time)
+                    ? 'bg-red-950/50 border-red-500/50'
+                    : 'bg-f1-surface-elevated border-f1-border'
+                }`}>
+                  <p className={`font-semibold ${
+                    isLessThanOneHour(race.date, race.time)
+                      ? 'text-red-400'
+                      : 'text-white'
+                  }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
+                  <p className={`text-sm mt-1 ${
+                    isLessThanOneHour(race.date, race.time)
+                      ? 'text-red-400'
+                      : 'text-slate-400'
+                  }`}>{t('races.saveBeforeStart')}</p>
+                  <Link
+                    to={`/races/${race.id}/predict`}
+                    className="btn btn-primary btn-sm mt-3"
+                  >
+                    {userPrediction ? t('prediction.editPrediction') : t('races.makePredict')}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right column: prediction sidebar */}
+          {user && (
+            <div className="card-carbon lg:sticky lg:top-4 self-start">
+              <h2 className="racing-stripe text-lg font-bold text-white mb-4">{t('prediction.yourPrediction')}</h2>
+
+              {userPrediction ? (
+                <div className="space-y-2">
+                  {renderPredictionRow('P1', userPrediction.firstPlaceDriverId, race.firstPlaceDriverId, 'bg-podium-gold/20 text-podium-gold')}
+                  {renderPredictionRow('P2', userPrediction.secondPlaceDriverId, race.secondPlaceDriverId, 'bg-podium-silver/20 text-slate-300')}
+                  {renderPredictionRow('P3', userPrediction.thirdPlaceDriverId, race.thirdPlaceDriverId, 'bg-podium-bronze/20 text-podium-bronze')}
+
+                  <div className="border-t border-white/5 my-1" />
+
+                  {renderPredictionRow('FL', userPrediction.fastestLapDriverId, race.fastestLapDriverId, 'bg-blue-500/20 text-blue-400')}
+                  {renderPredictionRow('★', userPrediction.driverOfTheDayId, race.driverOfTheDayId, 'bg-purple-500/20 text-purple-400')}
+
+                  {canPredict && (
+                    <Link to={`/races/${race.id}/predict`} className="btn btn-secondary btn-sm w-full mt-3">
+                      {t('prediction.editPrediction')}
+                    </Link>
+                  )}
+                </div>
+              ) : canPredict ? (
+                <div>
+                  <p className="text-slate-400 text-sm mb-4">{t('prediction.noPredictionCta')}</p>
+                  <Link to={`/races/${race.id}/predict`} className="btn btn-primary btn-sm w-full">
+                    {t('races.makePredict')}
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">{t('prediction.noPredictionMade')}</p>
+              )}
             </div>
           )}
         </div>
@@ -277,14 +391,14 @@ const RaceDetailPage: React.FC = () => {
             {race.isSprintWeekend && (
               <div className="card border-2 border-purple-500/30">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-lg font-bold text-purple-400">🏁 Sprint Weekend</h3>
+                  <h3 className="text-lg font-bold text-purple-400">🏁 {t('races.sprintWeekend')}</h3>
                 </div>
 
                 {/* Sprint Qualifying */}
                 {race.sprintQualifyingDate && race.sprintQualifyingTime && (
                   <div className="mb-3 p-3 bg-purple-500/20 rounded">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold text-purple-400">Sprint Qualifying</span>
+                      <span className="font-semibold text-purple-400">{t('races.sprintQualifying')}</span>
                       <span className="text-sm text-purple-400">
                         {formatDateLocalized(race.sprintQualifyingDate, 'PP', language)}
                       </span>
@@ -299,7 +413,7 @@ const RaceDetailPage: React.FC = () => {
                 {race.sprintDate && race.sprintTime && (
                   <div className="p-3 bg-purple-500/20 rounded">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold text-purple-400">Sprint Race</span>
+                      <span className="font-semibold text-purple-400">{t('races.sprint')}</span>
                       <span className="text-sm text-purple-400">
                         {formatDateLocalized(race.sprintDate, 'PP', language)}
                       </span>
@@ -313,7 +427,7 @@ const RaceDetailPage: React.FC = () => {
             )}
           </div>
         </div>
-        
+
         {race.completed && (
           <div>
             <h2 className="text-xl font-bold text-white mb-4">{t('race.results')}</h2>

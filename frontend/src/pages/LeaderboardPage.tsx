@@ -110,7 +110,7 @@ const LeaderboardPage: React.FC = () => {
         <div className="flex justify-center items-end space-x-4 h-64">
           {/* Second Place */}
           <div className="flex flex-col items-center w-48">
-            <div className="bg-podium-silver/10 rounded-t-lg p-4 w-full text-center">
+            <div className="bg-podium-silver/20 rounded-t-lg p-4 w-full text-center">
               <div className="text-2xl font-bold text-slate-400">2</div>
               <div className="font-semibold text-white">{podium[1]?.userName || '-'}</div>
               <div className="text-slate-400">
@@ -128,12 +128,12 @@ const LeaderboardPage: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="bg-podium-silver/20 h-32 w-full"></div>
+            <div className="bg-podium-silver/30 h-32 w-full"></div>
           </div>
 
           {/* First Place */}
           <div className="flex flex-col items-center w-48">
-            <div className="bg-podium-gold/10 rounded-t-lg p-4 w-full text-center border-2 border-podium-gold/50">
+            <div className="bg-podium-gold/20 rounded-t-lg p-4 w-full text-center border-2 border-podium-gold/50">
               <div className="text-2xl font-bold text-podium-gold">1</div>
               <div className="font-semibold text-white">{podium[0]?.userName || '-'}</div>
               <div className="text-podium-gold">
@@ -151,12 +151,12 @@ const LeaderboardPage: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="bg-podium-gold/20 h-40 w-full border-2 border-podium-gold/50 border-t-0"></div>
+            <div className="bg-podium-gold/30 h-40 w-full border-2 border-podium-gold/50 border-t-0"></div>
           </div>
 
           {/* Third Place */}
           <div className="flex flex-col items-center w-48">
-            <div className="bg-podium-bronze/10 rounded-t-lg p-4 w-full text-center border-2 border-podium-bronze/50">
+            <div className="bg-podium-bronze/20 rounded-t-lg p-4 w-full text-center border-2 border-podium-bronze/50">
               <div className="text-2xl font-bold text-podium-bronze">3</div>
               <div className="font-semibold text-white">{podium[2]?.userName || '-'}</div>
               <div className="text-podium-bronze">
@@ -174,7 +174,7 @@ const LeaderboardPage: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="bg-podium-bronze/20 h-24 w-full border-2 border-podium-bronze/50 border-t-0"></div>
+            <div className="bg-podium-bronze/30 h-24 w-full border-2 border-podium-bronze/50 border-t-0"></div>
           </div>
         </div>
       </div>

@@ -18,7 +18,6 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.home': 'Home',
     'nav.races': 'Races',
     'nav.leaderboard': 'Leaderboard',
-    'nav.login': 'Login',
     'nav.logout': 'Logout',
     'nav.stats': 'Statistics',
 
@@ -56,7 +55,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.errorLoading': 'There was an error loading the race calendar.',
     'races.noUpcomingScheduled': 'No upcoming races scheduled.',
     'races.noPastRaces': 'No past races found.',
-    'races.localTime': 'English time',
+    'races.localTime': 'Local time',
     'races.timeRemaining': 'Time remaining to predict',
     'races.saveBeforeStart': 'Don\'t forget to save your prediction before the race starts!',
     'races.sprintWeekend': 'Sprint Weekend',
@@ -138,7 +137,12 @@ const translations: Record<Language, Record<string, string>> = {
     'prediction.raceStarted': 'This race has already started.',
     'prediction.timeRemaining': 'Time remaining to predict',
     'prediction.selectAll': 'Please select all predictions before saving.',
-    
+    'prediction.yourPrediction': 'Your Prediction',
+    'prediction.noPredictionYet': 'No Prediction Yet',
+    'prediction.noPredictionCta': 'You haven\'t made a prediction for this race yet. Don\'t miss out!',
+    'prediction.noPredictionMade': 'You did not make a prediction for this race.',
+    'prediction.editPrediction': 'Edit Prediction',
+
     // Results
     'results.title': 'Prediction Results',
     'results.notAvailable': 'Results Not Available',
@@ -192,6 +196,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Statistics
     'stats.title': 'F1 Chatter Statistics',
+    'stats.titleSuffix': 'Chatter Statistics',
     'stats.subtitle': 'Explore detailed analytics and insights about predictions and performance',
     'stats.overview': 'Overview',
     'stats.driverPerformance': 'Driver Performance',
@@ -269,7 +274,36 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link copied to clipboard!',
-    
+
+    // Leaderboard (missing)
+    'leaderboard.loginRequired': 'Login Required',
+
+    // Stats (missing)
+    'stats.loginRequired': 'Log in to view user statistics.',
+
+    // Profile
+    'profile.notLoggedIn': 'You are not logged in.',
+    'profile.account': 'Account',
+    'profile.deleteDescription': 'You can delete your account including all your predictions and scores.',
+    'profile.deleteFailed': 'Deletion failed',
+    'profile.deleteAccount': 'Delete my account',
+    'profile.deleteConfirmation': 'Type your full name exactly as shown below to confirm, then click "Confirm deletion". This action cannot be undone.',
+    'profile.nameToType': 'Name to type',
+    'profile.enterYourName': 'Enter your name',
+    'profile.typeExactName': 'Type your exact name',
+    'profile.copyPasteDisabled': 'Copy-paste is disabled for this field.',
+    'profile.confirmDelete': 'Confirm deletion',
+    'profile.deleting': 'Deleting...',
+
+    // Nav
+    'nav.loginWithFacebook': 'Login with Facebook',
+
+    // Footer
+    'footer.privacyPolicy': 'Privacy Policy',
+    'footer.dataDeletion': 'Data Deletion',
+
+    // Home (logged-in CTA)
+    'home.viewRaces': 'View Upcoming Races',
 
   },
   nl: {
@@ -277,7 +311,6 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.home': 'Home',
     'nav.races': 'Races',
     'nav.leaderboard': 'Ranglijst',
-    'nav.login': 'Inloggen',
     'nav.logout': 'Uitloggen',
     'nav.stats': 'Statistieken',
 
@@ -315,7 +348,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.errorLoading': 'Er was een fout bij het laden van de racekalender.',
     'races.noUpcomingScheduled': 'Geen aankomende races gepland.',
     'races.noPastRaces': 'Geen afgelopen races gevonden.',
-    'races.localTime': 'Nederlandse tijd',
+    'races.localTime': 'Lokale tijd',
     'races.timeRemaining': 'Tijd over om te voorspellen',
     'races.saveBeforeStart': 'Vergeet niet je voorspelling op te slaan voordat de race begint!',
     'races.sprintWeekend': 'Sprint Weekend',
@@ -397,7 +430,12 @@ const translations: Record<Language, Record<string, string>> = {
     'prediction.raceStarted': 'Deze race is al begonnen.',
     'prediction.timeRemaining': 'Tijd over om te voorspellen',
     'prediction.selectAll': 'Selecteer alle voorspellingen voordat je opslaat.',
-    
+    'prediction.yourPrediction': 'Jouw Voorspelling',
+    'prediction.noPredictionYet': 'Nog Geen Voorspelling',
+    'prediction.noPredictionCta': 'Je hebt nog geen voorspelling gedaan voor deze race. Mis het niet!',
+    'prediction.noPredictionMade': 'Je hebt geen voorspelling gedaan voor deze race.',
+    'prediction.editPrediction': 'Voorspelling Bewerken',
+
     // Results
     'results.title': 'Voorspellingsresultaten',
     'results.notAvailable': 'Resultaten Niet Beschikbaar',
@@ -440,6 +478,7 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
     'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
     'leaderboard.change': 'Verandering',
+    'leaderboard.selectRace': 'Selecteer race',
     
     // Leaderboard page
     'leaderboard.subtitle': 'Volg je prestaties tegen andere gebruikers',
@@ -452,6 +491,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Statistics
     'stats.title': 'F1 Chatter Statistieken',
+    'stats.titleSuffix': 'Chatter Statistieken',
     'stats.subtitle': 'Bekijk gedetailleerde analyses en inzichten over voorspellingen en prestaties',
     'stats.overview': 'Overzicht',
     'stats.driverPerformance': 'Coureur Prestaties',
@@ -531,7 +571,30 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'Nee',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link gekopieerd naar klembord!',
-    
+
+    // Profile
+    'profile.notLoggedIn': 'Je bent niet ingelogd.',
+    'profile.account': 'Account',
+    'profile.deleteDescription': 'Je kunt je account verwijderen inclusief al je voorspellingen en scores.',
+    'profile.deleteFailed': 'Verwijderen mislukt',
+    'profile.deleteAccount': 'Verwijder mijn account',
+    'profile.deleteConfirmation': 'Typ ter bevestiging je volledige naam exact zoals hieronder weergegeven en klik daarna op "Bevestig verwijderen". Deze actie kan niet ongedaan worden gemaakt.',
+    'profile.nameToType': 'Te typen naam',
+    'profile.enterYourName': 'Voer je naam in',
+    'profile.typeExactName': 'Typ exact je naam',
+    'profile.copyPasteDisabled': 'Kopieer-plakken is uitgeschakeld voor dit veld.',
+    'profile.confirmDelete': 'Bevestig verwijderen',
+    'profile.deleting': 'Verwijderen...',
+
+    // Nav
+    'nav.loginWithFacebook': 'Inloggen met Facebook',
+
+    // Footer
+    'footer.privacyPolicy': 'Privacybeleid',
+    'footer.dataDeletion': 'Gegevens verwijderen',
+
+    // Home (logged-in CTA)
+    'home.viewRaces': 'Bekijk aankomende races',
 
   },
 };

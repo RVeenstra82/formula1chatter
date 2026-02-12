@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const Navbar: React.FC = () => {
-  const { user, isLoading, login, logout, testLogin } = useAuth();
+  const { user, isLoading, login, logout } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'nl' : 'en');
   };
 
-  const navLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-f1-red hover:bg-f1-red/10 transition-all font-medium text-white uppercase tracking-f1 text-sm";
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+
+  const navLinkClass = (path: string) =>
+    `px-4 py-2 rounded-md border transition-all font-medium uppercase tracking-f1 text-sm ${
+      isActive(path)
+        ? 'border-f1-red bg-f1-red/10 text-f1-red'
+        : 'border-transparent hover:border-f1-red hover:bg-f1-red/10 text-white'
+    }`;
+
+  const mobileNavLinkClass = (path: string) =>
+    `px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
+      isActive(path)
+        ? 'bg-f1-red/10 border-l-2 border-l-f1-red text-f1-red'
+        : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
+    }`;
+
+  const ariaCurrent = (path: string) => isActive(path) ? 'page' as const : undefined;
+
   const adminLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-purple-500 hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1 text-sm";
 
   return (
@@ -27,13 +45,13 @@ const Navbar: React.FC = () => {
 
             <div className="flex items-center">
               <div className="flex space-x-2 mr-6">
-                <Link to="/races" className={navLinkClass}>
+                <Link to="/races" className={navLinkClass('/races')} aria-current={ariaCurrent('/races')}>
                   {t('nav.races')}
                 </Link>
-                <Link to="/leaderboard" className={navLinkClass}>
+                <Link to="/leaderboard" className={navLinkClass('/leaderboard')} aria-current={ariaCurrent('/leaderboard')}>
                   {t('nav.leaderboard')}
                 </Link>
-                <Link to="/stats" className={navLinkClass}>
+                <Link to="/stats" className={navLinkClass('/stats')} aria-current={ariaCurrent('/stats')}>
                   {t('nav.stats')}
                 </Link>
 
@@ -76,7 +94,7 @@ const Navbar: React.FC = () => {
                  </button>
                </div>
              ) : (
-               <div className="flex items-center space-x-2 ml-6">
+               <div className="ml-6">
                  <button
                    onClick={login}
                    className="btn btn-primary flex items-center"
@@ -84,16 +102,8 @@ const Navbar: React.FC = () => {
                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
                      <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24h-1.918c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
                    </svg>
-                   {t('nav.login')} with Facebook
+                   {t('nav.loginWithFacebook')}
                  </button>
-                 {testLogin && (
-                   <button
-                     onClick={testLogin}
-                     className="btn btn-secondary"
-                   >
-                     Test Login
-                   </button>
-                 )}
                </div>
              )}
            </div>
@@ -137,21 +147,24 @@ const Navbar: React.FC = () => {
               <div className="flex flex-col space-y-3 mt-4">
                 <Link
                   to="/races"
-                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
+                  className={mobileNavLinkClass('/races')}
+                  aria-current={ariaCurrent('/races')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.races')}
                 </Link>
                 <Link
                   to="/leaderboard"
-                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
+                  className={mobileNavLinkClass('/leaderboard')}
+                  aria-current={ariaCurrent('/leaderboard')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.leaderboard')}
                 </Link>
                 <Link
                   to="/stats"
-                  className="px-4 py-3 rounded-md hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red transition-all font-medium text-white uppercase tracking-f1"
+                  className={mobileNavLinkClass('/stats')}
+                  aria-current={ariaCurrent('/stats')}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('nav.stats')}
@@ -196,31 +209,18 @@ const Navbar: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col space-y-3">
-                    <button
-                      onClick={() => {
-                        login();
-                        setIsMenuOpen(false);
-                      }}
-                      className="btn btn-primary flex items-center justify-center"
-                    >
-                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24h-1.918c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
-                      </svg>
-                      {t('nav.login')} with Facebook
-                    </button>
-                    {testLogin && (
-                      <button
-                        onClick={() => {
-                          testLogin();
-                          setIsMenuOpen(false);
-                        }}
-                        className="btn btn-secondary"
-                      >
-                        Test Login
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => {
+                      login();
+                      setIsMenuOpen(false);
+                    }}
+                    className="btn btn-primary flex items-center justify-center"
+                  >
+                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24h-1.918c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
+                    </svg>
+                    {t('nav.loginWithFacebook')}
+                  </button>
                 )}
               </div>
             </div>

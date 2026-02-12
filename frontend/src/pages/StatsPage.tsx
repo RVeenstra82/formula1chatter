@@ -345,8 +345,8 @@ const StatsPage: React.FC = () => {
       return (
         <div className="card p-8 text-center">
           <div className="text-6xl mb-4">🔒</div>
-          <h3 className="text-lg font-semibold mb-2 text-white">Inloggen Vereist</h3>
-          <p className="text-slate-400">Je moet ingelogd zijn om gebruiker vergelijkingen te bekijken.</p>
+          <h3 className="text-lg font-semibold mb-2 text-white">{t('predict.loginRequired')}</h3>
+          <p className="text-slate-400">{t('stats.loginRequired')}</p>
         </div>
       );
     }
@@ -500,7 +500,7 @@ const StatsPage: React.FC = () => {
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-f1">
-              <span className="text-f1-red">F1</span> Chatter Statistieken
+              <span className="text-f1-red">F1</span> {t('stats.titleSuffix')}
             </h1>
             <p className="text-slate-400">{t('stats.subtitle')}</p>
           </div>

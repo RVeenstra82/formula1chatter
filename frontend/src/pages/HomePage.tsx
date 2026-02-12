@@ -33,16 +33,23 @@ const HomePage: React.FC = () => {
             {t('home.subtitle')}
           </p>
 
-          {!user && (
-            <div className="mt-4">
+          <div className="mt-4">
+            {!user ? (
               <button
                 onClick={login}
                 className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 red-glow-hover"
               >
                 {t('home.loginToStart')}
               </button>
-            </div>
-          )}
+            ) : (
+              <Link
+                to="/races"
+                className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 red-glow-hover inline-block"
+              >
+                {t('home.viewRaces')}
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Diagonal accent */}

@@ -219,7 +219,7 @@ const PredictionPage: React.FC = () => {
             <PredictionForm
               race={race}
               onSuccess={() => {
-                navigate(`/races/${race.id}`);
+                navigate(`/races/${race.id}`, { state: { predictionSaved: true } });
               }}
             />
           </div>

@@ -1,52 +1,34 @@
 package com.f1chatter.backend.controller
 
+import com.f1chatter.backend.config.AuthenticationHelper
 import com.f1chatter.backend.dto.LeaderboardEntryDto
 import com.f1chatter.backend.dto.PredictionDto
 import com.f1chatter.backend.dto.PredictionResultDto
 import com.f1chatter.backend.service.PredictionService
 import com.f1chatter.backend.util.F1SeasonUtils
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
-import java.util.NoSuchElementException
 
 @RestController
 @RequestMapping("/predictions")
 class PredictionController(
-    private val predictionService: PredictionService
+    private val predictionService: PredictionService,
+    private val authenticationHelper: AuthenticationHelper
 ) {
-    private fun getAuthenticatedUserId(): Long {
-        val authentication = SecurityContextHolder.getContext().authentication
-            ?: throw IllegalStateException("Not authenticated")
-        val principal = authentication.principal
-        val username = when (principal) {
-            is UserDetails -> {
-                if (principal.username == "anonymousUser") throw IllegalStateException("Not authenticated")
-                principal.username
-            }
-            is String -> if (principal == "anonymousUser") throw IllegalStateException("Not authenticated") else principal
-            else -> throw IllegalStateException("Not authenticated. Please use a JWT token for API requests.")
-        }
-        return username.toLongOrNull() ?: throw IllegalStateException("Invalid user ID in token")
-    }
-
     @PostMapping("/{raceId}")
     fun savePrediction(
         @PathVariable raceId: String,
         @RequestBody predictionDto: PredictionDto
     ): ResponseEntity<Any> {
         return try {
-            val userId = getAuthenticatedUserId()
+            val userId = authenticationHelper.getAuthenticatedUserId()
             predictionService.savePrediction(userId, raceId, predictionDto)
             ResponseEntity.ok(predictionDto)
         } catch (e: IllegalStateException) {
             ResponseEntity.badRequest().body(mapOf("error" to e.message))
-        } catch (e: NoSuchElementException) {
-            ResponseEntity.status(404).body(mapOf("error" to e.message))
         }
     }
-    
+
     @GetMapping("/user/{userId}/race/{raceId}")
     fun getUserPredictionForRace(
         @PathVariable userId: Long,
@@ -59,20 +41,20 @@ class PredictionController(
             ResponseEntity.notFound().build()
         }
     }
-    
+
     @GetMapping("/race/{raceId}/results")
     fun getRaceResults(@PathVariable raceId: String): ResponseEntity<List<PredictionResultDto>> {
         val results = predictionService.getRaceResults(raceId)
         return ResponseEntity.ok(results)
     }
-    
+
     @GetMapping("/leaderboard")
     fun getSeasonLeaderboard(@RequestParam(required = false) season: Int?): ResponseEntity<List<LeaderboardEntryDto>> {
         val currentSeason = season ?: F1SeasonUtils.getCurrentSeason()
         val leaderboard = predictionService.getSeasonLeaderboard(currentSeason)
         return ResponseEntity.ok(leaderboard)
     }
-    
+
     @GetMapping("/user/{userId}/score")
     fun getUserSeasonScore(
         @PathVariable userId: Long,
@@ -82,4 +64,4 @@ class PredictionController(
         val score = predictionService.getUserSeasonScore(userId, currentSeason)
         return ResponseEntity.ok(score)
     }
-} 
+}

@@ -57,6 +57,7 @@ class PredictionService(
         val now = LocalDateTime.now(ZoneOffset.UTC)
         // Treat race time as UTC time to match frontend behavior
         val raceDateTime = LocalDateTime.of(race.date, race.time)
+        // toMinutes() truncates toward zero, so the effective cutoff is at the 5:00 mark
         val minutesUntilRace = java.time.Duration.between(now, raceDateTime).toMinutes()
 
         // Block predictions if race starts within 5 minutes or has already started

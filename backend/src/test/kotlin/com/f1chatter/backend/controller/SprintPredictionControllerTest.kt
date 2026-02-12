@@ -1,5 +1,6 @@
 package com.f1chatter.backend.controller
 
+import com.f1chatter.backend.config.AuthenticationHelper
 import com.f1chatter.backend.config.SecurityConfig
 import com.f1chatter.backend.dto.SprintPredictionDto
 import com.f1chatter.backend.service.SprintPredictionService
@@ -21,7 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(SprintPredictionController::class)
-@Import(SecurityConfig::class)
+@Import(SecurityConfig::class, AuthenticationHelper::class)
 class SprintPredictionControllerTest {
 
     @Autowired

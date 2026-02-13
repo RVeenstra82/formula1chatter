@@ -110,8 +110,9 @@ const RaceDetailPage: React.FC = () => {
   const formattedDate = formatDateLocalized(race.date, 'PPP', language);
   
   // Format time based on locale
-  const formattedTime = race.time 
-    ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
+  const timeFormat = language === 'nl' ? 'HH:mm' : 'h:mm a';
+  const formattedTime = race.time
+    ? formatTimeLocalized(race.time, timeFormat, language)
     : 'TBA';
   
   const getDriverById = (driverId: string | null) => {
@@ -207,7 +208,7 @@ const RaceDetailPage: React.FC = () => {
 
       <div className="card mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">{race.raceName}</h1>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-6">
           <span className="inline-block px-3 py-1 bg-f1-surface-elevated text-slate-200 rounded-full text-sm font-semibold">
             {t('races.round')} {race.round}
           </span>
@@ -229,17 +230,17 @@ const RaceDetailPage: React.FC = () => {
           )}
         </div>
 
-        <div className={`grid grid-cols-1 ${user ? 'lg:grid-cols-[1fr_320px]' : ''} gap-6 mb-6`}>
-          {/* Left column: race info */}
+        <div className={`grid grid-cols-1 ${user ? 'lg:grid-cols-[1fr_1fr_280px]' : 'lg:grid-cols-2'} gap-6 mb-6`}>
+          {/* Column 1: Circuit info + Race schedule */}
           <div>
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-white mb-2">{t('race.circuitInfo')}</h2>
+              <h2 className="racing-stripe text-xl font-bold text-white mb-3">{t('race.circuitInfo')}</h2>
               <p className="text-slate-300">{race.circuitName}</p>
               <p className="text-slate-400">{race.locality}, {race.country}</p>
             </div>
 
             <div>
-              <h2 className="text-xl font-bold text-white mb-2">{t('race.raceSchedule')}</h2>
+              <h2 className="racing-stripe text-xl font-bold text-white mb-3">{t('race.raceSchedule')}</h2>
               <p className="text-slate-300">
                 <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
               </p>
@@ -248,35 +249,25 @@ const RaceDetailPage: React.FC = () => {
               </p>
 
               {canPredict && timeRemaining && (
-                <div className={`mt-4 p-4 rounded-lg border ${
+                <div className={`mt-3 p-3 rounded-lg border flex items-center gap-3 ${
                   isLessThanOneHour(race.date, race.time)
                     ? 'bg-red-950/50 border-red-500/50'
                     : 'bg-f1-surface-elevated border-f1-border'
                 }`}>
-                  <p className={`font-semibold ${
-                    isLessThanOneHour(race.date, race.time)
-                      ? 'text-red-400'
-                      : 'text-white'
-                  }`}>{t('races.timeRemaining')}: {timeRemaining}</p>
-                  <p className={`text-sm mt-1 ${
-                    isLessThanOneHour(race.date, race.time)
-                      ? 'text-red-400'
-                      : 'text-slate-400'
-                  }`}>{t('races.saveBeforeStart')}</p>
-                  <Link
-                    to={`/races/${race.id}/predict`}
-                    className="btn btn-primary btn-sm mt-3"
-                  >
-                    {userPrediction ? t('prediction.editPrediction') : t('races.makePredict')}
-                  </Link>
+                  <p className={`font-semibold text-sm whitespace-nowrap ${
+                    isLessThanOneHour(race.date, race.time) ? 'text-red-400' : 'text-slate-400'
+                  }`}>{t('races.timeRemaining')}:</p>
+                  <p className={`font-bold ${
+                    isLessThanOneHour(race.date, race.time) ? 'text-f1-red' : 'text-white'
+                  }`}>{timeRemaining}</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right column: prediction sidebar */}
+          {/* Prediction sidebar — pinned to right column */}
           {user && (
-            <div className="card-carbon lg:sticky lg:top-4 self-start">
+            <div className="card-carbon lg:sticky lg:top-4 self-start order-last lg:order-none lg:col-start-3 lg:row-start-1">
               <h2 className="racing-stripe text-lg font-bold text-white mb-4">{t('prediction.yourPrediction')}</h2>
 
               {userPrediction ? (
@@ -308,123 +299,121 @@ const RaceDetailPage: React.FC = () => {
               )}
             </div>
           )}
-        </div>
-        
-        {/* Practice and Qualifying Schedule */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-white mb-4">{t('race.weekendSchedule')}</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Practice Sessions */}
-            <div className="card">
-              <h3 className="text-lg font-bold text-white mb-3">{t('race.practiceSessions')}</h3>
+          {/* Column 2: Weekend Schedule grouped by day */}
+          <div>
+            <h2 className="racing-stripe text-xl font-bold text-white mb-4">{t('race.weekendSchedule')}</h2>
 
-              {race.practice1Date && race.practice1Time && (
-                <div className="mb-3 p-3 bg-f1-bg rounded">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-slate-200">{t('race.practice1')}</span>
-                    <span className="text-sm text-slate-400">
-                      {formatDateLocalized(race.practice1Date, 'PP', language)}
-                    </span>
-                  </div>
-                  <p className="text-lg font-medium text-white">
-                    {formatTimeLocalized(race.practice1Time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                  </p>
+            <div className="space-y-4">
+              {/* Friday */}
+              <div className="rounded-lg border border-f1-border overflow-hidden">
+                <div className="bg-f1-surface-elevated px-3 py-2 border-b border-f1-border">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-f1">{t('races.friday')}</h3>
                 </div>
-              )}
-
-              {race.practice2Date && race.practice2Time && (
-                <div className="mb-3 p-3 bg-f1-bg rounded">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-slate-200">{t('race.practice2')}</span>
-                    <span className="text-sm text-slate-400">
-                      {formatDateLocalized(race.practice2Date, 'PP', language)}
-                    </span>
-                  </div>
-                  <p className="text-lg font-medium text-white">
-                    {formatTimeLocalized(race.practice2Time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                  </p>
+                <div className="divide-y divide-f1-border">
+                  {race.isSprintWeekend ? (
+                    <>
+                      <div className="p-3 flex justify-between items-center">
+                        <span className="font-semibold text-slate-200">{t('race.practice1')}</span>
+                        <span className="text-white font-medium">
+                          {race.practice1Time
+                            ? formatTimeLocalized(race.practice1Time, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                      <div className="p-3 flex justify-between items-center bg-purple-500/5">
+                        <span className="font-semibold text-purple-400">{t('races.sprintQualifying')}</span>
+                        <span className="text-purple-300 font-medium">
+                          {race.sprintQualifyingTime
+                            ? formatTimeLocalized(race.sprintQualifyingTime, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-3 flex justify-between items-center">
+                        <span className="font-semibold text-slate-200">{t('race.practice1')}</span>
+                        <span className="text-white font-medium">
+                          {race.practice1Time
+                            ? formatTimeLocalized(race.practice1Time, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                      <div className="p-3 flex justify-between items-center">
+                        <span className="font-semibold text-slate-200">{t('race.practice2')}</span>
+                        <span className="text-white font-medium">
+                          {race.practice2Time
+                            ? formatTimeLocalized(race.practice2Time, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
-
-              {race.practice3Date && race.practice3Time && (
-                <div className="mb-3 p-3 bg-f1-bg rounded">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-slate-200">{t('race.practice3')}</span>
-                    <span className="text-sm text-slate-400">
-                      {formatDateLocalized(race.practice3Date, 'PP', language)}
-                    </span>
-                  </div>
-                  <p className="text-lg font-medium text-white">
-                    {formatTimeLocalized(race.practice3Time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                </p>
-                </div>
-              )}
-
-              {!race.practice1Date && !race.practice2Date && !race.practice3Date && (
-                <p className="text-slate-400 italic">{t('race.scheduleTBA')}</p>
-              )}
-            </div>
-
-            {/* Qualifying */}
-            <div className="card">
-              <h3 className="text-lg font-bold text-white mb-3">{t('race.qualifying')}</h3>
-
-              {race.qualifyingDate && race.qualifyingTime ? (
-                <div className="p-3 bg-f1-bg rounded">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-slate-200">{t('race.qualifying')}</span>
-                    <span className="text-sm text-slate-400">
-                      {formatDateLocalized(race.qualifyingDate, 'PP', language)}
-                    </span>
-                  </div>
-                  <p className="text-lg font-medium text-white">
-                    {formatTimeLocalized(race.qualifyingTime, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-slate-400 italic">{t('race.scheduleTBA')}</p>
-              )}
-            </div>
-            
-            {/* Sprint Weekend Information */}
-            {race.isSprintWeekend && (
-              <div className="card border-2 border-purple-500/30">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-lg font-bold text-purple-400">🏁 {t('races.sprintWeekend')}</h3>
-                </div>
-
-                {/* Sprint Qualifying */}
-                {race.sprintQualifyingDate && race.sprintQualifyingTime && (
-                  <div className="mb-3 p-3 bg-purple-500/20 rounded">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold text-purple-400">{t('races.sprintQualifying')}</span>
-                      <span className="text-sm text-purple-400">
-                        {formatDateLocalized(race.sprintQualifyingDate, 'PP', language)}
-                      </span>
-                    </div>
-                    <p className="text-lg font-medium text-purple-300">
-                      {formatTimeLocalized(race.sprintQualifyingTime, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                    </p>
-                  </div>
-                )}
-
-                {/* Sprint Race */}
-                {race.sprintDate && race.sprintTime && (
-                  <div className="p-3 bg-purple-500/20 rounded">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold text-purple-400">{t('races.sprint')}</span>
-                      <span className="text-sm text-purple-400">
-                        {formatDateLocalized(race.sprintDate, 'PP', language)}
-                      </span>
-                    </div>
-                    <p className="text-lg font-medium text-purple-300">
-                      {formatTimeLocalized(race.sprintTime, language === 'nl' ? 'HH:mm' : 'h:mm a', language)}
-                    </p>
-                  </div>
-                )}
               </div>
-            )}
+
+              {/* Saturday */}
+              <div className="rounded-lg border border-f1-border overflow-hidden">
+                <div className="bg-f1-surface-elevated px-3 py-2 border-b border-f1-border">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-f1">{t('races.saturday')}</h3>
+                </div>
+                <div className="divide-y divide-f1-border">
+                  {race.isSprintWeekend ? (
+                    <>
+                      <div className="p-3 flex justify-between items-center bg-purple-500/5">
+                        <span className="font-semibold text-purple-400">{t('races.sprint')}</span>
+                        <span className="text-purple-300 font-medium">
+                          {race.sprintTime
+                            ? formatTimeLocalized(race.sprintTime, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                      <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
+                        <span className="font-semibold text-slate-200">{t('race.qualifying')}</span>
+                        <span className="text-white font-medium">
+                          {race.qualifyingTime
+                            ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-3 flex justify-between items-center">
+                        <span className="font-semibold text-slate-200">{t('race.practice3')}</span>
+                        <span className="text-white font-medium">
+                          {race.practice3Time
+                            ? formatTimeLocalized(race.practice3Time, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                      <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
+                        <span className="font-semibold text-slate-200">{t('race.qualifying')}</span>
+                        <span className="text-white font-medium">
+                          {race.qualifyingTime
+                            ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
+                            : 'TBA'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Sunday */}
+              <div className="rounded-lg border border-f1-red/30 overflow-hidden">
+                <div className="bg-f1-red/15 px-3 py-2 border-b border-f1-red/30">
+                  <h3 className="text-sm font-bold text-red-400 uppercase tracking-f1">{t('races.sunday')}</h3>
+                </div>
+                <div className="p-3 flex justify-between items-center bg-f1-red/5">
+                  <span className="font-semibold text-white">{t('races.race')}</span>
+                  <span className="text-white font-bold">
+                    {formattedTime}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

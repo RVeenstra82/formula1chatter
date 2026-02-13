@@ -11,6 +11,7 @@ test.describe('Page Tests', () => {
     await expect(page.locator('main')).toBeVisible();
   });
 
+
   test('should load StatsPage', async ({ page }) => {
     await page.goto('/stats');
     

@@ -47,7 +47,14 @@ function App() {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/data-deletion" element={<DataDeletion />} />
-                  <Route path="*" element={<div>Page not found</div>} />
+                  <Route path="*" element={
+                    <div className="flex flex-col items-center justify-center py-24">
+                      <div className="text-6xl mb-6">🏁</div>
+                      <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-f1">{404}</h1>
+                      <p className="text-slate-400 mb-8">This page could not be found.</p>
+                      <a href="/" className="btn btn-primary">Back to Home</a>
+                    </div>
+                  } />
                 </Routes>
               </Layout>
             </BrowserRouter>

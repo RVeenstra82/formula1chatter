@@ -355,4 +355,4 @@ export const api = {
     const response = await apiClient.get('/stats/constructor-performance');
     return response.data;
   },
-}; 
+};

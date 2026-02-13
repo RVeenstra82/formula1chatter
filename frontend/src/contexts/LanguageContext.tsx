@@ -186,7 +186,10 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.raceNotCompleted': 'This race has not been completed yet.',
     'leaderboard.loginToView': 'You need to be logged in to view the leaderboard.',
     'leaderboard.change': 'Change',
-    
+    'leaderboard.seasonNotStarted': 'Season Not Started Yet',
+    'leaderboard.seasonNotStartedDescription': 'The leaderboard will appear after the first race of the season has been completed.',
+    'leaderboard.scoreProcessingNote': 'After a race finishes, it can take up to an hour for scores to be calculated.',
+
     // Leaderboard page
     'leaderboard.subtitle': 'Track your performance against other users',
     'leaderboard.score': 'Score',
@@ -248,8 +251,8 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.thirdPlace': 'Third Place',
     'stats.fastestLap': 'Fastest Lap',
     'stats.driverOfDay': 'Driver of the Day',
-    'stats.shareThisStat': 'Share this statistic',
-    'stats.copiedToClipboard': 'Link copied to clipboard!',
+    'stats.seasonNotStarted': 'Season Just Started',
+    'stats.statsAfterFirstRace': 'Statistics will be available after the first completed race of the season.',
     
     // Common
     'common.loading': 'Loading...',
@@ -308,6 +311,12 @@ const translations: Record<Language, Record<string, string>> = {
     // Home (logged-in CTA)
     'home.viewRaces': 'View Upcoming Races',
 
+    // Profile ranking
+    'profile.seasonRanking': 'Season Ranking',
+    'profile.noRankingYet': 'No ranking yet',
+    'profile.noRankingDescription': 'Your ranking will appear after the first completed race.',
+    'profile.viewLeaderboard': 'View Full Leaderboard',
+
   },
   nl: {
     // Navigation
@@ -326,7 +335,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.step1': 'Log in met je Facebook account om deel te nemen',
     'home.step2': 'Maak voorspellingen voor aankomende races voordat ze beginnen',
     'home.step3': 'Verdien punten op basis van de nauwkeurigheid van je voorspellingen',
-    'home.step4': 'Wedijver met vrienden en volg je positie gedurende het seizoen',
+    'home.step4': 'Neem het op tegen je vrienden en volg je positie gedurende het seizoen',
     
     // Races
     'races.upcomingRaces': 'Aankomende Races',
@@ -483,6 +492,9 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
     'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
     'leaderboard.change': 'Verandering',
+    'leaderboard.seasonNotStarted': 'Seizoen Nog Niet Gestart',
+    'leaderboard.seasonNotStartedDescription': 'De ranglijst verschijnt nadat de eerste race van het seizoen is voltooid.',
+    'leaderboard.scoreProcessingNote': 'Na afloop van een race kan het tot een uur duren voordat de scores berekend zijn.',
     'leaderboard.selectRace': 'Selecteer race',
     
     // Leaderboard page
@@ -546,8 +558,8 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.thirdPlace': 'Derde Plaats',
     'stats.fastestLap': 'Snelste Ronde',
     'stats.driverOfDay': 'Coureur van de Dag',
-    'stats.shareThisStat': 'Deel deze statistiek',
-    'stats.copiedToClipboard': 'Link gekopieerd naar klembord!',
+    'stats.seasonNotStarted': 'Seizoen Net Begonnen',
+    'stats.statsAfterFirstRace': 'Statistieken worden beschikbaar na de eerste voltooide race van het seizoen.',
     'stats.loading': 'Statistieken laden...',
     'stats.error': 'Fout bij laden statistieken.',
     'stats.noData': 'Geen statistieken beschikbaar.',
@@ -601,6 +613,12 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Home (logged-in CTA)
     'home.viewRaces': 'Bekijk aankomende races',
+
+    // Profile ranking
+    'profile.seasonRanking': 'Seizoensranglijst',
+    'profile.noRankingYet': 'Nog geen ranglijst',
+    'profile.noRankingDescription': 'Je ranglijst verschijnt na de eerste voltooide race.',
+    'profile.viewLeaderboard': 'Bekijk volledige ranglijst',
 
   },
 };

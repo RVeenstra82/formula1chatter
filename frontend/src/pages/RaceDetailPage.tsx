@@ -6,7 +6,7 @@ import type { Race, Driver, Prediction } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLessThanOneHour, hasRaceStarted } from '../utils/timeUtils';
-import { mockRaces } from '../mocks/mockLeaderboardData';
+
 
 const RaceDetailPage: React.FC = () => {
   const { raceId } = useParams<{ raceId: string }>();
@@ -35,16 +35,7 @@ const RaceDetailPage: React.FC = () => {
 
   const { data: race, isLoading: isLoadingRace } = useQuery<Race>({
     queryKey: ['race', raceId],
-    queryFn: () => {
-      if (import.meta.env.DEV) {
-        // Use mock data in development
-        const mockRace = mockRaces.find(r => r.id === raceId);
-        if (mockRace) {
-          return Promise.resolve(mockRace);
-        }
-      }
-      return api.getRaceById(raceId!);
-    },
+    queryFn: () => api.getRaceById(raceId!),
     enabled: !!raceId,
   });
 
@@ -245,7 +236,7 @@ const RaceDetailPage: React.FC = () => {
                 <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
               </p>
               <p className="text-slate-300">
-                <span className="font-semibold">{t('races.time')}:</span> {formattedTime} <span className="text-xs text-slate-500">({t('races.localTime')})</span>
+                <span className="font-semibold">{t('races.time')}:</span> {race.time ? formattedTime : <span className="text-slate-600 italic">TBA</span>} {race.time && <span className="text-xs text-slate-500">({t('races.localTime')})</span>}
               </p>
 
               {canPredict && timeRemaining && (
@@ -267,8 +258,9 @@ const RaceDetailPage: React.FC = () => {
 
           {/* Prediction sidebar — pinned to right column */}
           {user && (
-            <div className="card-carbon lg:sticky lg:top-4 self-start order-last lg:order-none lg:col-start-3 lg:row-start-1">
-              <h2 className="racing-stripe text-lg font-bold text-white mb-4">{t('prediction.yourPrediction')}</h2>
+            <div className="order-last lg:order-none lg:col-start-3 lg:row-start-1 lg:sticky lg:top-4 self-start">
+              <h2 className="racing-stripe text-xl font-bold text-white mb-4">{t('prediction.yourPrediction')}</h2>
+              <div className="card-carbon">
 
               {userPrediction ? (
                 <div className="space-y-2">
@@ -297,6 +289,7 @@ const RaceDetailPage: React.FC = () => {
               ) : (
                 <p className="text-slate-500 text-sm">{t('prediction.noPredictionMade')}</p>
               )}
+              </div>
             </div>
           )}
 
@@ -318,7 +311,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice1Time
                             ? formatTimeLocalized(race.practice1Time, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center bg-purple-500/5">
@@ -326,7 +319,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-purple-300 font-medium">
                           {race.sprintQualifyingTime
                             ? formatTimeLocalized(race.sprintQualifyingTime, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                     </>
@@ -337,7 +330,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice1Time
                             ? formatTimeLocalized(race.practice1Time, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center">
@@ -345,7 +338,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice2Time
                             ? formatTimeLocalized(race.practice2Time, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                     </>
@@ -366,7 +359,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-purple-300 font-medium">
                           {race.sprintTime
                             ? formatTimeLocalized(race.sprintTime, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
@@ -374,7 +367,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.qualifyingTime
                             ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                     </>
@@ -385,7 +378,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice3Time
                             ? formatTimeLocalized(race.practice3Time, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
@@ -393,7 +386,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.qualifyingTime
                             ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
-                            : 'TBA'}
+                            : <span className="text-slate-600 italic">TBA</span>}
                         </span>
                       </div>
                     </>
@@ -408,8 +401,8 @@ const RaceDetailPage: React.FC = () => {
                 </div>
                 <div className="p-3 flex justify-between items-center bg-f1-red/5">
                   <span className="font-semibold text-white">{t('races.race')}</span>
-                  <span className="text-white font-bold">
-                    {formattedTime}
+                  <span className={race.time ? 'text-white font-bold' : 'text-slate-600 italic'}>
+                    {race.time ? formattedTime : 'TBA'}
                   </span>
                 </div>
               </div>

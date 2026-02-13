@@ -7,9 +7,10 @@ import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLes
 interface RaceCardProps {
   race: Race;
   isNext?: boolean;
+  carbon?: boolean;
 }
 
-const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
+const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false, carbon = isNext }) => {
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
 
@@ -74,7 +75,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
   }
 
   return (
-    <div className={`${isNext ? 'card-carbon' : 'card'} transition-all duration-300 hover:border-slate-500`}>
+    <div className={`${carbon ? 'card-carbon' : 'card'} transition-all duration-300 hover:border-slate-500`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
         <div className="flex-1">
           <h3 className="text-lg sm:text-xl font-bold text-white">{race.raceName}</h3>

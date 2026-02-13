@@ -1,20 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { apiClient } from '../api/client';
+import { apiClient, api } from '../api/client';
+import type { LeaderboardEntry } from '../api/client';
 
 const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { t } = useLanguage();
+  const { user, login, logout } = useAuth();
+  const { t, language } = useLanguage();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmName, setConfirmName] = useState('');
 
+  const { data: leaderboard = [], isLoading: isLoadingLeaderboard } = useQuery<LeaderboardEntry[]>({
+    queryKey: ['leaderboard', 'season'],
+    queryFn: () => api.getLeaderboard(),
+    enabled: !!user,
+  });
+
+  const userRanking = useMemo(() => {
+    if (!user || leaderboard.length === 0) return null;
+    const index = leaderboard.findIndex(e => e.userId === user.id);
+    if (index === -1) return null;
+    return { position: index + 1, total: leaderboard.length, score: leaderboard[index].totalScore };
+  }, [user, leaderboard]);
+
+  const getOrdinalSuffix = (n: number): string => {
+    if (language === 'nl') return 'e';
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-400">{t('profile.notLoggedIn')}</div>
+        <div className="card p-8 text-center max-w-md">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-xl font-bold text-white mb-2">{t('predict.loginRequired')}</h2>
+          <p className="text-slate-400 mb-6">{t('profile.notLoggedIn')}</p>
+          <button
+            onClick={login}
+            className="btn btn-primary flex items-center justify-center mx-auto"
+          >
+            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24h-1.918c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z" />
+            </svg>
+            {t('nav.loginWithFacebook')}
+          </button>
+        </div>
       </div>
     );
   }
@@ -33,11 +69,19 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const positionColorClass = (pos: number) => {
+    if (pos === 1) return 'bg-podium-gold text-gray-900';
+    if (pos === 2) return 'bg-podium-silver text-gray-900';
+    if (pos === 3) return 'bg-podium-bronze text-gray-900';
+    return 'bg-f1-surface-elevated text-white';
+  };
+
   return (
     <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="card p-6">
-          <div className="flex items-center mb-6">
+        {/* User Info */}
+        <div className="card p-6 mb-6">
+          <div className="flex items-center">
             {user.profilePictureUrl && (
               <img src={user.profilePictureUrl} alt={user.name} className="w-16 h-16 rounded-full mr-4" />
             )}
@@ -48,7 +92,49 @@ const ProfilePage: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
 
+        {/* Season Ranking */}
+        <div className="card p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">{t('profile.seasonRanking')}</h2>
+            <Link to="/leaderboard" className="text-sm text-f1-red hover:text-red-400 transition-colors">
+              {t('profile.viewLeaderboard')} →
+            </Link>
+          </div>
+
+          {isLoadingLeaderboard ? (
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-f1-surface-elevated animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-5 w-24 bg-f1-surface-elevated rounded animate-pulse" />
+                <div className="h-4 w-16 bg-f1-surface-elevated rounded animate-pulse" />
+              </div>
+            </div>
+          ) : userRanking ? (
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${positionColorClass(userRanking.position)}`}>
+                {userRanking.position}
+              </div>
+              <div>
+                <p className="text-white font-medium">
+                  {userRanking.position}{getOrdinalSuffix(userRanking.position)} {t('leaderboard.of')} {userRanking.total}
+                </p>
+                <p className="text-slate-400 text-sm">
+                  {userRanking.score} {t('common.points')}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-slate-400 font-medium">{t('profile.noRankingYet')}</p>
+              <p className="text-slate-500 text-sm mt-1">{t('profile.noRankingDescription')}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Account */}
+        <div className="card p-6">
           <h2 className="text-lg font-semibold text-white mb-2">{t('profile.account')}</h2>
           <p className="text-sm text-slate-400 mb-4">{t('profile.deleteDescription')}</p>
 

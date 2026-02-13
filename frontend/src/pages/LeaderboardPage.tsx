@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import type { LeaderboardEntry, Race, PredictionResult } from '../api/client';
-import { mockLeaderboard, mockRaceResults, mockRaces } from '../mocks/mockLeaderboardData';
 import { api } from '../api/client';
 import PositionChangeIndicator from '../components/prediction/PositionChangeIndicator';
 
@@ -18,13 +17,7 @@ const LeaderboardPage: React.FC = () => {
   // Fetch all races to get completed ones for the race menu
   const { data: allRaces = [] } = useQuery<Race[]>({
     queryKey: ['races', 'all'],
-    queryFn: () => {
-      if (import.meta.env.DEV) {
-        // Use mock data in development
-        return Promise.resolve(mockRaces);
-      }
-      return api.getCurrentSeasonRaces();
-    },
+    queryFn: () => api.getCurrentSeasonRaces(),
   });
 
   // Get completed races for the sidebar menu
@@ -42,26 +35,14 @@ const LeaderboardPage: React.FC = () => {
   // Fetch season leaderboard
   const { data: seasonLeaderboard = [], isLoading: isLoadingSeason } = useQuery<LeaderboardEntry[]>({
     queryKey: ['leaderboard', 'season'],
-    queryFn: () => {
-      if (import.meta.env.DEV) {
-        // Use mock data in development
-        return Promise.resolve(mockLeaderboard);
-      }
-      return api.getLeaderboard();
-    },
+    queryFn: () => api.getLeaderboard(),
     enabled: viewMode === 'season',
   });
 
   // Fetch race leaderboard
   const { data: raceLeaderboard = [], isLoading: isLoadingRace } = useQuery<PredictionResult[]>({
     queryKey: ['leaderboard', 'race', selectedRaceId],
-    queryFn: () => {
-      if (import.meta.env.DEV && selectedRaceId) {
-        // Use mock data in development
-        return Promise.resolve(mockRaceResults[selectedRaceId] || []);
-      }
-      return api.getRaceLeaderboard(selectedRaceId!);
-    },
+    queryFn: () => api.getRaceLeaderboard(selectedRaceId!),
     enabled: viewMode === 'race' && !!selectedRaceId,
   });
 
@@ -257,7 +238,7 @@ const LeaderboardPage: React.FC = () => {
       <h1 className="text-3xl font-bold text-white mb-8">{t('leaderboard.title')}</h1>
 
       {/* View Mode Toggle */}
-      <div className="mb-8">
+      {completedRaces.length > 0 && <div className="mb-8">
         <div className="flex gap-4">
           <button
             className={`btn ${viewMode === 'season' ? 'btn-primary' : 'btn-secondary'}`}
@@ -272,10 +253,17 @@ const LeaderboardPage: React.FC = () => {
             {t('leaderboard.raceResults')}
           </button>
         </div>
-      </div>
+      </div>}
 
       {/* Content */}
-      {viewMode === 'season' ? (
+      {completedRaces.length === 0 ? (
+        <div className="card p-8 text-center max-w-lg mx-auto">
+          <div className="text-6xl mb-4">🏁</div>
+          <h3 className="text-lg font-semibold mb-2 text-white">{t('leaderboard.seasonNotStarted')}</h3>
+          <p className="text-slate-400">{t('leaderboard.seasonNotStartedDescription')}</p>
+          <p className="text-slate-500 text-sm mt-4">{t('leaderboard.scoreProcessingNote')}</p>
+        </div>
+      ) : viewMode === 'season' ? (
         <>
           {renderPodium(seasonLeaderboard)}
           {renderLeaderboardTable(seasonLeaderboard)}

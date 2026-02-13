@@ -32,16 +32,6 @@ const StatsPage: React.FC = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
 
-  // Share functionality
-  const handleShare = async () => {
-    const url = `${window.location.origin}/stats/${activeTab}`;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Failed to copy link
-    }
-  };
-
   // URL synchronization
   useEffect(() => {
     if (tab && tab !== activeTab) {
@@ -67,11 +57,10 @@ const StatsPage: React.FC = () => {
     }
   }, [user, activeTab, navigate]);
 
-  // Data fetching — only fetch when tab is active
+  // Data fetching — overview loads on every tab to check completedRaces
   const { data: overview, isLoading: overviewLoading } = useQuery({
     queryKey: ['stats', 'overview'],
     queryFn: api.getStatsOverview,
-    enabled: activeTab === 'overview',
   });
 
   const { data: driverStats, isLoading: driverLoading } = useQuery({
@@ -473,10 +462,27 @@ const StatsPage: React.FC = () => {
     </div>
   );
 
+  const renderSeasonNotStarted = () => (
+    <div className="card p-8 text-center">
+      <div className="text-6xl mb-4">🏎️</div>
+      <h3 className="text-lg font-semibold mb-2 text-white">{t('stats.seasonNotStarted')}</h3>
+      <p className="text-slate-400">{t('stats.statsAfterFirstRace')}</p>
+      <p className="text-slate-500 text-sm mt-4">{t('leaderboard.scoreProcessingNote')}</p>
+    </div>
+  );
+
   const renderContent = () => {
+    if (overviewLoading) {
+      return renderLoading(t('stats.loadingOverview'));
+    }
+
+    if (overview && overview.completedRaces === 0) {
+      return renderSeasonNotStarted();
+    }
+
     switch (activeTab) {
       case 'overview':
-        return overviewLoading ? renderLoading(t('stats.loadingOverview')) : renderOverview();
+        return renderOverview();
       case 'drivers':
         return driverLoading ? renderLoading(t('stats.loadingDriverStatistics')) : renderDriverPerformance();
       case 'accuracy':
@@ -497,29 +503,36 @@ const StatsPage: React.FC = () => {
   return (
     <div>
       <div className="max-w-7xl mx-auto py-2">
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-f1">
-              <span className="text-f1-red">F1</span> {t('stats.titleSuffix')}
-            </h1>
-            <p className="text-slate-400">{t('stats.subtitle')}</p>
-          </div>
-          <button
-            onClick={handleShare}
-            className="btn btn-primary"
-            title={t('stats.shareThisStat')}
-          >
-            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-            </svg>
-            {t('stats.shareThisStat')}
-          </button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-f1">
+            <span className="text-f1-red">F1</span> {t('stats.titleSuffix')}
+          </h1>
+          <p className="text-slate-400">{t('stats.subtitle')}</p>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation — dropdown on mobile, tabs on desktop */}
         <div className="bg-f1-surface rounded-lg border border-f1-border mb-8 checkered-bg">
-          <div className="border-b border-f1-border">
-            <nav className="-mb-px flex space-x-4 md:space-x-8 px-4 md:px-6 overflow-x-auto scrollbar-hide" aria-label="Tabs">
+          {/* Mobile dropdown */}
+          <div className="md:hidden p-3">
+            <select
+              value={activeTab}
+              onChange={(e) => {
+                setActiveTab(e.target.value);
+                navigate(`/stats/${e.target.value}`);
+              }}
+              className="w-full bg-f1-surface-elevated border border-f1-border rounded-lg px-4 py-3 text-white text-sm font-medium appearance-none cursor-pointer"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.25rem' }}
+            >
+              {tabs.map((tabItem) => (
+                <option key={tabItem.id} value={tabItem.id}>
+                  {tabItem.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop tabs */}
+          <div className="hidden md:block border-b border-f1-border">
+            <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
               {tabs.map((tabItem) => (
                 <button
                   key={tabItem.id}
@@ -527,7 +540,7 @@ const StatsPage: React.FC = () => {
                     setActiveTab(tabItem.id);
                     navigate(`/stats/${tabItem.id}`);
                   }}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap uppercase tracking-f1 transition-colors ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap shrink-0 uppercase tracking-f1 transition-colors ${
                     activeTab === tabItem.id
                       ? 'border-f1-red text-f1-red'
                       : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-f1-border'

@@ -7,17 +7,18 @@ import { formatDateLocalized, formatTimeLocalized, calculateTimeRemaining, isLes
 interface RaceCardProps {
   race: Race;
   isNext?: boolean;
+  carbon?: boolean;
 }
 
-const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
+const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false, carbon = isNext }) => {
   const { t, language } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
 
-  const formattedDate = formatDateLocalized(race.date, 'PP', language);
+  const formattedDate = formatDateLocalized(race.date, 'PPP', language);
 
   const formattedTime = race.time
     ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
-    : 'TBA';
+    : t('common.tba');
 
   const hasStarted = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !hasStarted;
@@ -43,8 +44,38 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
     return () => clearInterval(interval);
   }, [race.date, race.time, language, showCountdown]);
 
+  // Build weekend schedule sessions for the timetable
+  const timeFormat = language === 'nl' ? 'HH:mm' : 'h:mm a';
+  const weekendSessions: { label: string; date?: string; time?: string; highlight?: boolean }[] = [];
+
+  if (isNext) {
+    if (race.isSprintWeekend) {
+      // Sprint weekends: FP1, SQ, Sprint, Quali, Race
+      if (race.practice1Date && race.practice1Time)
+        weekendSessions.push({ label: t('race.practice1'), date: race.practice1Date, time: race.practice1Time });
+      if (race.sprintQualifyingDate && race.sprintQualifyingTime)
+        weekendSessions.push({ label: t('races.sprintQualifying'), date: race.sprintQualifyingDate, time: race.sprintQualifyingTime });
+      if (race.sprintDate && race.sprintTime)
+        weekendSessions.push({ label: t('races.sprint'), date: race.sprintDate, time: race.sprintTime });
+      if (race.qualifyingDate && race.qualifyingTime)
+        weekendSessions.push({ label: t('race.qualifying'), date: race.qualifyingDate, time: race.qualifyingTime });
+    } else {
+      // Standard weekends: FP1, FP2, FP3, Quali, Race
+      if (race.practice1Date && race.practice1Time)
+        weekendSessions.push({ label: t('race.practice1'), date: race.practice1Date, time: race.practice1Time });
+      if (race.practice2Date && race.practice2Time)
+        weekendSessions.push({ label: t('race.practice2'), date: race.practice2Date, time: race.practice2Time });
+      if (race.practice3Date && race.practice3Time)
+        weekendSessions.push({ label: t('race.practice3'), date: race.practice3Date, time: race.practice3Time });
+      if (race.qualifyingDate && race.qualifyingTime)
+        weekendSessions.push({ label: t('race.qualifying'), date: race.qualifyingDate, time: race.qualifyingTime });
+    }
+    // Always add the race itself
+    weekendSessions.push({ label: t('races.race'), date: race.date, time: race.time, highlight: true });
+  }
+
   return (
-    <div className={`${isNext ? 'card-featured' : 'card'} transition-all duration-300 hover:border-slate-500`}>
+    <div className={`${carbon ? 'card-carbon' : 'card'} transition-all duration-300 hover:border-slate-500`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
         <div className="flex-1">
           <h3 className="text-lg sm:text-xl font-bold text-white">{race.raceName}</h3>
@@ -100,6 +131,41 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false }) => {
           )}
         </div>
       </div>
+
+      {/* Weekend timetable (featured next race only) */}
+      {isNext && weekendSessions.length > 1 && (
+        <div className="mt-4 pt-4 border-t border-f1-border">
+          <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-f1 mb-3">
+            {t('race.weekendSchedule')}
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2">
+            {weekendSessions.map((session) => (
+              <div
+                key={session.label}
+                className={`rounded px-3 py-2 text-center ${
+                  session.highlight
+                    ? 'bg-f1-red/15 border border-f1-red/30'
+                    : 'bg-f1-surface-elevated'
+                }`}
+              >
+                <p className={`text-xs font-semibold mb-0.5 ${session.highlight ? 'text-red-400' : 'text-slate-400'}`}>
+                  {session.label}
+                </p>
+                {session.date && (
+                  <p className="text-xs text-slate-500">
+                    {formatDateLocalized(session.date, 'EEE d MMMM', language)}
+                  </p>
+                )}
+                {session.time && (
+                  <p className={`text-sm font-medium ${session.highlight ? 'text-white' : 'text-slate-200'}`}>
+                    {formatTimeLocalized(session.time, timeFormat, language)}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         {race.completed ? (

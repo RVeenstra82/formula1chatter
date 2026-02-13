@@ -416,3 +416,13 @@ input:-webkit-autofill:focus {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(225, 6, 0, 0.5);
 }
+
+/* Hide scrollbar for horizontal tab navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

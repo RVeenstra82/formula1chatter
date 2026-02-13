@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { Race } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
+import FacebookIcon from '../components/common/FacebookIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 import PredictionForm from '../components/prediction/PredictionForm';
 import DriverSelect from '../components/prediction/DriverSelect';
@@ -123,8 +124,9 @@ const PredictionPage: React.FC = () => {
         <p className="text-slate-300 mb-8">{t('predict.needLogin')}</p>
         <button
           onClick={login}
-          className="btn btn-primary"
+          className="btn btn-primary inline-flex items-center"
         >
+          <FacebookIcon className="w-4 h-4 mr-2" />
           {t('predict.loginFacebook')}
         </button>
       </div>
@@ -226,9 +228,10 @@ const PredictionPage: React.FC = () => {
         </div>
 
         <div>
+          <h2 className="text-2xl font-bold mb-4 text-white uppercase tracking-f1">
+            {t('race.raceInfo')}
+          </h2>
           <div className="card">
-            <h2 className="text-2xl font-bold text-white mb-4">{t('race.raceInfo')}</h2>
-
             {/* Sprint Weekend Information */}
             {race.isSprintWeekend && (
               <div className="mb-6 p-4 bg-f1-surface-elevated border border-f1-border rounded-lg">
@@ -254,14 +257,13 @@ const PredictionPage: React.FC = () => {
             <p className="mb-4 text-slate-400">{race.circuitName}, {race.locality}, {race.country}</p>
 
             {timeRemaining && (
-              <div className={`p-4 rounded-lg mb-6 border ${
+              <div className={`p-3 rounded-lg mb-6 border flex items-center gap-3 ${
                 isLessThanOneHour(race.date, race.time)
                   ? 'bg-red-500/10 border-red-500/30'
                   : 'bg-f1-surface-elevated border-f1-border'
               }`}>
-                <p className="font-bold text-lg mb-1 text-white">{t('races.timeRemaining')}:</p>
-                <p className={`text-2xl font-bold ${isLessThanOneHour(race.date, race.time) ? 'text-f1-red' : 'text-white'}`}>{timeRemaining}</p>
-                <p className="text-sm mt-2 text-slate-400">{t('races.saveBeforeStart')}</p>
+                <p className={`font-semibold text-sm ${isLessThanOneHour(race.date, race.time) ? 'text-red-400' : 'text-slate-400'}`}>{t('races.timeRemaining')}:</p>
+                <p className={`font-bold ${isLessThanOneHour(race.date, race.time) ? 'text-f1-red' : 'text-white'}`}>{timeRemaining}</p>
               </div>
             )}
 

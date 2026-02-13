@@ -50,7 +50,8 @@ const emptyStatsOverview = {
 
 test.describe('Empty state messages', () => {
   test.beforeEach(async ({ page }) => {
-    // Mock auth — inject a fake JWT token so the user is "logged in"
+    // Mock auth — addInitScript runs in the browser context and cannot reference
+    // outer variables, so the user data is duplicated from mockUser above.
     await page.addInitScript(() => {
       localStorage.setItem('authToken', 'fake-jwt-token');
       localStorage.setItem('user', JSON.stringify({

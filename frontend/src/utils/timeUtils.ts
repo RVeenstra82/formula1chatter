@@ -178,12 +178,8 @@ export const getSeasonState = (
   if (hasCompleted) return 'data-available';
 
   // Check if any race weekend has started (use practice1Date if available, fallback to race date)
-  const sorted = [...allRaces].sort((a, b) =>
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-
   const now = new Date();
-  const weekendStarted = sorted.some(race => {
+  const weekendStarted = allRaces.some(race => {
     const weekendDate = race.practice1Date || race.date;
     const weekendTime = race.practice1Date ? (race.practice1Time || null) : (race.time || null);
     const start = getRaceStartDate(weekendDate, weekendTime);

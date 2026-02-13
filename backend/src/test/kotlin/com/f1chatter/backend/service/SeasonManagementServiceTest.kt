@@ -1,22 +1,21 @@
 package com.f1chatter.backend.service
 
-import com.f1chatter.backend.model.Prediction
 import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.model.User
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
+import com.f1chatter.backend.util.F1SeasonUtils
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.Optional
-import org.springframework.data.repository.findByIdOrNull
-import io.mockk.mockkStatic
 
 class SeasonManagementServiceTest {
+
+    private val currentSeason = F1SeasonUtils.getCurrentSeason()
 
     @Test
     fun `checkForNewSeasonAndResetScores triggers reset when races exist and no predictions`() {
@@ -25,15 +24,13 @@ class SeasonManagementServiceTest {
         val userRepo = mockk<UserRepository>()
         val service = SeasonManagementService(predictionRepo, raceRepo, userRepo)
 
-        val season = LocalDate.now().year
-        every { predictionRepo.findBySeason(season) } returns emptyList()
-        every { raceRepo.findBySeason(season) } returns listOf(sampleRace("$season-1", season))
+        every { predictionRepo.findBySeason(currentSeason) } returns emptyList()
+        every { raceRepo.findBySeason(currentSeason) } returns listOf(sampleRace("$currentSeason-1", currentSeason))
         every { userRepo.findAll() } returns emptyList()
 
         service.checkForNewSeasonAndResetScores()
 
-        verify { raceRepo.findBySeason(season) }
-        // resetScoresForNewSeason is internal; we assert via interactions
+        verify { raceRepo.findBySeason(currentSeason) }
     }
 
     @Test
@@ -77,5 +74,3 @@ class SeasonManagementServiceTest {
         )
     }
 }
-
-

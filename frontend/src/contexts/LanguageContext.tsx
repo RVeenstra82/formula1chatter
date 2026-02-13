@@ -63,6 +63,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.sprintQualifying': 'Sprint Qualifying',
     'races.saturday': 'Saturday',
     'races.sunday': 'Sunday',
+    'races.race': 'Race',
     
     // Race detail
     'race.raceInfo': 'Race Information',
@@ -357,6 +358,7 @@ const translations: Record<Language, Record<string, string>> = {
     'races.sprintQualifying': 'Sprint Kwalificatie',
     'races.saturday': 'Zaterdag',
     'races.sunday': 'Zondag',
+    'races.race': 'Race',
     
     // Race detail
     'race.raceInfo': 'Race Informatie',

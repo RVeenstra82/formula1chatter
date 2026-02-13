@@ -14,7 +14,7 @@ const RaceCardCompact: React.FC<RaceCardCompactProps> = ({ race }) => {
   const formattedDate = formatDateLocalized(race.date, 'PPP', language);
   const formattedTime = race.time
     ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
-    : 'TBA';
+    : t('common.tba');
 
   const hasStarted = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !hasStarted;

@@ -104,7 +104,7 @@ const RaceDetailPage: React.FC = () => {
   const timeFormat = language === 'nl' ? 'HH:mm' : 'h:mm a';
   const formattedTime = race.time
     ? formatTimeLocalized(race.time, timeFormat, language)
-    : 'TBA';
+    : t('common.tba');
   
   const getDriverById = (driverId: string | null) => {
     if (!driverId || !drivers) return null;
@@ -236,7 +236,7 @@ const RaceDetailPage: React.FC = () => {
                 <span className="font-semibold">{t('races.date')}:</span> {formattedDate}
               </p>
               <p className="text-slate-300">
-                <span className="font-semibold">{t('races.time')}:</span> {race.time ? formattedTime : <span className="text-slate-600 italic">TBA</span>} {race.time && <span className="text-xs text-slate-500">({t('races.localTime')})</span>}
+                <span className="font-semibold">{t('races.time')}:</span> {race.time ? formattedTime : <span className="text-slate-600 italic">{t('common.tba')}</span>} {race.time && <span className="text-xs text-slate-500">({t('races.localTime')})</span>}
               </p>
 
               {canPredict && timeRemaining && (
@@ -311,7 +311,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice1Time
                             ? formatTimeLocalized(race.practice1Time, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center bg-purple-500/5">
@@ -319,7 +319,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-purple-300 font-medium">
                           {race.sprintQualifyingTime
                             ? formatTimeLocalized(race.sprintQualifyingTime, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                     </>
@@ -330,7 +330,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice1Time
                             ? formatTimeLocalized(race.practice1Time, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center">
@@ -338,7 +338,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice2Time
                             ? formatTimeLocalized(race.practice2Time, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                     </>
@@ -359,7 +359,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-purple-300 font-medium">
                           {race.sprintTime
                             ? formatTimeLocalized(race.sprintTime, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
@@ -367,7 +367,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.qualifyingTime
                             ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                     </>
@@ -378,7 +378,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.practice3Time
                             ? formatTimeLocalized(race.practice3Time, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                       <div className="p-3 flex justify-between items-center border-l-2 border-l-f1-red">
@@ -386,7 +386,7 @@ const RaceDetailPage: React.FC = () => {
                         <span className="text-white font-medium">
                           {race.qualifyingTime
                             ? formatTimeLocalized(race.qualifyingTime, timeFormat, language)
-                            : <span className="text-slate-600 italic">TBA</span>}
+                            : <span className="text-slate-600 italic">{t('common.tba')}</span>}
                         </span>
                       </div>
                     </>
@@ -402,7 +402,7 @@ const RaceDetailPage: React.FC = () => {
                 <div className="p-3 flex justify-between items-center bg-f1-red/5">
                   <span className="font-semibold text-white">{t('races.race')}</span>
                   <span className={race.time ? 'text-white font-bold' : 'text-slate-600 italic'}>
-                    {race.time ? formattedTime : 'TBA'}
+                    {race.time ? formattedTime : t('common.tba')}
                   </span>
                 </div>
               </div>

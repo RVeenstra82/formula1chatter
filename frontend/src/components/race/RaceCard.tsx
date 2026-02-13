@@ -18,7 +18,7 @@ const RaceCard: React.FC<RaceCardProps> = ({ race, isNext = false, carbon = isNe
 
   const formattedTime = race.time
     ? formatTimeLocalized(race.time, language === 'nl' ? 'HH:mm' : 'h:mm a', language)
-    : 'TBA';
+    : t('common.tba');
 
   const hasStarted = hasRaceStarted(race.date, race.time);
   const canPredict = !race.completed && !hasStarted;

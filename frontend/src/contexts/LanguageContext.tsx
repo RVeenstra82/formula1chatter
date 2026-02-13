@@ -268,6 +268,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.raceIdRequired': 'Race ID is required',
     'common.important': 'Important',
     'common.login': 'Login',
+    'common.tba': 'TBA',
     
     // Common additional
     'common.next': 'Next',
@@ -579,6 +580,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.raceIdRequired': 'Race ID is vereist',
     'common.important': 'Belangrijk',
     'common.login': 'Inloggen',
+    'common.tba': 'Nog niet bekend',
     'common.next': 'Volgende',
     'common.previous': 'Vorige',
     'common.cancel': 'Annuleren',

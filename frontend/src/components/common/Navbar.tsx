@@ -10,23 +10,19 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'nl' : 'en');
-  };
-
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   const navLinkClass = (path: string) =>
     `px-4 py-2 rounded-md border transition-all font-medium uppercase tracking-f1 text-sm ${
       isActive(path)
-        ? 'border-f1-red bg-f1-red/20 text-f1-red shadow-[inset_0_0_12px_rgba(225,6,0,0.15)]'
+        ? 'border-f1-red bg-f1-red/20 text-white shadow-[inset_0_0_12px_rgba(225,6,0,0.15)]'
         : 'border-transparent hover:border-f1-red hover:bg-f1-red/10 text-white'
     }`;
 
   const mobileNavLinkClass = (path: string) =>
     `px-4 py-3 rounded-md transition-all font-medium uppercase tracking-f1 ${
       isActive(path)
-        ? 'bg-f1-red/20 border-l-2 border-l-f1-red text-f1-red'
+        ? 'bg-f1-red/20 border-l-2 border-l-f1-red text-white'
         : 'hover:bg-f1-red/10 hover:border-l-2 hover:border-l-f1-red text-white'
     }`;
 
@@ -36,69 +32,82 @@ const Navbar: React.FC = () => {
     <nav className="carbon-bg text-white border-b border-f1-border speed-line">
       <div className="container mx-auto px-4 py-3">
         {/* Desktop Navigation */}
-        <div className="hidden md:flex justify-between items-center">
+        <div className="hidden md:flex items-center">
           <Link to="/" className="text-xl font-bold flex items-center">
             <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_var(--f1-red-glow)]">F1</span>
             <span>Chatter Championship</span>
           </Link>
 
-            <div className="flex items-center">
-              <div className="flex space-x-2 mr-6">
-                <Link to="/races" className={navLinkClass('/races')} aria-current={ariaCurrent('/races')}>
-                  {t('nav.races')}
-                </Link>
-                <Link to="/leaderboard" className={navLinkClass('/leaderboard')} aria-current={ariaCurrent('/leaderboard')}>
-                  {t('nav.leaderboard')}
-                </Link>
-                <Link to="/stats" className={navLinkClass('/stats')} aria-current={ariaCurrent('/stats')}>
-                  {t('nav.stats')}
-                </Link>
-              </div>
+          <div className="border-l border-f1-border pl-6 ml-6 flex space-x-2">
+            <Link to="/races" className={navLinkClass('/races')} aria-current={ariaCurrent('/races')}>
+              {t('nav.races')}
+            </Link>
+            <Link to="/leaderboard" className={navLinkClass('/leaderboard')} aria-current={ariaCurrent('/leaderboard')}>
+              {t('nav.leaderboard')}
+            </Link>
+            <Link to="/stats" className={navLinkClass('/stats')} aria-current={ariaCurrent('/stats')}>
+              {t('nav.stats')}
+            </Link>
           </div>
 
-             <div className="border-l border-f1-border pl-6">
-               <button
-                 onClick={toggleLanguage}
-                 className="text-slate-400 hover:text-f1-red transition-colors px-3 py-2 rounded-md text-sm font-medium uppercase tracking-f1"
-               >
-                 {language.toUpperCase()}
-               </button>
-             </div>
+          <div className="flex-1" />
 
-             {isLoading ? (
-               <div className="w-8 h-8 rounded-full bg-f1-surface-elevated animate-pulse ml-6"></div>
-             ) : user ? (
-               <div className="flex items-center ml-6">
-                 <Link to="/profile" className="flex items-center hover:text-f1-red transition-colors">
-                   {user.profilePictureUrl && (
-                     <img
-                       src={user.profilePictureUrl}
-                       alt={user.name}
-                       className="w-8 h-8 rounded-full mr-2 border-2 border-f1-border hover:border-f1-red transition-colors"
-                     />
-                   )}
-                   <span className="font-body">{user.name}</span>
-                 </Link>
-                 <button
-                   onClick={() => logout()}
-                   className="ml-4 text-sm btn btn-primary"
-                 >
-                   {t('nav.logout')}
-                 </button>
-               </div>
-             ) : (
-               <div className="ml-6">
-                 <button
-                   onClick={login}
-                   className="btn btn-primary flex items-center"
-                 >
-                   <FacebookIcon className="w-4 h-4 mr-2" />
-                   {t('nav.loginWithFacebook')}
-                 </button>
-               </div>
-             )}
-           </div>
-         </div>
+          <div className="border-l border-f1-border pl-6 flex space-x-1">
+            <button
+              onClick={() => setLanguage('nl')}
+              aria-label="Wissel naar Nederlands"
+              aria-pressed={language === 'nl'}
+              className={`px-2 py-2 rounded-md text-sm font-medium uppercase tracking-f1 transition-colors ${
+                language === 'nl' ? 'text-f1-red' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              NL
+            </button>
+            <button
+              onClick={() => setLanguage('en')}
+              aria-label="Switch to English"
+              aria-pressed={language === 'en'}
+              className={`px-2 py-2 rounded-md text-sm font-medium uppercase tracking-f1 transition-colors ${
+                language === 'en' ? 'text-f1-red' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              EN
+            </button>
+          </div>
+
+          <div className="border-l border-f1-border pl-6 ml-6">
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-f1-surface-elevated animate-pulse"></div>
+            ) : user ? (
+              <div className="flex items-center">
+                <Link to="/profile" className="flex items-center hover:text-f1-red transition-colors">
+                  {user.profilePictureUrl && (
+                    <img
+                      src={user.profilePictureUrl}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full mr-2 border-2 border-f1-border hover:border-f1-red transition-colors"
+                    />
+                  )}
+                  <span className="font-body">{user.name}</span>
+                </Link>
+                <button
+                  onClick={() => logout()}
+                  className="ml-4 text-sm btn btn-primary"
+                >
+                  {t('nav.logout')}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={login}
+                className="btn btn-primary flex items-center"
+              >
+                <FacebookIcon className="w-4 h-4 mr-2" />
+                {t('nav.loginWithFacebook')}
+              </button>
+            )}
+          </div>
+        </div>
 
               {/* Mobile Navigation */}
         <div className="md:hidden">
@@ -109,12 +118,28 @@ const Navbar: React.FC = () => {
             </Link>
 
             <div className="flex items-center space-x-3">
-              <button
-                onClick={toggleLanguage}
-                className="text-slate-400 hover:text-f1-red transition-colors px-2 py-1 rounded text-sm uppercase tracking-f1"
-              >
-                {language.toUpperCase()}
-              </button>
+              <div className="flex space-x-1">
+                <button
+                  onClick={() => setLanguage('nl')}
+                  aria-label="Wissel naar Nederlands"
+                  aria-pressed={language === 'nl'}
+                  className={`px-1 py-1 rounded text-sm font-medium uppercase tracking-f1 transition-colors ${
+                    language === 'nl' ? 'text-f1-red' : 'text-slate-500'
+                  }`}
+                >
+                  NL
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  aria-label="Switch to English"
+                  aria-pressed={language === 'en'}
+                  className={`px-1 py-1 rounded text-sm font-medium uppercase tracking-f1 transition-colors ${
+                    language === 'en' ? 'text-f1-red' : 'text-slate-500'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
 
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -205,6 +230,7 @@ const Navbar: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
     </nav>
   );
 };

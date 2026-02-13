@@ -65,6 +65,16 @@ class UserService(
         )
     }
 
+    fun findByFacebookId(facebookId: String): UserDto? {
+        val user = userRepository.findByFacebookId(facebookId) ?: return null
+        return UserDto(
+            id = user.id!!,
+            name = user.name,
+            email = user.email,
+            profilePictureUrl = user.profilePictureUrl
+        )
+    }
+
     fun deleteUserAndData(userId: Long) {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")

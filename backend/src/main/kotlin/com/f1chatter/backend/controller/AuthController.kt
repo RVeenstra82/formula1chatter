@@ -52,8 +52,7 @@ class AuthController(
                     "id" to 0L,
                     "name" to "Test User",
                     "email" to "testuser@f1chatter.com",
-                    "profilePictureUrl" to null,
-                    "isAdmin" to true
+                    "profilePictureUrl" to null
                 )
                 return ResponseEntity.ok(testUser)
             } else if (token != "test-token" && jwtService.isTokenValid(token)) {
@@ -78,7 +77,7 @@ class AuthController(
             val user = userService.processOAuthPostLogin(auth)
 
             // Generate JWT token for the user
-            val jwtToken = jwtService.generateToken(user.id, user.name, user.email, user.isAdmin)
+            val jwtToken = jwtService.generateToken(user.id, user.name, user.email)
 
             logger.info { "OAuth2 authentication successful, generated JWT for user: ${user.name}" }
 
@@ -120,7 +119,7 @@ class AuthController(
             val user = userService.processOAuthPostLogin(auth)
 
             // Generate JWT token for the user
-            val jwtToken = jwtService.generateToken(user.id, user.name, user.email, user.isAdmin)
+            val jwtToken = jwtService.generateToken(user.id, user.name, user.email)
 
             logger.info { "OAuth2 callback successful, generated JWT for user: ${user.name}" }
 
@@ -129,8 +128,7 @@ class AuthController(
                 "id" to user.id,
                 "name" to user.name,
                 "email" to user.email,
-                "profilePictureUrl" to (user.profilePictureUrl ?: ""),
-                "isAdmin" to user.isAdmin
+                "profilePictureUrl" to (user.profilePictureUrl ?: "")
             )
             val userJson = objectMapper.writeValueAsString(userMap)
             val encodedUserJson = URLEncoder.encode(userJson, StandardCharsets.UTF_8.toString())

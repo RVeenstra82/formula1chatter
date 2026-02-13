@@ -46,26 +46,13 @@ class SprintPredictionControllerTest {
     """.trimIndent()
 
     @Test
-    fun `should return 400 when saving sprint prediction without authentication`() {
+    fun `should return 401 when saving sprint prediction without authentication`() {
         mockMvc.perform(
             post("/api/sprint-predictions/2026-1").contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(predictionJson)
         )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.error").value("Not authenticated"))
-    }
-
-    @Test
-    @WithMockUser(username = "anonymousUser")
-    fun `should return 400 for anonymous user trying to save sprint prediction`() {
-        mockMvc.perform(
-            post("/api/sprint-predictions/2026-1").contextPath("/api")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(predictionJson)
-        )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.error").value("Not authenticated"))
+            .andExpect(status().isUnauthorized)
     }
 
     @Test

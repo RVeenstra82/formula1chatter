@@ -42,7 +42,6 @@ export interface User {
   name: string;
   email: string;
   profilePictureUrl: string | null;
-  isAdmin?: boolean;
 }
 
 export interface Race {
@@ -179,10 +178,6 @@ export interface UserComparisonStats {
 
 export interface SeasonProgressStats {
   raceProgress: Array<{ raceName: string; accuracy: number; averageScore: number }>;
-}
-
-export interface AdminActionResult {
-  [key: string]: unknown;
 }
 
 // API Functions
@@ -358,42 +353,6 @@ export const api = {
 
   getConstructorPerformanceStats: async (): Promise<ConstructorPerformanceStats> => {
     const response = await apiClient.get('/stats/constructor-performance');
-    return response.data;
-  },
-
-  // Admin
-  updateDriverPhotos: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/update-driver-photos');
-    return response.data;
-  },
-
-  processCompletedRaces: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/process-completed-races');
-    return response.data;
-  },
-
-  syncRaceData: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/sync-race-data');
-    return response.data;
-  },
-
-  forceSyncRaceData: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/force-sync-race-data');
-    return response.data;
-  },
-
-  forceSyncWeekendSchedules: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/force-sync-weekend-schedules');
-    return response.data;
-  },
-
-  syncDriverData: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.post('/admin/sync-driver-data');
-    return response.data;
-  },
-
-  getSystemStatus: async (): Promise<AdminActionResult> => {
-    const response = await apiClient.get('/admin/system-status');
     return response.data;
   },
 }; 

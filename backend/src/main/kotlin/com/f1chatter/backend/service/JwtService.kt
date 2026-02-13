@@ -27,7 +27,7 @@ class JwtService(
     /**
      * Generate a JWT token for a user
      */
-    fun generateToken(userId: Long, username: String, email: String, isAdmin: Boolean = false): String {
+    fun generateToken(userId: Long, username: String, email: String): String {
         val now = Instant.now()
         val expiration = now.plus(expirationSeconds, ChronoUnit.SECONDS)
 
@@ -35,12 +35,11 @@ class JwtService(
             .subject(userId.toString())
             .claim("username", username)
             .claim("email", email)
-            .claim("isAdmin", isAdmin)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiration))
             .signWith(key)
             .compact()
-            
+
         logger.debug { "Generated JWT token for user $userId (${username})" }
         return token
     }
@@ -84,19 +83,6 @@ class JwtService(
         }
     }
     
-    /**
-     * Extract isAdmin from JWT token
-     */
-    fun extractIsAdmin(token: String): Boolean {
-        return try {
-            val claims = extractAllClaims(token)
-            claims["isAdmin"] as? Boolean ?: false
-        } catch (e: Exception) {
-            logger.warn { "Failed to extract isAdmin from token: ${e.message}" }
-            false
-        }
-    }
-
     /**
      * Validate JWT token
      */

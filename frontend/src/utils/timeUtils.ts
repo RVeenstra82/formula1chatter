@@ -162,3 +162,33 @@ export const hasRaceStarted = (
   const now = new Date();
   return now >= start;
 };
+
+export type SeasonState = 'pre-season' | 'waiting-for-results' | 'data-available';
+
+/**
+ * Determine the season state based on races data.
+ * - 'data-available': at least one race is completed
+ * - 'waiting-for-results': no completed races but a race weekend has started (practice1 or race date in past)
+ * - 'pre-season': no race weekend has started yet
+ */
+export const getSeasonState = (
+  allRaces: { date: string; time?: string | null; practice1Date?: string | null; practice1Time?: string | null; completed: boolean }[]
+): SeasonState => {
+  const hasCompleted = allRaces.some(r => r.completed);
+  if (hasCompleted) return 'data-available';
+
+  // Check if any race weekend has started (use practice1Date if available, fallback to race date)
+  const sorted = [...allRaces].sort((a, b) =>
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  const now = new Date();
+  const weekendStarted = sorted.some(race => {
+    const weekendDate = race.practice1Date || race.date;
+    const weekendTime = race.practice1Date ? (race.practice1Time || null) : (race.time || null);
+    const start = getRaceStartDate(weekendDate, weekendTime);
+    return now >= start;
+  });
+
+  return weekendStarted ? 'waiting-for-results' : 'pre-season';
+};

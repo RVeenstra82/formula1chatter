@@ -186,10 +186,6 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.raceNotCompleted': 'This race has not been completed yet.',
     'leaderboard.loginToView': 'You need to be logged in to view the leaderboard.',
     'leaderboard.change': 'Change',
-    'leaderboard.seasonNotStarted': 'Season Not Started Yet',
-    'leaderboard.seasonNotStartedDescription': 'The leaderboard will appear after the first race of the season has been completed.',
-    'leaderboard.scoreProcessingNote': 'After a race finishes, it can take up to an hour for scores to be calculated.',
-
     // Leaderboard page
     'leaderboard.subtitle': 'Track your performance against other users',
     'leaderboard.score': 'Score',
@@ -251,9 +247,6 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.thirdPlace': 'Third Place',
     'stats.fastestLap': 'Fastest Lap',
     'stats.driverOfDay': 'Driver of the Day',
-    'stats.seasonNotStarted': 'Season Just Started',
-    'stats.statsAfterFirstRace': 'Statistics will be available after the first completed race of the season.',
-    
     // Common
     'common.loading': 'Loading...',
     'common.save': 'Save',
@@ -280,6 +273,10 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'No',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link copied to clipboard!',
+    'common.seasonNotStarted': 'The Season Has Not Started Yet',
+    'common.seasonNotStartedDescription': 'The first race weekend has not started yet. Come back when the season begins!',
+    'common.waitingForResults': 'Waiting for Race Results',
+    'common.waitingForResultsDescription': 'Scores will be updated after the race results have been processed. This can take up to an hour after the race finishes.',
 
     // Leaderboard (missing)
     'leaderboard.loginRequired': 'Login Required',
@@ -493,9 +490,6 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.noCompletedRaces': 'Geen voltooide races beschikbaar.',
     'leaderboard.raceNotCompleted': 'Deze race is nog niet voltooid.',
     'leaderboard.change': 'Verandering',
-    'leaderboard.seasonNotStarted': 'Seizoen Nog Niet Gestart',
-    'leaderboard.seasonNotStartedDescription': 'De ranglijst verschijnt nadat de eerste race van het seizoen is voltooid.',
-    'leaderboard.scoreProcessingNote': 'Na afloop van een race kan het tot een uur duren voordat de scores berekend zijn.',
     'leaderboard.selectRace': 'Selecteer race',
     
     // Leaderboard page
@@ -559,8 +553,6 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.thirdPlace': 'Derde Plaats',
     'stats.fastestLap': 'Snelste Ronde',
     'stats.driverOfDay': 'Coureur van de Dag',
-    'stats.seasonNotStarted': 'Seizoen Net Begonnen',
-    'stats.statsAfterFirstRace': 'Statistieken worden beschikbaar na de eerste voltooide race van het seizoen.',
     'stats.loading': 'Statistieken laden...',
     'stats.error': 'Fout bij laden statistieken.',
     'stats.noData': 'Geen statistieken beschikbaar.',
@@ -590,6 +582,10 @@ const translations: Record<Language, Record<string, string>> = {
     'common.no': 'Nee',
     'common.ok': 'OK',
     'common.copiedToClipboard': 'Link gekopieerd naar klembord!',
+    'common.seasonNotStarted': 'Het Seizoen is Nog Niet Gestart',
+    'common.seasonNotStartedDescription': 'Het eerste raceweekend is nog niet begonnen. Kom terug wanneer het seizoen begint!',
+    'common.waitingForResults': 'Wachten op de Uitslag van de Race',
+    'common.waitingForResultsDescription': 'De scores worden bijgewerkt nadat de race-uitslagen zijn verwerkt. Dit kan tot een uur duren na afloop van de race.',
 
     // Profile
     'profile.notLoggedIn': 'Je bent niet ingelogd.',

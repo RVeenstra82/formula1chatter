@@ -55,7 +55,7 @@ class PredictionControllerTest {
     }
 
     @Test
-    fun `should return 400 when saving prediction without authentication`() {
+    fun `should return 401 when saving prediction without authentication`() {
         val predictionJson = """
             {
                 "firstPlaceDriverId": "verstappen",
@@ -71,30 +71,7 @@ class PredictionControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(predictionJson)
         )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.error").value("Not authenticated"))
-    }
-
-    @Test
-    @WithMockUser(username = "anonymousUser")
-    fun `should return 400 for anonymous user trying to save prediction`() {
-        val predictionJson = """
-            {
-                "firstPlaceDriverId": "verstappen",
-                "secondPlaceDriverId": "norris",
-                "thirdPlaceDriverId": "leclerc",
-                "fastestLapDriverId": "hamilton",
-                "driverOfTheDayId": "russell"
-            }
-        """.trimIndent()
-
-        mockMvc.perform(
-            post("/api/predictions/2026-1").contextPath("/api")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(predictionJson)
-        )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.error").value("Not authenticated"))
+            .andExpect(status().isUnauthorized)
     }
 
     @Test

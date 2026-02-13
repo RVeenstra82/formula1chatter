@@ -32,8 +32,6 @@ const Navbar: React.FC = () => {
 
   const ariaCurrent = (path: string) => isActive(path) ? 'page' as const : undefined;
 
-  const adminLinkClass = "px-4 py-2 rounded-md border border-transparent hover:border-purple-500 hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1 text-sm";
-
   return (
     <nav className="carbon-bg text-white border-b border-f1-border speed-line">
       <div className="container mx-auto px-4 py-3">
@@ -55,12 +53,6 @@ const Navbar: React.FC = () => {
                 <Link to="/stats" className={navLinkClass('/stats')} aria-current={ariaCurrent('/stats')}>
                   {t('nav.stats')}
                 </Link>
-
-                {user?.isAdmin ? (
-                  <Link to="/admin" className={adminLinkClass}>
-                    Admin
-                  </Link>
-                ) : null}
               </div>
           </div>
 
@@ -168,16 +160,6 @@ const Navbar: React.FC = () => {
                 >
                   {t('nav.stats')}
                 </Link>
-
-                {user?.isAdmin ? (
-                  <Link
-                    to="/admin"
-                    className="px-4 py-3 rounded-md hover:bg-purple-500/10 transition-all font-medium text-purple-300 uppercase tracking-f1"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Admin
-                  </Link>
-                ) : null}
 
                 {isLoading ? (
                   <div className="w-8 h-8 rounded-full bg-f1-surface-elevated animate-pulse"></div>

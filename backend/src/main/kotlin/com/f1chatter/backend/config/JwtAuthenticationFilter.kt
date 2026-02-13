@@ -45,7 +45,7 @@ class JwtAuthenticationFilter(
                 val userDetails: UserDetails = User.builder()
                     .username("0") // TestUser userId
                     .password("")
-                    .authorities("USER", "ADMIN")
+                    .authorities("USER")
                     .build()
 
                 val authToken = UsernamePasswordAuthenticationToken(
@@ -61,22 +61,16 @@ class JwtAuthenticationFilter(
                 val userId = jwtService.extractUserId(token)
                 val username = jwtService.extractUsername(token)
                 val email = jwtService.extractEmail(token)
-                val isAdmin = jwtService.extractIsAdmin(token)
 
                 if (userId != null && username != null && email != null) {
                     try {
                         // Verify user still exists in database
                         userService.getUserById(userId)
 
-                        val authorities = mutableListOf<SimpleGrantedAuthority>(SimpleGrantedAuthority("USER"))
-                        if (isAdmin) {
-                            authorities.add(SimpleGrantedAuthority("ADMIN"))
-                        }
-
                         val userDetails: UserDetails = User.builder()
                             .username(userId.toString())
                             .password("")
-                            .authorities(authorities as Collection<SimpleGrantedAuthority>)
+                            .authorities(SimpleGrantedAuthority("USER"))
                             .build()
 
                         val authToken = UsernamePasswordAuthenticationToken(
@@ -87,7 +81,7 @@ class JwtAuthenticationFilter(
                         authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                         SecurityContextHolder.getContext().authentication = authToken
 
-                        logger.debug { "JWT authentication successful for user: $username (admin=$isAdmin)" }
+                        logger.debug { "JWT authentication successful for user: $username" }
                     } catch (e: Exception) {
                         logger.warn { "JWT authentication failed for user ID $userId: ${e.message}" }
                     }

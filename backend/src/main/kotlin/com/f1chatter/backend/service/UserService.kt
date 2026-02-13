@@ -17,9 +17,6 @@ class UserService(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    private fun isKnownAdmin(user: User): Boolean =
-        user.email == "wub66@hotmail.com" || user.facebookId == "10162944940270266"
-
     fun processOAuthPostLogin(auth: OAuth2AuthenticationToken): UserDto {
         val attributes = auth.principal.attributes
         val facebookId = attributes["id"].toString()
@@ -42,17 +39,15 @@ class UserService(
             )
         }
 
-        user.isAdmin = isKnownAdmin(user)
         val savedUser = userRepository.save(user)
 
-        logger.info { "User ${savedUser.name} (${savedUser.email}) - isAdmin: ${savedUser.isAdmin}" }
+        logger.info { "User ${savedUser.name} (${savedUser.email})" }
 
         return UserDto(
             id = savedUser.id!!,
             name = savedUser.name,
             email = savedUser.email,
-            profilePictureUrl = savedUser.profilePictureUrl,
-            isAdmin = savedUser.isAdmin
+            profilePictureUrl = savedUser.profilePictureUrl
         )
     }
 
@@ -60,14 +55,13 @@ class UserService(
         val user = userRepository.findByIdOrNull(id)
             ?: throw NoSuchElementException("User not found with id: $id")
 
-        logger.info { "User ${user.name} (${user.email}) - isAdmin: ${user.isAdmin}" }
+        logger.info { "User ${user.name} (${user.email})" }
 
         return UserDto(
             id = user.id!!,
             name = user.name,
             email = user.email,
-            profilePictureUrl = user.profilePictureUrl,
-            isAdmin = user.isAdmin
+            profilePictureUrl = user.profilePictureUrl
         )
     }
 

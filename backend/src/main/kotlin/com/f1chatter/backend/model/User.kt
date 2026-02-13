@@ -14,14 +14,11 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    
+
     val facebookId: String,
     val name: String,
     val email: String,
     val profilePictureUrl: String?,
-
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    var isAdmin: Boolean = false,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     val predictions: MutableList<Prediction> = mutableListOf()
@@ -32,8 +29,7 @@ data class User(
             facebookId = "test-user",
             name = "Test User",
             email = "testuser@f1chatter.com",
-            profilePictureUrl = null,
-            isAdmin = true
+            profilePictureUrl = null
         )
     }
 } 

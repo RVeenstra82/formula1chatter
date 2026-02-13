@@ -3,20 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Page Tests', () => {
   test('should load ProfilePage', async ({ page }) => {
     await page.goto('/profile');
-    
-    // Check that the page loads
-    await expect(page).toHaveTitle(/Formula 1 Chatter/);
-    
-    // Should have main content
-    await expect(page.locator('main')).toBeVisible();
-  });
 
-  test('should load AdminPage', async ({ page }) => {
-    await page.goto('/admin');
-    
     // Check that the page loads
     await expect(page).toHaveTitle(/Formula 1 Chatter/);
-    
+
     // Should have main content
     await expect(page.locator('main')).toBeVisible();
   });

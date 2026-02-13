@@ -32,4 +32,7 @@ interface PredictionRepository : JpaRepository<Prediction, Long> {
     fun findByRace(race: Race): List<Prediction>
 
     fun findByUserId(userId: Long): List<Prediction>
+
+    @Query("SELECT AVG(p.score) FROM Prediction p WHERE p.score IS NOT NULL")
+    fun getAverageScore(): Double?
 } 

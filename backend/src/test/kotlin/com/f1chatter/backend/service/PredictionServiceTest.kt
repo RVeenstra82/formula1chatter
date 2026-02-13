@@ -196,14 +196,16 @@ class PredictionServiceTest {
         
         every { raceRepository.findByIdOrNull(raceId) } returns race
         every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(prediction1, prediction2)
-        every { predictionRepository.save(any()) } answers { firstArg() }
-        
+        every { predictionRepository.saveAll(any<List<Prediction>>()) } answers { firstArg() }
+
         // Act
         predictionService.calculateScores(raceId)
-        
+
         // Assert
-        verify { predictionRepository.save(match { it.id == 1L && it.score == 10 }) }
-        verify { predictionRepository.save(match { it.id == 2L && it.score == 2 }) }
+        verify { predictionRepository.saveAll(match<List<Prediction>> { list ->
+            list.any { it.id == 1L && it.score == 10 } &&
+            list.any { it.id == 2L && it.score == 2 }
+        }) }
     }
     
     @Test

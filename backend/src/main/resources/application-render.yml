@@ -45,11 +45,15 @@ app:
 
 server:
   port: ${PORT:8090}
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/css,application/javascript
+    min-response-size: 1024
 
 logging:
   level:
     com.f1chatter: INFO
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
+    org.springframework.security: WARN
+    org.springframework.security.oauth2: WARN
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql.BasicBinder: WARN

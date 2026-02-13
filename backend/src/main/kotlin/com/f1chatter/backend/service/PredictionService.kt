@@ -11,6 +11,7 @@ import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
 import com.f1chatter.backend.util.F1SeasonUtils
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -115,6 +116,7 @@ class PredictionService(
     }
     
     @Transactional
+    @CacheEvict(value = ["stats"], allEntries = true)
     fun calculateScores(raceId: String) {
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
@@ -124,38 +126,39 @@ class PredictionService(
         }
         
         val predictions = predictionRepository.findByRaceIdOrderByScoreDesc(raceId)
-        
-        predictions.forEach { prediction ->
+
+        val updatedPredictions = predictions.map { prediction ->
             var score = 0
-            
+
             // First place prediction (5 points)
             if (prediction.firstPlaceDriverId.isNotEmpty() && prediction.firstPlaceDriverId == race.firstPlaceDriverId) {
                 score += 5
             }
-            
+
             // Second place prediction (3 points)
             if (prediction.secondPlaceDriverId.isNotEmpty() && prediction.secondPlaceDriverId == race.secondPlaceDriverId) {
                 score += 3
             }
-            
+
             // Third place prediction (1 point)
             if (prediction.thirdPlaceDriverId.isNotEmpty() && prediction.thirdPlaceDriverId == race.thirdPlaceDriverId) {
                 score += 1
             }
-            
+
             // Fastest lap prediction (1 point)
             if (prediction.fastestLapDriverId.isNotEmpty() && prediction.fastestLapDriverId == race.fastestLapDriverId) {
                 score += 1
             }
-            
+
             // Driver of the day prediction (1 point)
             if (prediction.driverOfTheDayId.isNotEmpty() && prediction.driverOfTheDayId == race.driverOfTheDayId) {
                 score += 1
             }
-            
-            val updatedPrediction = prediction.copy(score = score)
-            predictionRepository.save(updatedPrediction)
+
+            prediction.copy(score = score)
         }
+
+        predictionRepository.saveAll(updatedPredictions)
     }
     
     fun getRaceResults(raceId: String): List<PredictionResultDto> {

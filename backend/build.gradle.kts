@@ -30,6 +30,8 @@ dependencies {
     implementation(libs.kotlin.logging.jvm)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.persistence.api)
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation(libs.caffeine)
     
     // JWT dependencies
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")

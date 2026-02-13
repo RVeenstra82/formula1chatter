@@ -28,4 +28,7 @@ interface RaceRepository : JpaRepository<Race, String> {
 fun findOldestSeason(): Int?
 
 fun findByRaceCompletedTrue(): List<Race>
+
+    @Query("SELECT DISTINCT r FROM Race r LEFT JOIN FETCH r.predictions WHERE r.raceCompleted = true")
+    fun findCompletedRacesWithPredictions(): List<Race>
 } 

@@ -83,13 +83,15 @@ class PredictionServiceScoringTest {
         )
 
         every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p1, p2)
-        every { predictionRepository.save(any()) } answers { firstArg() }
+        every { predictionRepository.saveAll(any<List<Prediction>>()) } answers { firstArg() }
 
         service.calculateScores(raceId)
 
         // p1 should be 5+3+1+1+1 = 11 ; p2 should be 0+0+0+1+1 = 2
-        verify { predictionRepository.save(match { it.id == 1L && it.score == 11 }) }
-        verify { predictionRepository.save(match { it.id == 2L && it.score == 2 }) }
+        verify { predictionRepository.saveAll(match<List<Prediction>> { list ->
+            list.any { it.id == 1L && it.score == 11 } &&
+            list.any { it.id == 2L && it.score == 2 }
+        }) }
     }
 }
 

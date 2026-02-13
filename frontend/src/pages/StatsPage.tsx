@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../api/client';
+import type { Race } from '../api/client';
+import { getSeasonState } from '../utils/timeUtils';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
@@ -61,6 +63,11 @@ const StatsPage: React.FC = () => {
   const { data: overview, isLoading: overviewLoading } = useQuery({
     queryKey: ['stats', 'overview'],
     queryFn: api.getStatsOverview,
+  });
+
+  const { data: allRaces = [] } = useQuery<Race[]>({
+    queryKey: ['races', 'all'],
+    queryFn: () => api.getCurrentSeasonRaces(),
   });
 
   const { data: driverStats, isLoading: driverLoading } = useQuery({
@@ -462,14 +469,25 @@ const StatsPage: React.FC = () => {
     </div>
   );
 
-  const renderSeasonNotStarted = () => (
-    <div className="card p-8 text-center">
-      <div className="text-6xl mb-4">🏎️</div>
-      <h3 className="text-lg font-semibold mb-2 text-white">{t('stats.seasonNotStarted')}</h3>
-      <p className="text-slate-400">{t('stats.statsAfterFirstRace')}</p>
-      <p className="text-slate-500 text-sm mt-4">{t('leaderboard.scoreProcessingNote')}</p>
-    </div>
-  );
+  const renderEmptyState = () => {
+    const seasonState = getSeasonState(allRaces);
+    if (seasonState === 'pre-season') {
+      return (
+        <div className="card p-8 text-center">
+          <div className="text-6xl mb-4">🏎️</div>
+          <h3 className="text-lg font-semibold mb-2 text-white">{t('common.seasonNotStarted')}</h3>
+          <p className="text-slate-400">{t('common.seasonNotStartedDescription')}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="card p-8 text-center">
+        <div className="text-6xl mb-4">⏳</div>
+        <h3 className="text-lg font-semibold mb-2 text-white">{t('common.waitingForResults')}</h3>
+        <p className="text-slate-400">{t('common.waitingForResultsDescription')}</p>
+      </div>
+    );
+  };
 
   const renderContent = () => {
     if (overviewLoading) {
@@ -477,7 +495,7 @@ const StatsPage: React.FC = () => {
     }
 
     if (overview && overview.completedRaces === 0) {
-      return renderSeasonNotStarted();
+      return renderEmptyState();
     }
 
     switch (activeTab) {

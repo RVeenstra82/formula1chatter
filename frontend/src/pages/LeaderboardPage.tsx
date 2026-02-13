@@ -6,6 +6,7 @@ import type { LeaderboardEntry, Race, PredictionResult } from '../api/client';
 import { api } from '../api/client';
 import FacebookIcon from '../components/common/FacebookIcon';
 import PositionChangeIndicator from '../components/prediction/PositionChangeIndicator';
+import { getSeasonState } from '../utils/timeUtils';
 
 type ViewMode = 'season' | 'race';
 
@@ -83,7 +84,26 @@ const LeaderboardPage: React.FC = () => {
     );
   }
 
+  const seasonState = getSeasonState(allRaces);
 
+  const renderEmptyState = () => {
+    if (seasonState === 'pre-season') {
+      return (
+        <div className="card p-8 text-center max-w-lg mx-auto">
+          <div className="text-6xl mb-4">🏁</div>
+          <h3 className="text-lg font-semibold mb-2 text-white">{t('common.seasonNotStarted')}</h3>
+          <p className="text-slate-400">{t('common.seasonNotStartedDescription')}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="card p-8 text-center max-w-lg mx-auto">
+        <div className="text-6xl mb-4">⏳</div>
+        <h3 className="text-lg font-semibold mb-2 text-white">{t('common.waitingForResults')}</h3>
+        <p className="text-slate-400">{t('common.waitingForResultsDescription')}</p>
+      </div>
+    );
+  };
 
   const renderPodium = (data: (LeaderboardEntry | PredictionResult)[]) => {
     const podium = data.slice(0, 3);
@@ -256,12 +276,7 @@ const LeaderboardPage: React.FC = () => {
 
       {/* Content */}
       {completedRaces.length === 0 ? (
-        <div className="card p-8 text-center max-w-lg mx-auto">
-          <div className="text-6xl mb-4">🏁</div>
-          <h3 className="text-lg font-semibold mb-2 text-white">{t('leaderboard.seasonNotStarted')}</h3>
-          <p className="text-slate-400">{t('leaderboard.seasonNotStartedDescription')}</p>
-          <p className="text-slate-500 text-sm mt-4">{t('leaderboard.scoreProcessingNote')}</p>
-        </div>
+        renderEmptyState()
       ) : viewMode === 'season' ? (
         <>
           {renderPodium(seasonLeaderboard)}

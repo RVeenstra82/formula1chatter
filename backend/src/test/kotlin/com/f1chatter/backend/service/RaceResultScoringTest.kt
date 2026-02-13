@@ -79,6 +79,18 @@ class RaceResultScoringTest {
         mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
 
+    private fun setupSinglePredictionTest(race: Race, p: Prediction, expectedScore: Int) {
+        every { raceRepository.findByIdOrNull(raceId) } returns race
+        every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
+        every { predictionRepository.saveAll(any<List<Prediction>>()) } answers { firstArg() }
+
+        service.calculateScores(raceId)
+
+        verify { predictionRepository.saveAll(match<List<Prediction>> { list ->
+            list.size == 1 && list[0].score == expectedScore
+        }) }
+    }
+
     @Nested
     inner class HappyPaths {
 
@@ -87,14 +99,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Alice")
             val p = prediction(1, u, race, "verstappen", "norris", "leclerc", "verstappen", "norris")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 11 }) }
+            setupSinglePredictionTest(race, p, 11)
         }
 
         @Test
@@ -102,14 +107,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Bob")
             val p = prediction(1, u, race, "verstappen", "norris", "leclerc", "wrong", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 9 }) }
+            setupSinglePredictionTest(race, p, 9)
         }
 
         @Test
@@ -117,14 +115,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Charlie")
             val p = prediction(1, u, race, "verstappen", "wrong", "wrong", "wrong", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 5 }) }
+            setupSinglePredictionTest(race, p, 5)
         }
 
         @Test
@@ -132,14 +123,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Dave")
             val p = prediction(1, u, race, "wrong", "norris", "wrong", "wrong", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 3 }) }
+            setupSinglePredictionTest(race, p, 3)
         }
 
         @Test
@@ -147,14 +131,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Eve")
             val p = prediction(1, u, race, "wrong", "wrong", "leclerc", "wrong", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 1 }) }
+            setupSinglePredictionTest(race, p, 1)
         }
 
         @Test
@@ -162,14 +139,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Frank")
             val p = prediction(1, u, race, "wrong", "wrong", "wrong", "verstappen", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 1 }) }
+            setupSinglePredictionTest(race, p, 1)
         }
 
         @Test
@@ -177,14 +147,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Grace")
             val p = prediction(1, u, race, "wrong", "wrong", "wrong", "wrong", "norris")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 1 }) }
+            setupSinglePredictionTest(race, p, 1)
         }
 
         @Test
@@ -192,14 +155,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Hank")
             val p = prediction(1, u, race, "verstappen", "wrong", "wrong", "verstappen", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 6 }) }
+            setupSinglePredictionTest(race, p, 6)
         }
 
         @Test
@@ -218,13 +174,15 @@ class RaceResultScoringTest {
 
             every { raceRepository.findByIdOrNull(raceId) } returns race
             every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p1, p2, p3)
-            every { predictionRepository.save(any()) } answers { firstArg() }
+            every { predictionRepository.saveAll(any<List<Prediction>>()) } answers { firstArg() }
 
             service.calculateScores(raceId)
 
-            verify { predictionRepository.save(match { it.id == 1L && it.score == 11 }) }
-            verify { predictionRepository.save(match { it.id == 2L && it.score == 0 }) }
-            verify { predictionRepository.save(match { it.id == 3L && it.score == 6 }) }
+            verify { predictionRepository.saveAll(match<List<Prediction>> { list ->
+                list.any { it.id == 1L && it.score == 11 } &&
+                list.any { it.id == 2L && it.score == 0 } &&
+                list.any { it.id == 3L && it.score == 6 }
+            }) }
         }
 
         @Test
@@ -235,7 +193,7 @@ class RaceResultScoringTest {
 
             service.calculateScores(raceId)
 
-            verify(exactly = 0) { predictionRepository.save(any()) }
+            verify { predictionRepository.saveAll(match<List<Prediction>> { it.isEmpty() }) }
         }
 
         @Test
@@ -249,14 +207,7 @@ class RaceResultScoringTest {
                 thirdPlaceDriverId = "wrong", fastestLapDriverId = "wrong",
                 driverOfTheDayId = "wrong", score = 99 // old wrong score
             )
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 5 }) }
+            setupSinglePredictionTest(race, p, 5)
         }
     }
 
@@ -268,14 +219,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Loser")
             val p = prediction(1, u, race, "wrong1", "wrong2", "wrong3", "wrong4", "wrong5")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 0 }) }
+            setupSinglePredictionTest(race, p, 0)
         }
 
         @Test
@@ -283,14 +227,7 @@ class RaceResultScoringTest {
             val race = completedRace()
             val u = user(1, "Empty")
             val p = prediction(1, u, race, "", "", "", "", "")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 0 }) }
+            setupSinglePredictionTest(race, p, 0)
         }
 
         @Test
@@ -329,14 +266,7 @@ class RaceResultScoringTest {
             val race = completedRace(firstPlace = "verstappen")
             val u = user(1, "CaseMismatch")
             val p = prediction(1, u, race, "Verstappen", "wrong", "wrong", "wrong", "wrong")
-
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
-            verify { predictionRepository.save(match { it.score == 0 }) }
+            setupSinglePredictionTest(race, p, 0)
         }
 
         @Test
@@ -346,14 +276,8 @@ class RaceResultScoringTest {
             // Prediction has empty DOTD
             val p = prediction(1, u, race, "verstappen", "norris", "leclerc", "verstappen", "")
 
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
             // 5+3+1+1 = 10 (no DOTD point because race DOTD is null, comparison fails)
-            verify { predictionRepository.save(match { it.score == 10 }) }
+            setupSinglePredictionTest(race, p, 10)
         }
 
         @Test
@@ -363,14 +287,8 @@ class RaceResultScoringTest {
             val u = user(1, "Swapped")
             val p = prediction(1, u, race, "norris", "verstappen", "leclerc", "", "")
 
-            every { raceRepository.findByIdOrNull(raceId) } returns race
-            every { predictionRepository.findByRaceIdOrderByScoreDesc(raceId) } returns listOf(p)
-            every { predictionRepository.save(any()) } answers { firstArg() }
-
-            service.calculateScores(raceId)
-
             // Only 3rd place correct = 1 point
-            verify { predictionRepository.save(match { it.score == 1 }) }
+            setupSinglePredictionTest(race, p, 1)
         }
     }
 }

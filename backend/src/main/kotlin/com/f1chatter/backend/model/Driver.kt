@@ -2,12 +2,19 @@ package com.f1chatter.backend.model
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "drivers")
+@Table(
+    name = "drivers",
+    indexes = [
+        Index(name = "idx_drivers_code", columnList = "code"),
+        Index(name = "idx_drivers_constructor_id", columnList = "constructor_id")
+    ]
+)
 data class Driver(
     @Id
     val id: String,

@@ -1,7 +1,6 @@
 package com.f1chatter.backend.config
 
 import com.f1chatter.backend.service.JwtService
-import com.f1chatter.backend.service.UserService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -19,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtAuthenticationFilter(
     private val jwtService: JwtService,
-    private val userService: UserService,
     private val environment: Environment
 ) : OncePerRequestFilter() {
 
@@ -63,28 +61,21 @@ class JwtAuthenticationFilter(
                 val email = jwtService.extractEmail(token)
 
                 if (userId != null && username != null && email != null) {
-                    try {
-                        // Verify user still exists in database
-                        userService.getUserById(userId)
+                    val userDetails: UserDetails = User.builder()
+                        .username(userId.toString())
+                        .password("")
+                        .authorities(SimpleGrantedAuthority("USER"))
+                        .build()
 
-                        val userDetails: UserDetails = User.builder()
-                            .username(userId.toString())
-                            .password("")
-                            .authorities(SimpleGrantedAuthority("USER"))
-                            .build()
+                    val authToken = UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.authorities
+                    )
+                    authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                    SecurityContextHolder.getContext().authentication = authToken
 
-                        val authToken = UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.authorities
-                        )
-                        authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                        SecurityContextHolder.getContext().authentication = authToken
-
-                        logger.debug { "JWT authentication successful for user: $username" }
-                    } catch (e: Exception) {
-                        logger.warn { "JWT authentication failed for user ID $userId: ${e.message}" }
-                    }
+                    logger.debug { "JWT authentication successful for user: $username" }
                 }
             } else {
                 logger.debug { "Invalid JWT token" }

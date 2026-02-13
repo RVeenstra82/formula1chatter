@@ -82,7 +82,7 @@ const ProfilePage: React.FC = () => {
         <div className="card p-6 mb-6">
           <div className="flex items-center">
             {user.profilePictureUrl && (
-              <img src={user.profilePictureUrl} alt={user.name} className="w-16 h-16 rounded-full mr-4" />
+              <img src={user.profilePictureUrl} alt={user.name} className="w-16 h-16 rounded-full mr-4" loading="lazy" />
             )}
             <div>
               <h1 className="text-2xl font-bold text-white">{user.name}</h1>

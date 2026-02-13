@@ -28,6 +28,5 @@ RUN ls -la /app/public/
 ENV PORT=8090
 EXPOSE 8090
 
-# Add debugging
-ENV JAVA_OPTS="-Dserver.port=8090 -Dlogging.level.root=DEBUG"
+ENV JAVA_OPTS="-Dserver.port=8090 -Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
 CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"] 

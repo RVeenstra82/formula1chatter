@@ -4,9 +4,8 @@ import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.UserRepository
-import com.f1chatter.backend.repository.UserScoreProjection
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class StatsService(
@@ -15,62 +14,61 @@ class StatsService(
     private val driverRepository: DriverRepository,
     private val userRepository: UserRepository
 ) {
-    
+
+    @Cacheable("stats", key = "'driverPerformance'")
     fun getDriverPerformanceStats(): Map<String, Any> {
-        val completedRaces = raceRepository.findByRaceCompletedTrue()
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions()
         val allDrivers = driverRepository.findAll()
-        
+
+        // Pre-collect all predictions to avoid repeated lazy loading
+        val allPredictions = completedRaces.flatMap { it.predictions }
+
         val driverStats = allDrivers.map { driver ->
-            val correctPredictions = completedRaces.count { race ->
-                race.firstPlaceDriverId == driver.id || 
-                race.secondPlaceDriverId == driver.id || 
+            val podiumFinishes = completedRaces.count { race ->
+                race.firstPlaceDriverId == driver.id ||
+                race.secondPlaceDriverId == driver.id ||
                 race.thirdPlaceDriverId == driver.id
             }
-            
-            val totalPredictions = completedRaces.sumOf { race ->
-                race.predictions.count { prediction ->
-                    prediction.firstPlaceDriverId == driver.id || 
-                    prediction.secondPlaceDriverId == driver.id || 
-                    prediction.thirdPlaceDriverId == driver.id
-                }
+
+            val totalPredictions = allPredictions.count { prediction ->
+                prediction.firstPlaceDriverId == driver.id ||
+                prediction.secondPlaceDriverId == driver.id ||
+                prediction.thirdPlaceDriverId == driver.id
             }
-            
+
             val successRate = if (totalPredictions > 0) {
-                (correctPredictions.toDouble() / totalPredictions) * 100
+                (podiumFinishes.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             mapOf(
                 "driverId" to driver.id,
                 "driverName" to "${driver.givenName} ${driver.familyName}",
                 "driverCode" to driver.code,
                 "constructor" to driver.constructor?.name,
-                "correctPredictions" to correctPredictions,
+                "correctPredictions" to podiumFinishes,
                 "totalPredictions" to totalPredictions,
                 "successRate" to successRate,
-                "podiumFinishes" to completedRaces.count { race ->
-                    race.firstPlaceDriverId == driver.id || 
-                    race.secondPlaceDriverId == driver.id || 
-                    race.thirdPlaceDriverId == driver.id
-                }
+                "podiumFinishes" to podiumFinishes
             )
         }.sortedByDescending { it["successRate"] as Double }
-        
+
         return mapOf(
             "driverStats" to driverStats,
             "totalRaces" to completedRaces.size,
             "totalDrivers" to allDrivers.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'predictionAccuracy'")
     fun getPredictionAccuracyStats(): Map<String, Any> {
-        val completedRaces = raceRepository.findByRaceCompletedTrue()
-        
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions()
+
         val predictionTypes = listOf("firstPlace", "secondPlace", "thirdPlace", "fastestLap", "driverOfTheDay")
         val accuracyByType = predictionTypes.associateWith { predictionType ->
             val totalPredictions = completedRaces.sumOf { race ->
                 race.predictions.size
             }
-            
+
             val correctPredictions = completedRaces.sumOf { race ->
                 race.predictions.count { prediction ->
                     when (predictionType) {
@@ -83,27 +81,28 @@ class StatsService(
                     }
                 }
             }
-            
+
             val accuracy = if (totalPredictions > 0) {
                 (correctPredictions.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             mapOf(
                 "totalPredictions" to totalPredictions,
                 "correctPredictions" to correctPredictions,
                 "accuracy" to accuracy
             )
         }
-        
+
         return mapOf(
             "accuracyByType" to accuracyByType,
             "totalRaces" to completedRaces.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'circuitDifficulty'")
     fun getCircuitDifficultyStats(): Map<String, Any> {
-        val completedRaces = raceRepository.findByRaceCompletedTrue()
-        
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions()
+
         val circuitStats = completedRaces.groupBy { it.circuitName }.mapValues { (circuitName, races) ->
             val totalPredictions = races.sumOf { it.predictions.size }
             val correctPredictions = races.sumOf { race ->
@@ -113,11 +112,11 @@ class StatsService(
                     (prediction.thirdPlaceDriverId == race.thirdPlaceDriverId)
                 }
             }
-            
+
             val accuracy = if (totalPredictions > 0) {
                 (correctPredictions.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             mapOf(
                 "circuitName" to circuitName,
                 "totalPredictions" to totalPredictions,
@@ -128,21 +127,25 @@ class StatsService(
                 "country" to races.first().country
             )
         }.values.sortedBy { it["difficulty"] as Double }
-        
+
         return mapOf(
             "circuitStats" to circuitStats,
             "totalCircuits" to circuitStats.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'userComparison'")
     fun getUserComparisonStats(): Map<String, Any> {
         val users = userRepository.findAll()
-        val completedRaces = raceRepository.findByRaceCompletedTrue()
-        
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions()
+
+        // Pre-collect all predictions once
+        val allPredictions = completedRaces.flatMap { it.predictions }
+
         val userStats = users.map { user ->
-            val userPredictions = completedRaces.flatMap { it.predictions }.filter { it.user.id == user.id }
+            val userPredictions = allPredictions.filter { it.user.id == user.id }
             val totalPredictions = userPredictions.size
-            
+
             val correctPredictions = userPredictions.count { prediction ->
                 val race = prediction.race
                 (prediction.firstPlaceDriverId == race.firstPlaceDriverId) ||
@@ -151,13 +154,13 @@ class StatsService(
                 (prediction.fastestLapDriverId == race.fastestLapDriverId) ||
                 (prediction.driverOfTheDayId == race.driverOfTheDayId)
             }
-            
+
             val accuracy = if (totalPredictions > 0) {
                 (correctPredictions.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             val totalScore = userPredictions.sumOf { it.score ?: 0 }
-            
+
             mapOf(
                 "userId" to user.id,
                 "userName" to user.name,
@@ -169,16 +172,17 @@ class StatsService(
                 "averageScore" to if (totalPredictions > 0) totalScore.toDouble() / totalPredictions else 0.0
             )
         }.sortedByDescending { it["totalScore"] as Int }
-        
+
         return mapOf(
             "userStats" to userStats,
             "totalUsers" to users.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'seasonProgress'")
     fun getSeasonProgressStats(): Map<String, Any> {
-        val completedRaces = raceRepository.findByRaceCompletedTrue().sortedBy { it.round }
-        
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions().sortedBy { it.round }
+
         val raceProgress = completedRaces.map { race ->
             val totalPredictions = race.predictions.size
             val correctPredictions = race.predictions.count { prediction ->
@@ -188,15 +192,15 @@ class StatsService(
                 (prediction.fastestLapDriverId == race.fastestLapDriverId) ||
                 (prediction.driverOfTheDayId == race.driverOfTheDayId)
             }
-            
+
             val accuracy = if (totalPredictions > 0) {
                 (correctPredictions.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             val averageScore = if (totalPredictions > 0) {
                 race.predictions.sumOf { it.score ?: 0 }.toDouble() / totalPredictions
             } else 0.0
-            
+
             mapOf(
                 "raceId" to race.id,
                 "raceName" to race.raceName,
@@ -209,21 +213,28 @@ class StatsService(
                 "date" to race.date.toString()
             )
         }
-        
+
         return mapOf(
             "raceProgress" to raceProgress,
             "totalRaces" to completedRaces.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'constructorPerformance'")
     fun getConstructorPerformanceStats(): Map<String, Any> {
-        val completedRaces = raceRepository.findByRaceCompletedTrue()
-        val constructors = driverRepository.findAll().mapNotNull { it.constructor }.distinctBy { it.id }
-        
+        val completedRaces = raceRepository.findCompletedRacesWithPredictions()
+        val allDrivers = driverRepository.findAll()
+        val constructors = allDrivers.mapNotNull { it.constructor }.distinctBy { it.id }
+
+        // Pre-build driver-to-constructor map
+        val driverIdsByConstructor = allDrivers
+            .filter { it.constructor != null }
+            .groupBy { it.constructor!!.id }
+            .mapValues { (_, drivers) -> drivers.map { it.id }.toSet() }
+
         val constructorStats = constructors.map { constructor ->
-            val drivers = driverRepository.findByConstructorId(constructor.id)
-            val driverIds = drivers.map { it.id }
-            
+            val driverIds = driverIdsByConstructor[constructor.id] ?: emptySet()
+
             val correctPredictions = completedRaces.sumOf { race ->
                 race.predictions.count { prediction ->
                     val predictedDrivers = listOf(
@@ -236,12 +247,12 @@ class StatsService(
                         race.secondPlaceDriverId,
                         race.thirdPlaceDriverId
                     )
-                    
-                    predictedDrivers.any { it in driverIds } && 
+
+                    predictedDrivers.any { it in driverIds } &&
                     actualDrivers.any { it in driverIds }
                 }
             }
-            
+
             val totalPredictions = completedRaces.sumOf { race ->
                 race.predictions.count { prediction ->
                     val predictedDrivers = listOf(
@@ -252,46 +263,56 @@ class StatsService(
                     predictedDrivers.any { it in driverIds }
                 }
             }
-            
+
             val successRate = if (totalPredictions > 0) {
                 (correctPredictions.toDouble() / totalPredictions) * 100
             } else 0.0
-            
+
             mapOf(
                 "constructorId" to constructor.id,
                 "constructorName" to constructor.name,
                 "correctPredictions" to correctPredictions,
                 "totalPredictions" to totalPredictions,
                 "successRate" to successRate,
-                "driverCount" to drivers.size
+                "driverCount" to driverIds.size
             )
         }.sortedByDescending { it["successRate"] as Double }
-        
+
         return mapOf(
             "constructorStats" to constructorStats,
             "totalConstructors" to constructors.size
         )
     }
-    
+
+    @Cacheable("stats", key = "'overview'")
     fun getStatsOverview(): Map<String, Any?> {
         val totalUsers = userRepository.count()
         val totalRaces = raceRepository.count()
         val completedRaces = raceRepository.findByRaceCompletedTrue().size
         val totalPredictions = predictionRepository.count()
         val totalDrivers = driverRepository.count()
-        
+
         val averageScore = if (totalPredictions > 0) {
-            predictionRepository.findAll().mapNotNull { it.score }.average()
+            predictionRepository.getAverageScore() ?: 0.0
         } else 0.0
-        
-        val mostPredictedDriver = driverRepository.findAll().maxByOrNull { driver ->
-            predictionRepository.findAll().count { prediction ->
-                prediction.firstPlaceDriverId == driver.id ||
-                prediction.secondPlaceDriverId == driver.id ||
-                prediction.thirdPlaceDriverId == driver.id
-            }
+
+        // Load all predictions once and all drivers once for most-predicted calculation
+        val allPredictions = predictionRepository.findAll()
+        val allDrivers = driverRepository.findAll()
+
+        // Count predictions per driver in-memory (single pass)
+        val predictionCountByDriver = mutableMapOf<String, Int>()
+        for (prediction in allPredictions) {
+            listOf(prediction.firstPlaceDriverId, prediction.secondPlaceDriverId, prediction.thirdPlaceDriverId)
+                .filter { it.isNotEmpty() }
+                .forEach { driverId ->
+                    predictionCountByDriver[driverId] = (predictionCountByDriver[driverId] ?: 0) + 1
+                }
         }
-        
+
+        val mostPredictedDriverId = predictionCountByDriver.maxByOrNull { it.value }?.key
+        val mostPredictedDriver = mostPredictedDriverId?.let { id -> allDrivers.find { it.id == id } }
+
         val mostPredictedDriverData = mostPredictedDriver?.let { driver ->
             mapOf(
                 "driverId" to driver.id,
@@ -299,7 +320,7 @@ class StatsService(
                 "driverCode" to driver.code
             )
         }
-        
+
         return mapOf(
             "totalUsers" to totalUsers,
             "totalRaces" to totalRaces,

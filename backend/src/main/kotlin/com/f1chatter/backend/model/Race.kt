@@ -9,7 +9,9 @@ import java.time.LocalTime
     name = "races",
     indexes = [
         Index(name = "idx_races_season", columnList = "season"),
-        Index(name = "idx_races_race_completed", columnList = "raceCompleted")
+        Index(name = "idx_races_race_completed", columnList = "raceCompleted"),
+        Index(name = "idx_races_date", columnList = "date"),
+        Index(name = "idx_races_season_round", columnList = "season, round")
     ]
 )
 data class Race(

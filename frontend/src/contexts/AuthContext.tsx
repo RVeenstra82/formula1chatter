@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { apiClient } from '../api/client';
 import type { User } from '../api/client';
@@ -82,12 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkUserStatus();
   }, []);
 
-  const login = () => {
+  const login = useCallback(() => {
     // Redirect to Facebook login
     window.location.href = `${apiClient.defaults.baseURL}/oauth2/authorization/facebook`;
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       // Call backend logout endpoint first
       await apiClient.post('/logout');
@@ -105,15 +105,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Redirect to home page
     window.location.href = '/';
-  };
+  }, []);
 
-  const value: AuthContextType = {
+  const value = useMemo<AuthContextType>(() => ({
     user,
     isLoading,
     error,
     login,
     logout,
-  };
+  }), [user, isLoading, error, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

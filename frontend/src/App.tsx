@@ -4,18 +4,21 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Layout from './components/common/Layout';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import { Suspense, lazy } from 'react';
 
-// Pages
+// Eager-loaded (always needed)
 import HomePage from './pages/HomePage';
-import RacesPage from './pages/RacesPage';
-import RaceDetailPage from './pages/RaceDetailPage';
-import PredictionPage from './pages/PredictionPage';
-import ResultsPage from './pages/ResultsPage';
-import LeaderboardPage from './pages/LeaderboardPage';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import DataDeletion from './pages/DataDeletion';
-import StatsPage from './pages/StatsPage';
-import ProfilePage from './pages/ProfilePage';
+
+// Lazy-loaded pages
+const RacesPage = lazy(() => import('./pages/RacesPage'));
+const RaceDetailPage = lazy(() => import('./pages/RaceDetailPage'));
+const PredictionPage = lazy(() => import('./pages/PredictionPage'));
+const ResultsPage = lazy(() => import('./pages/ResultsPage'));
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const DataDeletion = lazy(() => import('./pages/DataDeletion'));
+const StatsPage = lazy(() => import('./pages/StatsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 // Create a client
 const queryClient = new QueryClient({
@@ -23,9 +26,18 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -35,27 +47,29 @@ function App() {
           <AuthProvider>
             <BrowserRouter>
               <Layout>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/races" element={<RacesPage />} />
-                  <Route path="/races/:raceId" element={<RaceDetailPage />} />
-                  <Route path="/races/:raceId/predict" element={<PredictionPage />} />
-                  <Route path="/races/:raceId/results" element={<ResultsPage />} />
-                  <Route path="/leaderboard" element={<LeaderboardPage />} />
-                  <Route path="/stats" element={<StatsPage />} />
-                  <Route path="/stats/:tab" element={<StatsPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/data-deletion" element={<DataDeletion />} />
-                  <Route path="*" element={
-                    <div className="flex flex-col items-center justify-center py-24">
-                      <div className="text-6xl mb-6">🏁</div>
-                      <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-f1">{404}</h1>
-                      <p className="text-slate-400 mb-8">This page could not be found.</p>
-                      <a href="/" className="btn btn-primary">Back to Home</a>
-                    </div>
-                  } />
-                </Routes>
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/races" element={<RacesPage />} />
+                    <Route path="/races/:raceId" element={<RaceDetailPage />} />
+                    <Route path="/races/:raceId/predict" element={<PredictionPage />} />
+                    <Route path="/races/:raceId/results" element={<ResultsPage />} />
+                    <Route path="/leaderboard" element={<LeaderboardPage />} />
+                    <Route path="/stats" element={<StatsPage />} />
+                    <Route path="/stats/:tab" element={<StatsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/data-deletion" element={<DataDeletion />} />
+                    <Route path="*" element={
+                      <div className="flex flex-col items-center justify-center py-24">
+                        <div className="text-6xl mb-6">🏁</div>
+                        <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-f1">{404}</h1>
+                        <p className="text-slate-400 mb-8">This page could not be found.</p>
+                        <a href="/" className="btn btn-primary">Back to Home</a>
+                      </div>
+                    } />
+                  </Routes>
+                </Suspense>
               </Layout>
             </BrowserRouter>
           </AuthProvider>

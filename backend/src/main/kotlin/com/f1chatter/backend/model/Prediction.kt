@@ -7,7 +7,9 @@ import java.time.LocalDateTime
 @Table(
     name = "predictions",
     indexes = [
-        Index(name = "idx_predictions_user_race", columnList = "user_id, race_id", unique = true)
+        Index(name = "idx_predictions_user_race", columnList = "user_id, race_id", unique = true),
+        Index(name = "idx_predictions_race_id", columnList = "race_id"),
+        Index(name = "idx_predictions_user_id", columnList = "user_id")
     ]
 )
 data class Prediction(
@@ -19,7 +21,7 @@ data class Prediction(
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
     
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "race_id", nullable = false)
     val race: Race,
     

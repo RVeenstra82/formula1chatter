@@ -2,6 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import type { GroupBase, SingleValue, StylesConfig } from 'react-select';
 import type { Driver } from '../../api/client';
+import { useLanguage } from '../../contexts/LanguageContext';
 const proxy = (src?: string | null) => (src ? `/api/images/proxy?src=${encodeURIComponent(src)}` : undefined);
 
 interface DriverSelectProps {
@@ -110,6 +111,7 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
   disabled = false,
   disabledReasons = {},
 }) => {
+  const { t } = useLanguage();
   const groupedOptions: GroupBase<DriverOption>[] = Object.entries(
     drivers.reduce((acc, driver) => {
       const team = driver.constructorName || 'Independent';
@@ -147,7 +149,7 @@ const DriverSelect: React.FC<DriverSelectProps> = ({
         isDisabled={disabled}
         isOptionDisabled={(option) => !!disabledReasons[option.value]}
         isSearchable
-        placeholder="Select a driver"
+        placeholder={t('common.selectDriver')}
         styles={darkStyles}
         formatOptionLabel={({ driver }, { context }) => {
           const reason = disabledReasons[driver.id];

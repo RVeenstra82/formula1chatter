@@ -304,7 +304,21 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     'footer.privacyPolicy': 'Privacy Policy',
     'footer.dataDeletion': 'Data Deletion',
+    'footer.donate': 'Donate',
     'footer.copyright': 'Chatter Championship',
+
+    // Donate
+    'donate.title': 'Support F1 Chatter',
+    'donate.subtitle': 'Help us keep the servers running!',
+    'donate.why.title': 'Why donate?',
+    'donate.why.description': 'F1 Chatter is a free platform that runs on paid servers. Your donation helps cover the monthly costs to keep the platform online and available for everyone.',
+    'donate.costs.title': 'What your donation covers',
+    'donate.costs.hosting': 'Server hosting',
+    'donate.costs.database': 'Secure data storage',
+    'donate.costs.api': 'F1 data API access',
+    'donate.costs.development': 'Domain and maintenance',
+    'donate.button': 'Donate via Ko-fi',
+    'donate.note': 'Donations are voluntary and non-refundable. Every contribution, big or small, is greatly appreciated!',
 
     // Home (logged-in CTA)
     'home.viewRaces': 'View Upcoming Races',
@@ -607,7 +621,21 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     'footer.privacyPolicy': 'Privacybeleid',
     'footer.dataDeletion': 'Gegevens verwijderen',
+    'footer.donate': 'Doneren',
     'footer.copyright': 'Chatter Kampioenschap',
+
+    // Donate
+    'donate.title': 'Steun F1 Chatter',
+    'donate.subtitle': 'Help ons de servers draaiende te houden!',
+    'donate.why.title': 'Waarom doneren?',
+    'donate.why.description': 'F1 Chatter is een gratis platform dat draait op betaalde servers. Je donatie helpt de maandelijkse kosten te dekken om het platform online en beschikbaar te houden voor iedereen.',
+    'donate.costs.title': 'Waar je donatie aan bijdraagt',
+    'donate.costs.hosting': 'Server hosting',
+    'donate.costs.database': 'Veilige gegevensopslag',
+    'donate.costs.api': 'F1 data API toegang',
+    'donate.costs.development': 'Domein en onderhoud',
+    'donate.button': 'Doneer via Ko-fi',
+    'donate.note': 'Donaties zijn vrijwillig en niet restitueerbaar. Elke bijdrage, groot of klein, wordt enorm gewaardeerd!',
 
     // Home (logged-in CTA)
     'home.viewRaces': 'Bekijk aankomende races',

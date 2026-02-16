@@ -19,6 +19,7 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const DataDeletion = lazy(() => import('./pages/DataDeletion'));
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const DonatePage = lazy(() => import('./pages/DonatePage'));
 
 // Create a client
 const queryClient = new QueryClient({
@@ -60,6 +61,7 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/data-deletion" element={<DataDeletion />} />
+                    <Route path="/donate" element={<DonatePage />} />
                     <Route path="*" element={
                       <div className="flex flex-col items-center justify-center py-24">
                         <div className="text-6xl mb-6">🏁</div>

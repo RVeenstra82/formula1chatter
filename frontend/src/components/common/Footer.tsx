@@ -19,6 +19,9 @@ const Footer: React.FC = () => {
             <Link to="/data-deletion" className="text-slate-400 hover:text-f1-red transition-colors">
               {t('footer.dataDeletion')}
             </Link>
+            <Link to="/donate" className="text-slate-400 hover:text-f1-red transition-colors">
+              {t('footer.donate')}
+            </Link>
             <a
               href="https://github.com/RVeenstra82/formula1chatter"
               target="_blank"

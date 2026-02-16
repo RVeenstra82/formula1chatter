@@ -282,7 +282,8 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.loginRequired': 'Login Required',
 
     // Stats (missing)
-    'stats.loginRequired': 'Log in to view user statistics.',
+    'stats.loginRequired': 'Login Required',
+    'stats.loginRequiredDescription': 'You need to be logged in to view the statistics.',
 
     // Profile
     'profile.notLoggedIn': 'You are not logged in.',
@@ -570,7 +571,8 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.loading': 'Statistieken laden...',
     'stats.error': 'Fout bij laden statistieken.',
     'stats.noData': 'Geen statistieken beschikbaar.',
-    'stats.loginRequired': 'Log in om gebruikersstatistieken te bekijken.',
+    'stats.loginRequired': 'Inloggen Vereist',
+    'stats.loginRequiredDescription': 'Je moet ingelogd zijn om de statistieken te bekijken.',
     
     // Common
     'common.loading': 'Laden...',

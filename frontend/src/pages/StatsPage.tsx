@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import FacebookIcon from '../components/common/FacebookIcon';
 import { api } from '../api/client';
 import type { Race } from '../api/client';
 import { getSeasonState } from '../utils/timeUtils';
@@ -32,7 +33,7 @@ const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, login, isLoading: isLoadingAuth } = useAuth();
 
   // URL synchronization
   useEffect(() => {
@@ -517,6 +518,32 @@ const StatsPage: React.FC = () => {
         return renderOverview();
     }
   };
+
+  if (isLoadingAuth) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-f1-red"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">{t('stats.loginRequired')}</h1>
+          <p className="text-slate-400 mb-6">{t('stats.loginRequiredDescription')}</p>
+          <button
+            onClick={login}
+            className="btn btn-primary inline-flex items-center"
+          >
+            <FacebookIcon className="w-4 h-4 mr-2" />
+            {t('predict.loginFacebook')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

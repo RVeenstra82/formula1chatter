@@ -66,7 +66,7 @@ const LeaderboardPage: React.FC = () => {
           <p className="text-slate-400 mb-6">{t('leaderboard.loginToView')}</p>
           <button
             onClick={login}
-            className="btn btn-primary flex items-center"
+            className="btn btn-primary inline-flex items-center"
           >
             <FacebookIcon className="w-4 h-4 mr-2" />
             {t('predict.loginFacebook')}

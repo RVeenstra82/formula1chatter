@@ -1,22 +1,80 @@
 package com.f1chatter.backend.service
 
+import com.f1chatter.backend.model.ApiCache
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.UserRepository
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import mu.KotlinLogging
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class StatsService(
     private val predictionRepository: PredictionRepository,
     private val raceRepository: RaceRepository,
     private val driverRepository: DriverRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val apiCacheRepository: ApiCacheRepository,
+    private val objectMapper: ObjectMapper
 ) {
+    private val logger = KotlinLogging.logger {}
+    private val statsCacheTtlHours = 1L
+
+    private val mapTypeRef = object : TypeReference<Map<String, Any?>>() {}
+
+    /**
+     * Check L2 database cache for stats. If found, return it (Caffeine L1 will auto-store via @Cacheable).
+     * If not found, return null so the caller computes the result.
+     */
+    private fun getFromDbCache(cacheKey: String): Map<String, Any?>? {
+        return try {
+            val cached = apiCacheRepository.findValidCacheByUrl("stats://$cacheKey", LocalDateTime.now())
+            if (cached != null) {
+                logger.debug { "Stats cache hit (L2 database) for $cacheKey" }
+                objectMapper.readValue(cached.responseData, mapTypeRef)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to load stats from database cache for $cacheKey" }
+            null
+        }
+    }
+
+    /**
+     * Store computed stats in L2 database cache for survival across server restarts.
+     */
+    private fun storeInDbCache(cacheKey: String, result: Map<String, Any?>) {
+        try {
+            val json = objectMapper.writeValueAsString(result)
+            val now = LocalDateTime.now()
+            apiCacheRepository.save(
+                ApiCache(
+                    url = "stats://$cacheKey",
+                    responseData = json,
+                    lastFetched = now,
+                    expiresAt = now.plusHours(statsCacheTtlHours),
+                    responseSize = json.toByteArray().size
+                )
+            )
+            logger.debug { "Stored stats in database cache (L2) for $cacheKey" }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to store stats in database cache for $cacheKey" }
+        }
+    }
 
     @Cacheable("stats", key = "'driverPerformance'")
     fun getDriverPerformanceStats(): Map<String, Any> {
+        getFromDbCache("driverPerformance")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val completedRaces = raceRepository.findCompletedRacesWithPredictions()
         val allDrivers = driverRepository.findAll()
 
@@ -52,15 +110,22 @@ class StatsService(
             )
         }.sortedByDescending { it["successRate"] as Double }
 
-        return mapOf(
+        val result = mapOf(
             "driverStats" to driverStats,
             "totalRaces" to completedRaces.size,
             "totalDrivers" to allDrivers.size
         )
+        storeInDbCache("driverPerformance", result)
+        return result
     }
 
     @Cacheable("stats", key = "'predictionAccuracy'")
     fun getPredictionAccuracyStats(): Map<String, Any> {
+        getFromDbCache("predictionAccuracy")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val completedRaces = raceRepository.findCompletedRacesWithPredictions()
 
         val predictionTypes = listOf("firstPlace", "secondPlace", "thirdPlace", "fastestLap", "driverOfTheDay")
@@ -93,14 +158,21 @@ class StatsService(
             )
         }
 
-        return mapOf(
+        val result = mapOf(
             "accuracyByType" to accuracyByType,
             "totalRaces" to completedRaces.size
         )
+        storeInDbCache("predictionAccuracy", result)
+        return result
     }
 
     @Cacheable("stats", key = "'circuitDifficulty'")
     fun getCircuitDifficultyStats(): Map<String, Any> {
+        getFromDbCache("circuitDifficulty")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val completedRaces = raceRepository.findCompletedRacesWithPredictions()
 
         val circuitStats = completedRaces.groupBy { it.circuitName }.mapValues { (circuitName, races) ->
@@ -128,14 +200,21 @@ class StatsService(
             )
         }.values.sortedBy { it["difficulty"] as Double }
 
-        return mapOf(
+        val result = mapOf(
             "circuitStats" to circuitStats,
             "totalCircuits" to circuitStats.size
         )
+        storeInDbCache("circuitDifficulty", result)
+        return result
     }
 
     @Cacheable("stats", key = "'userComparison'")
     fun getUserComparisonStats(): Map<String, Any> {
+        getFromDbCache("userComparison")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val users = userRepository.findAll()
         val completedRaces = raceRepository.findCompletedRacesWithPredictions()
 
@@ -173,14 +252,21 @@ class StatsService(
             )
         }.sortedByDescending { it["totalScore"] as Int }
 
-        return mapOf(
+        val result = mapOf(
             "userStats" to userStats,
             "totalUsers" to users.size
         )
+        storeInDbCache("userComparison", result)
+        return result
     }
 
     @Cacheable("stats", key = "'seasonProgress'")
     fun getSeasonProgressStats(): Map<String, Any> {
+        getFromDbCache("seasonProgress")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val completedRaces = raceRepository.findCompletedRacesWithPredictions().sortedBy { it.round }
 
         val raceProgress = completedRaces.map { race ->
@@ -214,14 +300,21 @@ class StatsService(
             )
         }
 
-        return mapOf(
+        val result = mapOf(
             "raceProgress" to raceProgress,
             "totalRaces" to completedRaces.size
         )
+        storeInDbCache("seasonProgress", result)
+        return result
     }
 
     @Cacheable("stats", key = "'constructorPerformance'")
     fun getConstructorPerformanceStats(): Map<String, Any> {
+        getFromDbCache("constructorPerformance")?.let {
+            @Suppress("UNCHECKED_CAST")
+            return it as Map<String, Any>
+        }
+
         val completedRaces = raceRepository.findCompletedRacesWithPredictions()
         val allDrivers = driverRepository.findAll()
         val constructors = allDrivers.mapNotNull { it.constructor }.distinctBy { it.id }
@@ -278,14 +371,18 @@ class StatsService(
             )
         }.sortedByDescending { it["successRate"] as Double }
 
-        return mapOf(
+        val result = mapOf(
             "constructorStats" to constructorStats,
             "totalConstructors" to constructors.size
         )
+        storeInDbCache("constructorPerformance", result)
+        return result
     }
 
     @Cacheable("stats", key = "'overview'")
     fun getStatsOverview(): Map<String, Any?> {
+        getFromDbCache("overview")?.let { return it }
+
         val totalUsers = userRepository.count()
         val totalRaces = raceRepository.count()
         val completedRaces = raceRepository.findByRaceCompletedTrue().size
@@ -321,7 +418,7 @@ class StatsService(
             )
         }
 
-        return mapOf(
+        val result = mapOf(
             "totalUsers" to totalUsers,
             "totalRaces" to totalRaces,
             "completedRaces" to completedRaces,
@@ -330,5 +427,7 @@ class StatsService(
             "averageScore" to averageScore,
             "mostPredictedDriver" to mostPredictedDriverData
         )
+        storeInDbCache("overview", result)
+        return result
     }
 }

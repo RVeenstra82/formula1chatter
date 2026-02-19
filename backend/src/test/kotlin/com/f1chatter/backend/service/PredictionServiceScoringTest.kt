@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.model.Prediction
 import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.model.User
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
@@ -21,6 +22,7 @@ class PredictionServiceScoringTest {
     private lateinit var raceRepository: RaceRepository
     private lateinit var userRepository: UserRepository
     private lateinit var driverService: DriverService
+    private lateinit var apiCacheRepository: ApiCacheRepository
     private lateinit var service: PredictionService
 
     @BeforeEach
@@ -29,7 +31,8 @@ class PredictionServiceScoringTest {
         raceRepository = mockk()
         userRepository = mockk(relaxed = true)
         driverService = mockk(relaxed = true)
-        service = PredictionService(predictionRepository, raceRepository, userRepository, driverService)
+        apiCacheRepository = mockk(relaxed = true)
+        service = PredictionService(predictionRepository, raceRepository, userRepository, driverService, apiCacheRepository)
         mockkStatic("org.springframework.data.repository.CrudRepositoryExtensionsKt")
     }
 

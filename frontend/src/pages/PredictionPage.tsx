@@ -119,16 +119,35 @@ const PredictionPage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <h1 className="text-3xl font-bold text-white mb-4">{t('predict.loginRequired')}</h1>
-        <p className="text-slate-300 mb-8">{t('predict.needLogin')}</p>
-        <button
-          onClick={login}
-          className="btn btn-primary inline-flex items-center"
-        >
-          <FacebookIcon className="w-4 h-4 mr-2" />
-          {t('predict.loginFacebook')}
-        </button>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="card max-w-md w-full p-8 text-center">
+          <div className="text-5xl mb-4">🎯</div>
+          <h1 className="text-2xl font-bold text-white mb-3 uppercase tracking-f1">{t('predict.teaserTitle')}</h1>
+          <p className="text-slate-400 mb-6">{t('predict.teaserDescription')}</p>
+          <div className="bg-f1-surface-elevated rounded-lg border border-f1-border p-4 mb-6 text-left">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('predict.teaserFeature1')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('predict.teaserFeature2')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('predict.teaserFeature3')}</span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={login}
+            className="btn btn-primary inline-flex items-center"
+          >
+            <FacebookIcon className="w-4 h-4 mr-2" />
+            {t('predict.loginFacebook')}
+          </button>
+        </div>
       </div>
     );
   }

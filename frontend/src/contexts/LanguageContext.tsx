@@ -121,6 +121,13 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.sprintPredictionInfo': 'Make your prediction for the sprint race (top 3 only)',
     'predict.submitSprintPrediction': 'Submit Sprint Prediction',
     'predict.racePrediction': 'Race Prediction',
+
+    // Prediction teaser
+    'predict.teaserTitle': 'Make Your Prediction',
+    'predict.teaserDescription': 'Predict race winners, podium finishes, and special awards',
+    'predict.teaserFeature1': 'Predict podium finishes (1st, 2nd, 3rd)',
+    'predict.teaserFeature2': 'Choose fastest lap and Driver of the Day',
+    'predict.teaserFeature3': 'Earn up to 11 points per race',
     
     // Prediction form
     'prediction.title': 'Make Your Prediction',
@@ -254,6 +261,8 @@ const translations: Record<Language, Record<string, string>> = {
     'common.success': 'Success',
     'common.back': '← Back',
     'common.notFound': 'Not Found',
+    'common.pageNotFound': 'This page could not be found.',
+    'common.backToHome': 'Back to Home',
     'common.language': 'Language',
     'common.points': 'points',
     'common.point': 'point',
@@ -281,9 +290,23 @@ const translations: Record<Language, Record<string, string>> = {
     // Leaderboard (missing)
     'leaderboard.loginRequired': 'Login Required',
 
+    // Leaderboard teaser
+    'leaderboard.teaserTitle': 'Join the Competition',
+    'leaderboard.teaserDescription': 'See where you rank against other F1 prediction champions',
+    'leaderboard.teaserFeature1': 'Season standings and rankings',
+    'leaderboard.teaserFeature2': 'Race-by-race leaderboards',
+    'leaderboard.teaserFeature3': 'Track your climb to the top',
+
     // Stats (missing)
     'stats.loginRequired': 'Login Required',
     'stats.loginRequiredDescription': 'You need to be logged in to view the statistics.',
+
+    // Stats teaser
+    'stats.teaserTitle': 'Unlock Deep Insights',
+    'stats.teaserDescription': 'Access statistics and analytics on predictions, drivers, and circuits',
+    'stats.teaserFeature1': 'Track your prediction accuracy',
+    'stats.teaserFeature2': 'Driver and constructor trends',
+    'stats.teaserFeature3': 'Compare with other players',
 
     // Profile
     'profile.notLoggedIn': 'You are not logged in.',
@@ -301,6 +324,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Nav
     'nav.loginWithFacebook': 'Login with Facebook',
+    'nav.brand': 'Chatter Championship',
+    'nav.brandShort': 'Chatter',
 
     // Footer
     'footer.privacyPolicy': 'Privacy Policy',
@@ -439,6 +464,13 @@ const translations: Record<Language, Record<string, string>> = {
     'predict.sprintPredictionInfo': 'Maak je voorspelling voor de sprint race (alleen top 3)',
     'predict.submitSprintPrediction': 'Sprint Voorspelling Indienen',
     'predict.racePrediction': 'Race Voorspelling',
+
+    // Prediction teaser
+    'predict.teaserTitle': 'Doe Je Voorspelling',
+    'predict.teaserDescription': 'Voorspel racewinnaars, podiumplaatsen en speciale prijzen',
+    'predict.teaserFeature1': 'Voorspel podiumplaatsen (1e, 2e, 3e)',
+    'predict.teaserFeature2': 'Kies snelste ronde en Coureur van de Dag',
+    'predict.teaserFeature3': 'Verdien tot 11 punten per race',
     
     // Prediction form
     'prediction.title': 'Maak Je Voorspelling',
@@ -494,6 +526,13 @@ const translations: Record<Language, Record<string, string>> = {
     'leaderboard.noRaceResults': 'Geen verdere voorspellingen voor deze race gedaan.',
     'leaderboard.loginRequired': 'Inloggen Vereist',
     'leaderboard.loginToView': 'Je moet ingelogd zijn om de ranglijst te bekijken.',
+
+    // Leaderboard teaser
+    'leaderboard.teaserTitle': 'Doe Mee aan de Competitie',
+    'leaderboard.teaserDescription': 'Zie waar je staat tussen andere F1 voorspellingskampioenen',
+    'leaderboard.teaserFeature1': 'Seizoen ranglijst en klassementen',
+    'leaderboard.teaserFeature2': 'Race-voor-race ranglijsten',
+    'leaderboard.teaserFeature3': 'Volg je klim naar de top',
     'leaderboard.checkBack': 'Kom terug nadat races zijn voltooid!',
     'leaderboard.position': 'Positie',
     'leaderboard.user': 'Gebruiker',
@@ -573,6 +612,13 @@ const translations: Record<Language, Record<string, string>> = {
     'stats.noData': 'Geen statistieken beschikbaar.',
     'stats.loginRequired': 'Inloggen Vereist',
     'stats.loginRequiredDescription': 'Je moet ingelogd zijn om de statistieken te bekijken.',
+
+    // Stats teaser
+    'stats.teaserTitle': 'Ontgrendel Diepgaande Inzichten',
+    'stats.teaserDescription': 'Krijg toegang tot statistieken over voorspellingen, coureurs en circuits',
+    'stats.teaserFeature1': 'Volg je voorspellingsnauwkeurigheid',
+    'stats.teaserFeature2': 'Coureur- en constructeurtrends',
+    'stats.teaserFeature3': 'Vergelijk met andere spelers',
     
     // Common
     'common.loading': 'Laden...',
@@ -581,6 +627,8 @@ const translations: Record<Language, Record<string, string>> = {
     'common.success': 'Succes',
     'common.back': '← Terug',
     'common.notFound': 'Niet Gevonden',
+    'common.pageNotFound': 'Deze pagina kon niet worden gevonden.',
+    'common.backToHome': 'Terug naar Home',
     'common.language': 'Taal',
     'common.points': 'punten',
     'common.point': 'punt',
@@ -619,6 +667,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Nav
     'nav.loginWithFacebook': 'Inloggen met Facebook',
+    'nav.brand': 'Chatter Kampioenschap',
+    'nav.brandShort': 'Chatter',
 
     // Footer
     'footer.privacyPolicy': 'Privacybeleid',

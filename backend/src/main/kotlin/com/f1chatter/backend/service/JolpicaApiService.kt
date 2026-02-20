@@ -11,6 +11,7 @@ import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.SprintRaceRepository
 import com.f1chatter.backend.repository.ApiCacheRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.type.TypeReference
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
@@ -19,6 +20,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import com.f1chatter.backend.util.F1SeasonUtils
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
@@ -31,6 +33,7 @@ class JolpicaApiService(
     private val sprintRaceRepository: SprintRaceRepository,
     private val driverRepository: DriverRepository,
     private val constructorRepository: ConstructorRepository,
+    private val apiCacheRepository: ApiCacheRepository,
     @Value("\${jolpica.api.base-url}")
     private val baseUrl: String,
     @Value("\${jolpica.api.rate-limit.requests-per-second:3}")
@@ -39,38 +42,84 @@ class JolpicaApiService(
     private val maxRetries: Int
 ) {
     private val logger = KotlinLogging.logger {}
-    private val requestDelayMs = (1000 / requestsPerSecond).toLong() // Calculate delay based on requests per second
+    private val requestDelayMs = (1000 / requestsPerSecond).toLong()
     private var lastRequestTime = 0L
-    
-    private fun getCurrentSeason(): Int = F1SeasonUtils.getCurrentSeason()
-    
-    // Cache to store API responses
-    private val apiCache = ConcurrentHashMap<String, Map<*, *>>()
-    private val cacheExpiryHours = 24L // Cache expires after 24 hours
 
-    private fun clearExpiredCache() {
+    private fun getCurrentSeason(): Int = F1SeasonUtils.getCurrentSeason()
+
+    // L1 cache: in-memory for ultra-fast reads when the server is warm
+    private val memoryCache = ConcurrentHashMap<String, Map<*, *>>()
+    private val cacheExpiryHours = 24L
+
+    private fun clearExpiredMemoryCache() {
         val currentTime = System.currentTimeMillis()
-        val expiredUrls = apiCache.entries
-            .filter { entry -> 
+        val expiredUrls = memoryCache.entries
+            .filter { entry ->
                 val timestamp = entry.value["_cacheTimestamp"] as? Long ?: 0L
                 (currentTime - timestamp) > (cacheExpiryHours * 60 * 60 * 1000)
             }
             .map { it.key }
-        
-        expiredUrls.forEach { apiCache.remove(it) }
+
+        expiredUrls.forEach { memoryCache.remove(it) }
     }
-    
-    private fun <T> makeApiRequest(url: String, responseType: Class<T>): T? {
-        // Check if we have a cached response for this URL
-        if (apiCache.containsKey(url) && responseType == Map::class.java) {
-            logger.debug { "Using cached response for $url" }
-            @Suppress("UNCHECKED_CAST")
-            return apiCache[url] as T
+
+    private fun storeInDatabaseCache(url: String, responseJson: String) {
+        try {
+            val now = LocalDateTime.now()
+            val cacheEntry = ApiCache(
+                url = url,
+                responseData = responseJson,
+                lastFetched = now,
+                expiresAt = now.plusHours(cacheExpiryHours),
+                responseSize = responseJson.toByteArray().size
+            )
+            apiCacheRepository.save(cacheEntry)
+            logger.debug { "Stored response in database cache for $url (${cacheEntry.responseSize} bytes)" }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to store response in database cache for $url" }
         }
-        
+    }
+
+    private fun loadFromDatabaseCache(url: String): Map<*, *>? {
+        return try {
+            val cached = apiCacheRepository.findValidCacheByUrl(url, LocalDateTime.now())
+            if (cached != null) {
+                val map = objectMapper.readValue(cached.responseData, object : TypeReference<Map<String, Any>>() {})
+                // Populate L1 memory cache for subsequent fast reads
+                val memoryCopy = HashMap(map)
+                memoryCopy["_cacheTimestamp"] = System.currentTimeMillis()
+                memoryCache[url] = memoryCopy
+                logger.debug { "Loaded response from database cache (L2) for $url" }
+                map
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to load response from database cache for $url" }
+            null
+        }
+    }
+
+    private fun <T> makeApiRequest(url: String, responseType: Class<T>): T? {
+        // L1: Check in-memory cache
+        if (memoryCache.containsKey(url) && responseType == Map::class.java) {
+            logger.debug { "Cache hit (L1 memory) for $url" }
+            @Suppress("UNCHECKED_CAST")
+            return memoryCache[url] as T
+        }
+
+        // L2: Check database cache
+        if (responseType == Map::class.java) {
+            val dbCached = loadFromDatabaseCache(url)
+            if (dbCached != null) {
+                @Suppress("UNCHECKED_CAST")
+                return dbCached as T
+            }
+        }
+
         val currentTime = System.currentTimeMillis()
         val elapsedSinceLastRequest = currentTime - lastRequestTime
-        
+
         // If we've made a request recently, wait to avoid hitting rate limits
         if (elapsedSinceLastRequest < requestDelayMs && lastRequestTime > 0) {
             val sleepTime = requestDelayMs - elapsedSinceLastRequest
@@ -81,22 +130,26 @@ class JolpicaApiService(
                 Thread.currentThread().interrupt()
             }
         }
-        
+
         // Try the request with exponential backoff for retries
         var retries = 0
-        
+
         while (retries <= maxRetries) {
             try {
                 lastRequestTime = System.currentTimeMillis()
                 val response = restTemplate.getForObject(url, responseType)
-                
-                // Cache the response if it's a Map
+
+                // Store in both L1 (memory) and L2 (database) caches
                 if (response is Map<*, *> && responseType == Map::class.java) {
                     val responseCopy = HashMap(response)
                     responseCopy["_cacheTimestamp"] = System.currentTimeMillis()
-                    apiCache[url] = responseCopy
+                    memoryCache[url] = responseCopy
+
+                    // Store clean response (without _cacheTimestamp) in database
+                    val dbResponseJson = objectMapper.writeValueAsString(response)
+                    storeInDatabaseCache(url, dbResponseJson)
                 }
-                
+
                 return response
             } catch (e: HttpClientErrorException) {
                 if (e.statusCode.value() == 429) { // Too Many Requests
@@ -120,7 +173,7 @@ class JolpicaApiService(
                 }
             }
         }
-        
+
         return null
     }
     
@@ -526,11 +579,19 @@ class JolpicaApiService(
         }
     }
     
-    // Periodically clear expired cache entries
+    // Periodically clear expired cache entries (L1 memory + L2 database)
     @org.springframework.scheduling.annotation.Scheduled(fixedRate = 3600000) // Once per hour
     fun cleanupCache() {
         logger.debug { "Cleaning up expired cache entries" }
-        clearExpiredCache()
-        logger.debug { "Cache size after cleanup: ${apiCache.size}" }
+        clearExpiredMemoryCache()
+        logger.debug { "L1 memory cache size after cleanup: ${memoryCache.size}" }
+
+        try {
+            apiCacheRepository.deleteByExpiresAtBefore(LocalDateTime.now())
+            val validCount = apiCacheRepository.countValidCaches(LocalDateTime.now())
+            logger.debug { "L2 database cache: $validCount valid entries remaining" }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to clean up database cache" }
+        }
     }
 } 

@@ -7,10 +7,12 @@ import com.f1chatter.backend.dto.PredictionResultDto
 import com.f1chatter.backend.model.Prediction
 import com.f1chatter.backend.model.Race
 import com.f1chatter.backend.model.User
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.f1chatter.backend.repository.PredictionRepository
 import com.f1chatter.backend.repository.RaceRepository
 import com.f1chatter.backend.repository.UserRepository
 import com.f1chatter.backend.util.F1SeasonUtils
+import mu.KotlinLogging
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -25,8 +27,10 @@ class PredictionService(
     private val predictionRepository: PredictionRepository,
     private val raceRepository: RaceRepository,
     private val userRepository: UserRepository,
-    private val driverService: DriverService
+    private val driverService: DriverService,
+    private val apiCacheRepository: ApiCacheRepository
 ) {
+    private val logger = KotlinLogging.logger {}
     @Transactional
     fun savePrediction(userId: Long, raceId: String, predictionDto: PredictionDto): Prediction {
         val user = if (userId == 0L) User.TEST_USER else
@@ -120,11 +124,11 @@ class PredictionService(
     fun calculateScores(raceId: String) {
         val race = raceRepository.findByIdOrNull(raceId)
             ?: throw NoSuchElementException("Race not found")
-        
+
         if (!race.raceCompleted || race.firstPlaceDriverId == null) {
             throw IllegalStateException("Race results not available yet")
         }
-        
+
         val predictions = predictionRepository.findByRaceIdOrderByScoreDesc(raceId)
 
         val updatedPredictions = predictions.map { prediction ->
@@ -159,6 +163,14 @@ class PredictionService(
         }
 
         predictionRepository.saveAll(updatedPredictions)
+
+        // Also evict L2 database stats cache
+        try {
+            apiCacheRepository.deleteByUrlPrefix("stats://")
+            logger.debug { "Evicted L2 database stats cache after score calculation" }
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to evict L2 database stats cache" }
+        }
     }
     
     fun getRaceResults(raceId: String): List<PredictionResultDto> {

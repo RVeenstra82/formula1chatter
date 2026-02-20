@@ -3,6 +3,7 @@ package com.f1chatter.backend.service
 import com.f1chatter.backend.model.Constructor
 import com.f1chatter.backend.model.Driver
 import com.f1chatter.backend.model.Race
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
@@ -30,6 +31,7 @@ class JolpicaApiServiceTest {
     private lateinit var sprintRaceRepository: SprintRaceRepository
     private lateinit var driverRepository: DriverRepository
     private lateinit var constructorRepository: ConstructorRepository
+    private lateinit var apiCacheRepository: ApiCacheRepository
     private lateinit var service: JolpicaApiService
 
     @BeforeEach
@@ -40,6 +42,7 @@ class JolpicaApiServiceTest {
         sprintRaceRepository = mockk(relaxed = true)
         driverRepository = mockk(relaxed = true)
         constructorRepository = mockk(relaxed = true)
+        apiCacheRepository = mockk(relaxed = true)
         service = JolpicaApiService(
             restTemplate,
             objectMapper,
@@ -47,6 +50,7 @@ class JolpicaApiServiceTest {
             sprintRaceRepository,
             driverRepository,
             constructorRepository,
+            apiCacheRepository,
             baseUrl = "https://api.ergast.com/api/f1",
             requestsPerSecond = 1000,
             maxRetries = 0

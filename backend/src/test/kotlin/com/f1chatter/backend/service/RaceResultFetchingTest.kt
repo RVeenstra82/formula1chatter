@@ -1,6 +1,7 @@
 package com.f1chatter.backend.service
 
 import com.f1chatter.backend.model.Race
+import com.f1chatter.backend.repository.ApiCacheRepository
 import com.f1chatter.backend.repository.ConstructorRepository
 import com.f1chatter.backend.repository.DriverRepository
 import com.f1chatter.backend.repository.RaceRepository
@@ -68,9 +69,10 @@ class RaceResultFetchingTest {
         val sprintRaceRepository = mockk<SprintRaceRepository>(relaxed = true)
         val driverRepository = mockk<DriverRepository>(relaxed = true)
         val constructorRepository = mockk<ConstructorRepository>(relaxed = true)
+        val apiCacheRepository = mockk<ApiCacheRepository>(relaxed = true)
         service = JolpicaApiService(
             restTemplate, objectMapper, raceRepository, sprintRaceRepository,
-            driverRepository, constructorRepository,
+            driverRepository, constructorRepository, apiCacheRepository,
             baseUrl = "https://api.jolpi.ca/ergast/f1",
             requestsPerSecond = 1000, maxRetries = 0
         )

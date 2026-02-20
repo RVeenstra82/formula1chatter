@@ -2,8 +2,10 @@ package com.f1chatter.backend.repository
 
 import com.f1chatter.backend.model.ApiCache
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Repository
@@ -22,4 +24,9 @@ interface ApiCacheRepository : JpaRepository<ApiCache, String> {
     fun deleteByExpiresAtBefore(expiryTime: LocalDateTime)
     
     fun deleteByUrl(url: String)
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM ApiCache a WHERE a.url LIKE :prefix%")
+    fun deleteByUrlPrefix(prefix: String)
 }

@@ -13,6 +13,7 @@ Formula 1 Chatter is an F1 prediction platform where users predict race podiums,
 - **Auth:** Facebook OAuth2 → JWT tokens stored in localStorage
 - **External APIs:** Jolpica (F1 race data), OpenF1 (driver photos)
 - **Deployment:** Backend on Render, frontend on Vercel
+- Always check for TypeScript strict-mode/null-safety issues after frontend edits. Always verify correct data path expressions by reading the actual data model files first.
 
 ## Build & Run Commands
 
@@ -101,6 +102,11 @@ Scheduled with `@Scheduled` cron expressions. Syncs races weekly, drivers weekly
 ### External API Rate Limiting
 Jolpica API: 3 req/sec with retries. OpenF1 API: 500ms delay between drivers, stops after 2 consecutive errors. Responses are cached in `ApiCache` table.
 
+## Workflow
+
+- Before starting implementation, ask clarifying questions about the user's preferred approach rather than diving into lengthy analysis/planning. If the user suggests a specific approach, follow it.
+- When making git operations, NEVER use `git reset --hard` without explicitly warning about uncommitted changes first. Always run `git stash` before any destructive git operation.
+
 ## Git Workflow
 
 - **Never commit directly to `main`.** Always create a feature branch first.
@@ -108,6 +114,16 @@ Jolpica API: 3 req/sec with retries. OpenF1 API: 500ms delay between drivers, st
 - Use `/branch` skill to create and switch to a new branch.
 - When work is done, commit on the feature branch and create a PR to `main`.
 - Load `.env` before starting dev: `export $(cat .env | xargs) && npm run dev`
+- **After creating a PR**, suggest reviewing the PR with `/review-pr` — do NOT suggest merging directly.
+
+## Testing
+
+- Always ensure ALL tests pass before considering a task complete, including pre-existing test failures. Run the full test suite and fix any failures, not just tests related to the current change.
+- When fixing tests, do NOT create new test classes if existing test classes already cover the same service/component. Add tests to the existing class and follow its patterns.
+
+## UI & Styling
+
+- When working on UI/styling tasks, implement the change, then describe what it looks like and ask for user feedback before committing. Expect 2-3 iteration rounds for visual work.
 
 ## Key Conventions
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import FacebookIcon from '../components/common/FacebookIcon';
 import { api } from '../api/client';
 import type { Race } from '../api/client';
 import { getSeasonState } from '../utils/timeUtils';
@@ -32,7 +33,7 @@ const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, login, isLoading: isLoadingAuth } = useAuth();
 
   // URL synchronization
   useEffect(() => {
@@ -517,6 +518,49 @@ const StatsPage: React.FC = () => {
         return renderOverview();
     }
   };
+
+  if (isLoadingAuth) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-f1-red"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="card max-w-md w-full p-8 text-center">
+          <div className="text-5xl mb-4">📊</div>
+          <h1 className="text-2xl font-bold text-white mb-3 uppercase tracking-f1">{t('stats.teaserTitle')}</h1>
+          <p className="text-slate-400 mb-6">{t('stats.teaserDescription')}</p>
+          <div className="bg-f1-surface-elevated rounded-lg border border-f1-border p-4 mb-6 text-left">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('stats.teaserFeature1')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('stats.teaserFeature2')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-green-400 font-bold">✓</span>
+                <span className="text-slate-300">{t('stats.teaserFeature3')}</span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={login}
+            className="btn btn-primary inline-flex items-center"
+          >
+            <FacebookIcon className="w-4 h-4 mr-2" />
+            {t('predict.loginFacebook')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

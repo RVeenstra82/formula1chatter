@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import Layout from './components/common/Layout';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { Suspense, lazy } from 'react';
@@ -40,6 +40,18 @@ function PageLoader() {
   );
 }
 
+function NotFoundPage() {
+  const { t } = useLanguage();
+  return (
+    <div className="flex flex-col items-center justify-center py-24">
+      <div className="text-6xl mb-6">🏁</div>
+      <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-f1">{t('common.notFound')}</h1>
+      <p className="text-slate-400 mb-8">{t('common.pageNotFound')}</p>
+      <a href="/" className="btn btn-primary">{t('common.backToHome')}</a>
+    </div>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -62,14 +74,7 @@ function App() {
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/data-deletion" element={<DataDeletion />} />
                     <Route path="/donate" element={<DonatePage />} />
-                    <Route path="*" element={
-                      <div className="flex flex-col items-center justify-center py-24">
-                        <div className="text-6xl mb-6">🏁</div>
-                        <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-f1">{404}</h1>
-                        <p className="text-slate-400 mb-8">This page could not be found.</p>
-                        <a href="/" className="btn btn-primary">Back to Home</a>
-                      </div>
-                    } />
+                    <Route path="*" element={<NotFoundPage />} />
                   </Routes>
                 </Suspense>
               </Layout>

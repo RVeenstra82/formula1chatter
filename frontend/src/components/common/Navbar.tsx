@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center">
           <Link to="/" className="text-xl font-bold flex items-center">
             <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_var(--f1-red-glow)]">F1</span>
-            <span>Chatter Championship</span>
+            <span>{t('nav.brand')}</span>
           </Link>
 
           <div className="border-l border-f1-border pl-6 ml-6 flex space-x-2">
@@ -114,7 +114,7 @@ const Navbar: React.FC = () => {
           <div className="flex justify-between items-center">
             <Link to="/" className="text-lg font-bold flex items-center">
               <span className="text-f1-red mr-2 drop-shadow-[0_0_8px_var(--f1-red-glow)]">F1</span>
-              <span>Chatter</span>
+              <span>{t('nav.brandShort')}</span>
             </Link>
 
             <div className="flex items-center space-x-3">
